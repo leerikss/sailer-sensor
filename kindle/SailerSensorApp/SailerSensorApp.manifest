@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Main-Class: fi.leif.java.kindlet.milady.SailerSensorApp
+Description: Sailer Sensor
+Implementation-Title: Sailer Sensor
+Implementation-Version: 0.0.1
+Implementation-Vendor: Leif Eriksson
+Extension-List: SDK
+SDK-Extension-Name: com.amazon.kindle.kindlet
+SDK-Specification-Version: 1.2
+Toolbar-Mode: persistent
+Font-Size-Mode: point
+
