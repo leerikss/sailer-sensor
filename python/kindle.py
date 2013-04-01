@@ -24,13 +24,13 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 # Database
-DB = "/home/pi/.sailersensor/kindle.db"
-DDL = """CREATE TABLE IF NOT EXISTS kindle(
-             id         INTEGER PRIMARY KEY,
-             speed      REAL,
-             heading    REAL,
-             heeling    REAL);"""
-GPS_COL_ID = 10
+#DB = "/home/pi/.sailersensor/kindle.db"
+#DDL = """CREATE TABLE IF NOT EXISTS kindle(
+#             id         INTEGER PRIMARY KEY,
+#             speed      REAL,
+#             heading    REAL,
+#             heeling    REAL);"""
+#GPS_COL_ID = 10
 
 # GPS
 GPS_MIN_TRIES=5
@@ -42,38 +42,47 @@ SOCK_TIMEOUT = 5
 SOCK_PORT =    9000
 
 def main():
-    con = None
-    try:
-        logger.debug('Connecting to db "%s"...' % DB)
-        con = get_con()
-        init_db(con)
 
-        logger.debug('Getting previous db record for ID "%s"...' % GPS_COL_ID)  
-        prv = get_prev_msg(con,GPS_COL_ID)
-        logger.debug('Previous record: %s' % prv)
+#    con = None
+
+    prev_rec = None
+
+    while (True):
+        try:
+            # logger.debug('Connecting to db "%s"...' % DB)
+            # con = get_con()
+            # init_db(con)
+
+            # logger.debug('Getting previous db record for ID "%s"...' % GPS_COL_ID)  
+            # prv = get_prev_msg(con,GPS_COL_ID)
+            # logger.debug('Previous record: %s' % prv)
         
-        logger.debug('Getting GPS sensor data...')  
-        nxt = get_gps_data()
-        logger.debug('GPS sensor data: %s' % nxt)  
+            logger.debug('Getting GPS sensor data...')  
+            next_rec = get_gps_data()
+            logger.debug('GPS sensor data: %s' % next_rec)  
 
-        logger.debug('Getting message...')  
-        msg = get_msg_str(prv,nxt)
-        logger.debug('Message: %s' % msg)  
+            logger.debug('Getting message...')  
+            msg = get_msg_str(prev_rec,next_rec)
+            logger.debug('Message: %s' % msg)  
 
-        logger.debug('Sending message to Kindle (%s:%s)...' % (SOCK_HOST,SOCK_PORT) )  
-        send_to_kindle(msg)
+            logger.debug('Sending message to Kindle (%s:%s)...' % (SOCK_HOST,SOCK_PORT) )  
+            send_to_kindle(msg)
 
-        logger.debug('Storing GPS data into DB...')  
-        store_msg(con, GPS_COL_ID, nxt)
-        logger.debug('All successfull! Quitting.')  
+            prev_rec = next_rec
 
-    except Exception, e:
-        logger.exception(e)
-        sys.exit(1)
+            # logger.debug('Storing GPS data into DB...')  
+            # store_msg(con, GPS_COL_ID, nxt)
+            # logger.debug('All successfull! Quitting.')  
+            
+        except Exception, e:
+            logger.exception(e)
     
-    finally:
-        if con:
-            con.close()        
+        finally:
+            if con:
+                con.close()        
+
+        # Loop forever
+        time.sleep(1)
 
 def get_con():
     con = sqlite3.connect(DB)
