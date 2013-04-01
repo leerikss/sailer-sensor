@@ -1,45 +1,75 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# meerkat.probes.kindle
-#
 # Copyright 2013 Leif Eriksson
 #
 # Author: Leif Eriksson <leif@leif.fi>
 
 import sys
+import gps
 import sqlite3
-import json
 import socket
+import logging
+import logging.handlers
+import time
 
+# Logging
+LOG_FILE='/home/pi/.sailersensor/sailersensor.log'
+logger = logging.getLogger('SailerSensor.kindle')
+logger.setLevel(logging.DEBUG)
+handler = logging.handlers.RotatingFileHandler(
+          LOG_FILE, maxBytes=1048576, backupCount=3)
+formatter = logging.Formatter('[%(asctime)s] [%(name)s] [%(levelname)s]: %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
+# Database
+DB = "/home/pi/.sailersensor/kindle.db"
 DDL = """CREATE TABLE IF NOT EXISTS kindle(
+             id         INTEGER PRIMARY KEY,
              speed      REAL,
              heading    REAL,
-             heel       REAL);"""
-DB = "../../../data/meerkat.db"
-#SOCK_HOST = "192.168.2.2"
-SOCK_HOST = "127.0.0.1"
-SOCK_PORT = 8080
+             heeling    REAL);"""
+GPS_COL_ID = 10
+
+# GPS
+GPS_MIN_TRIES=5
+GPS_MAX_TRIES=10
+
+# Socket
+SOCK_HOST = "192.168.2.2"
+SOCK_TIMEOUT = 5
+SOCK_PORT =    9000
 
 def main():
     con = None
     try:
+        logger.debug('Connecting to db "%s"...' % DB)
         con = get_con()
         init_db(con)
-        gps = get_probe_data(con,'meerkat.probe.gps_info')
 
-        speed = gps[0]['speed']
-        head = gps[0]['heading']
-        heel = 0 # TODO: Retrieve
+        logger.debug('Getting previous db record for ID "%s"...' % GPS_COL_ID)  
+        prv = get_prev_msg(con,GPS_COL_ID)
+        logger.debug('Previous record: %s' % prv)
+        
+        logger.debug('Getting GPS sensor data...')  
+        nxt = get_gps_data()
+        logger.debug('GPS sensor data: %s' % nxt)  
 
-        # TODO: Add logic when to save to kindle
-        send_to_kindle(speed,head,heel)
-        store_kindle_msg(con,speed,head,0)
+        logger.debug('Getting message...')  
+        msg = get_msg_str(prv,nxt)
+        logger.debug('Message: %s' % msg)  
 
+        logger.debug('Sending message to Kindle (%s:%s)...' % (SOCK_HOST,SOCK_PORT) )  
+        send_to_kindle(msg)
 
-#    except:
-#        print "Error %s:" % sys.exc_info()[0]
-#        sys.exit(1)
+        logger.debug('Storing GPS data into DB...')  
+        store_msg(con, GPS_COL_ID, nxt)
+        logger.debug('All successfull! Quitting.')  
+
+    except Exception, e:
+        logger.exception(e)
+        sys.exit(1)
     
     finally:
         if con:
@@ -53,24 +83,85 @@ def init_db(con):
     cur = con.cursor()
     cur.execute(DDL)
 
-def get_probe_data(con,probe_id):
-    sql = "select data from probe_data where probe_id=? order by timestamp desc limit 1";
+def get_prev_msg(con,id):
+    sql = "select speed,heading,heeling from kindle where id=?";
     cur = con.cursor()
-    for row in cur.execute(sql,[probe_id]):
-        return json.loads( str( row[0] ) )
+    row = cur.execute(sql,[id]).fetchone()
+    if row is not None:
+        return {
+            "speed": row[0],
+            "heading": row[1],
+            "heeling": row[2]
+        }
+    else:
+        return None
 
-def send_to_kindle(speed,head,heel):
-    msg = ("SP%f HD%f HL%f" % (speed,head,heel))
-#    print msg
+def get_gps_data():
+
+    i=1;
+    session = gps.gps(mode=gps.WATCH_ENABLE)    
+
+    while True:
+
+        packet = session.next()
+
+        if packet['class'] == 'TPV':
+
+            session.close()
+
+            ret = {
+                "speed":     packet.get('speed', '?'),
+                "heading":     packet.get('track', '?'),
+                "heeling": 0 # TODO: Maybe add this somewhere else
+            }
+
+            return ret
+
+        else:
+            # TODO: Make this better
+            i+=1
+
+            if( i > GPS_MIN_TRIES):
+                    time.sleep(1)
+                    logger.debug("get_gps_data(): Try nr %s. Running session.next()..." % (i-GPS_MIN_TRIES) )
+
+
+            if(i > GPS_MAX_TRIES):
+                session.close()
+                raise Exception("Unable to retrieve GPS data. Quitting loop.")
+            
+
+def get_msg_str(prv,nxt):
+    msg = build_msg( 'SP', prv, nxt, 'speed', 1 ) + \
+        build_msg( 'HD', prv, nxt, 'heading', 0 ) + \
+        build_msg( 'HL', prv, nxt, 'heeling', 0 )
+    return msg
+
+def build_msg(id,prv,nxt,attr,r):
+    try:
+        if (prv is None) or ( prv[attr] <> nxt[attr] ):
+            val = round( nxt[attr], r) if r > 0 else int(nxt[attr])
+            return '%s%s ' % ( id, val)
+        else:
+            return ''
+    except:
+        return ''
+
+def send_to_kindle(msg):
+
+    if len(msg) == 0:
+        return
+
     sock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    sock.settimeout(SOCK_TIMEOUT)
     sock.connect((SOCK_HOST,SOCK_PORT))
+    sock.settimeout(None)
     sock.send(msg)
 
-def store_kindle_msg(con,speed,head,heel):
+def store_msg(con,id,data):
     cur = con.cursor()
-    cur.execute("DELETE FROM kindle")
-    sql = "INSERT INTO kindle(speed,heading,heel) VALUES (?,?,?)"
-    cur.execute(sql,(speed,head,heel))
+    sql = "REPLACE INTO kindle(id,speed,heading,heeling) VALUES (?,?,?,?)"
+    cur.execute(sql,(id,data['speed'],data['heading'],data['heeling']))
     con.commit()
 
 if __name__ == '__main__': 
