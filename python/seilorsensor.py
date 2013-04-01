@@ -16,7 +16,8 @@ import time
 # Logging
 LOG_FILE='/home/pi/.sailersensor/sailersensor.log'
 logger = logging.getLogger('SailerSensor.kindle')
-logger.setLevel(logging.DEBUG)
+# logger.setLevel(logging.DEBUG) # Debug
+logger.setLevel(logging.ERROR) # Production
 handler = logging.handlers.RotatingFileHandler(
           LOG_FILE, maxBytes=1048576, backupCount=3)
 formatter = logging.Formatter('[%(asctime)s] [%(name)s] [%(levelname)s]: %(message)s')
@@ -31,6 +32,9 @@ logger.addHandler(handler)
 #             heading    REAL,
 #             heeling    REAL);"""
 #GPS_COL_ID = 10
+
+# Loop sleep in secs
+LOOP_SLEEP=1
 
 # GPS
 GPS_MIN_TRIES=5
@@ -77,12 +81,12 @@ def main():
         except Exception, e:
             logger.exception(e)
     
-        finally:
-            if con:
-                con.close()        
+#        finally:
+#            if con:
+#                con.close()        
 
-        # Loop forever
-        time.sleep(1)
+        # Loop
+        time.sleep(LOOP_SLEEP)
 
 def get_con():
     con = sqlite3.connect(DB)

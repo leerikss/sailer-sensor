@@ -21,7 +21,7 @@ fi
 HOSTNAME=$(hostname)
 sudo /home/pi/WORKING/rpi-mothership-client/client.py $HOSTNAME "From rc.local" >> /home/pi/WORKING/rpi-mothership-client/client.log
 
-# Start sailersensor.sh
-su pi -c "/home/pi/WORKING/sailer-sensor/shell/sailersensor.sh" &
+# Start sailersensor.py
+su pi -c "/usr/bin/python /home/pi/WORKING/sailer-sensor/python/sailersensor.py" &
 
 exit 0
