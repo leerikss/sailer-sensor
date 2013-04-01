@@ -22,6 +22,6 @@ HOSTNAME=$(hostname)
 sudo /home/pi/WORKING/rpi-mothership-client/client.py $HOSTNAME "From rc.local" >> /home/pi/WORKING/rpi-mothership-client/client.log
 
 # Start sailersensor.py
-su pi -c "/usr/bin/python /home/pi/WORKING/sailer-sensor/python/sailersensor.py" &
+su pi -c "/usr/bin/flock -n /home/pi/.sailersensor/.sailersensor.lockfile -c \"/usr/bin/python /home/pi/WORKING/sailer-sensor/python/sailersensor.py\"" &
 
 exit 0
