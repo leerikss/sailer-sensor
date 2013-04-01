@@ -32,7 +32,7 @@ public class Config
 	public final int DATA_FONT_SIZE = 210;
 	public final String FONTFAMILY = null;
 	
-	public final int SOCKET_PORT = 8080;
+	public final int SOCKET_PORT = 9000;
 	public final int SOCKET_SLEEP_ON_ERROR = 5000;
 	
 	public final String MSG_SEPARATOR = " ";
