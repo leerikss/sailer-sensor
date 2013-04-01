@@ -1,9 +1,9 @@
-package fi.leif.java.kindlet.milady.messagehandler;
+package fi.leif.java.kindlet.sailersensor.messagehandler;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import fi.leif.java.kindlet.milady.sensordisplay.SensorDisplay;
+import fi.leif.java.kindlet.sailersensor.sensordisplay.SensorDisplay;
 
 public class SensorDisplayMessageHandler implements MessageHandler 
 {

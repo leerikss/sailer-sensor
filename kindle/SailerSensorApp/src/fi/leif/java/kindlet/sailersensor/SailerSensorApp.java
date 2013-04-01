@@ -1,4 +1,4 @@
-package fi.leif.java.kindlet.milady;
+package fi.leif.java.kindlet.sailersensor;
 
 import java.awt.CardLayout;
 import java.awt.Container;
@@ -8,9 +8,9 @@ import com.amazon.kindle.kindlet.AbstractKindlet;
 import com.amazon.kindle.kindlet.KindletContext;
 import com.amazon.kindle.kindlet.ui.KPanel;
 
-import fi.leif.java.kindlet.milady.messagehandler.MessageHandler;
-import fi.leif.java.kindlet.milady.messagehandler.SensorDisplayMessageHandler;
-import fi.leif.java.kindlet.milady.sensordisplay.SensorDisplay;
+import fi.leif.java.kindlet.sailersensor.messagehandler.MessageHandler;
+import fi.leif.java.kindlet.sailersensor.messagehandler.SensorDisplayMessageHandler;
+import fi.leif.java.kindlet.sailersensor.sensordisplay.SensorDisplay;
 
 
 public class SailerSensorApp extends AbstractKindlet

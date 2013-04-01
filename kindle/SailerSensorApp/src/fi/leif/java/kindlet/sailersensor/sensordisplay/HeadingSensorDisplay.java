@@ -1,4 +1,4 @@
-package fi.leif.java.kindlet.milady.sensordisplay;
+package fi.leif.java.kindlet.sailersensor.sensordisplay;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.amazon.kindle.kindlet.ui.KLabel;
 
-import fi.leif.java.kindlet.milady.Config;
+import fi.leif.java.kindlet.sailersensor.Config;
 
 public class HeadingSensorDisplay extends SensorDisplay
 {

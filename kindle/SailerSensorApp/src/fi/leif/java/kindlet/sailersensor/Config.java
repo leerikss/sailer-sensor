@@ -1,9 +1,9 @@
-package fi.leif.java.kindlet.milady;
+package fi.leif.java.kindlet.sailersensor;
 
-import fi.leif.java.kindlet.milady.sensordisplay.CompassSensorDisplay;
-import fi.leif.java.kindlet.milady.sensordisplay.HeadingSensorDisplay;
-import fi.leif.java.kindlet.milady.sensordisplay.SensorDisplay;
-import fi.leif.java.kindlet.milady.sensordisplay.SpeedSensorDisplay;
+import fi.leif.java.kindlet.sailersensor.sensordisplay.CompassSensorDisplay;
+import fi.leif.java.kindlet.sailersensor.sensordisplay.HeadingSensorDisplay;
+import fi.leif.java.kindlet.sailersensor.sensordisplay.SensorDisplay;
+import fi.leif.java.kindlet.sailersensor.sensordisplay.SpeedSensorDisplay;
 
 public class Config 
 {

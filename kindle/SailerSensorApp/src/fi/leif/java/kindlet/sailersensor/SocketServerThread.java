@@ -1,4 +1,4 @@
-package fi.leif.java.kindlet.milady;
+package fi.leif.java.kindlet.sailersensor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -7,7 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 
-import fi.leif.java.kindlet.milady.messagehandler.MessageHandler;
+import fi.leif.java.kindlet.sailersensor.messagehandler.MessageHandler;
 
 public class SocketServerThread extends Thread
 {

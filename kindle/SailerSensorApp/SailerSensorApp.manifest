@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Main-Class: fi.leif.java.kindlet.milady.SailerSensorApp
+Main-Class: fi.leif.java.kindlet.sailersensor.SailerSensorApp
 Description: Sailer Sensor
 Implementation-Title: Sailer Sensor
 Implementation-Version: 0.0.1
