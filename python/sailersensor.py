@@ -12,6 +12,7 @@ import socket
 import logging
 import logging.handlers
 import time
+from copy import deepcopy
 
 # Logging
 LOG_FILE='/home/pi/.sailersensor/sailersensor.log'
@@ -62,23 +63,24 @@ def main():
             # prv = get_prev_msg(con,GPS_COL_ID)
             # logger.debug('Previous record: %s' % prv)
 
+            logger.debug('=========================')    
             logger.debug('main() while(True) starts')              
             logger.debug('Getting GPS sensor data...')  
             next_rec = get_gps_data()
-            logger.debug('GPS sensor data: %s' % next_rec)  
+            logger.debug('GPS sensor data: "%s"' % next_rec)  
 
-            logger.debug('Getting message...')  
+            logger.debug('Building message...')  
             msg = get_msg_str(prev_rec,next_rec)
-            logger.debug('Message: %s' % msg)  
+            logger.debug('Message: "%s"' % msg)  
 
             logger.debug('Sending message to Kindle (%s:%s)...' % (SOCK_HOST,SOCK_PORT) )  
             send_to_kindle(msg)
 
-            prev_rec = next_rec
+            prev_rec = deepcopy(next_rec)
 
             # logger.debug('Storing GPS data into DB...')  
             # store_msg(con, GPS_COL_ID, nxt)
-            logger.debug('main() while(True) ends')  
+            logger.debug('main() while(True) ends. All good.')  
             
         except Exception, e:
             logger.exception(e)
@@ -143,7 +145,7 @@ def get_gps_data():
 
             if(i > GPS_MAX_TRIES):
                 session.close()
-                raise Exception("Unable to retrieve GPS data. Quitting loop.")
+                raise Exception("Unable to retrieve data from GPS sensor. Quitting loop.")
             
 
 def get_msg_str(prv,nxt):
@@ -171,6 +173,7 @@ def build_msg(id,prv,nxt,attr,mult=1,dig=0):
 def send_to_kindle(msg):
 
     if len(msg) == 0:
+        logger.debug('Message is empty. Not sending anything to Kindle')
         return
 
     sock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
