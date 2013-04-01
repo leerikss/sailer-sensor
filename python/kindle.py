@@ -132,15 +132,21 @@ def get_gps_data():
             
 
 def get_msg_str(prv,nxt):
-    msg = build_msg( 'SP', prv, nxt, 'speed', 1 ) + \
-        build_msg( 'HD', prv, nxt, 'heading', 0 ) + \
-        build_msg( 'HL', prv, nxt, 'heeling', 0 )
+    msg = build_msg( 'SP', prv, nxt, 'speed', 2, 1 ) + \
+        build_msg( 'HD', prv, nxt, 'heading' ) + \
+        build_msg( 'HL', prv, nxt, 'heeling' )
     return msg
 
-def build_msg(id,prv,nxt,attr,r):
+def build_msg(id,prv,nxt,attr,mult=1,dig=0):
     try:
         if (prv is None) or ( prv[attr] <> nxt[attr] ):
-            val = round( nxt[attr], r) if r > 0 else int(nxt[attr])
+            val = nxt[attr]
+            if(mult > 1):
+                val = val * mult
+            if(dig > 0):
+                val = round(val,dig)
+            else:
+                val = int(val)
             return '%s%s ' % ( id, val)
         else:
             return ''
