@@ -52,6 +52,7 @@ def main():
     prev_rec = None
 
     while (True):
+
         try:
             # logger.debug('Connecting to db "%s"...' % DB)
             # con = get_con()
@@ -60,7 +61,8 @@ def main():
             # logger.debug('Getting previous db record for ID "%s"...' % GPS_COL_ID)  
             # prv = get_prev_msg(con,GPS_COL_ID)
             # logger.debug('Previous record: %s' % prv)
-        
+
+            logger.debug('main() while(True) starts')              
             logger.debug('Getting GPS sensor data...')  
             next_rec = get_gps_data()
             logger.debug('GPS sensor data: %s' % next_rec)  
@@ -76,7 +78,7 @@ def main():
 
             # logger.debug('Storing GPS data into DB...')  
             # store_msg(con, GPS_COL_ID, nxt)
-            # logger.debug('All successfull! Quitting.')  
+            logger.debug('main() while(True) ends')  
             
         except Exception, e:
             logger.exception(e)
