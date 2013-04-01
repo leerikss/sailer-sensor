@@ -141,7 +141,7 @@ def build_msg(id,prv,nxt,attr,mult=1,dig=0):
     try:
         if (prv is None) or ( prv[attr] <> nxt[attr] ):
             val = nxt[attr]
-            if(mult > 1):
+            if(mult <> 1):
                 val = val * mult
             if(dig > 0):
                 val = round(val,dig)
