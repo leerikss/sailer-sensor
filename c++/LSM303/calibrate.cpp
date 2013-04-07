@@ -35,7 +35,7 @@ int main(void)
 	     (int16_t)mag_max.x,(int16_t)mag_max.y,(int16_t)mag_max.z,(int16_t)mag_min.x,(int16_t)mag_min.y,(int16_t)mag_min.z,
 	     (int16_t)acc_max.x,(int16_t)acc_max.y,(int16_t)acc_max.z,(int16_t)acc_min.x,(int16_t)acc_min.y,(int16_t)acc_min.z);
 
-      usleep(100);
+      usleep(100000);
     }
 
 }

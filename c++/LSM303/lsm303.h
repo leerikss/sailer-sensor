@@ -79,6 +79,12 @@ class lsm303
   vector a; // accelerometer readings
   vector m; // magnetometer readings
 
+  // Invert values if needed
+  float inv_acc_x;
+  float inv_acc_y;
+  float inv_acc_z;
+  float inv_mag;
+
   lsm303(const char * i2cDeviceName);
 
   uint8_t readAccRegister(uint8_t regAddr);
@@ -89,23 +95,21 @@ class lsm303
   void readAccelerationRaw(void);
   void readMagnetometerRaw(void);
   void readAcceleration(void);
+  static float scale(float x, float a1, float a2, float b1, float b2);
+
   int heading(void);
   int heading(vector from);
-
-  // vector functions
   static void vector_cross(const vector *a, const vector *b, vector *out);
   static float vector_dot(const vector *a,const vector *b);
   static void vector_normalize(vector *a);
     
  private:
   I2CBus i2c_lsm303;
-  static float map(float x, float a1, float a2, float b1, float b2);
 
   vector m_max; // maximum magnetometer values, used for calibration
   vector m_min; // minimum magnetometer values, used for calibration
   vector a_max; // maximum accelerometer values, used for calibration
   vector a_min; // minimum accelerometer values, used for calibration
-  int flip; // -1 If chip is upside down, 1 if not
 };
 
 #endif

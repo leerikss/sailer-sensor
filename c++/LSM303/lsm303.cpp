@@ -1,7 +1,5 @@
 #include"lsm303.h"
 #include<math.h>
-#include<stdio.h>
-#include <stdio.h>
 
 /*Conection to Raspberry PI:
   LSM303     Raspberry PI
@@ -18,15 +16,15 @@ lsm303::lsm303(const char * i2cDeviceName) : i2c_lsm303(i2cDeviceName)
 {
   // Maximum values fetched titling sensor while running calibrate.
 
-  // TODO: Get these from a textfile
-  m_max.x = 767;  m_max.y = 369; m_max.z = 427;
-  m_min.x = -671;  m_min.y = -907;  m_min.z = -559;
+  // TODO: Get these from a config file
+  m_max.x = 539;   m_max.y = 336;   m_max.z = 405;
+  m_min.x = -619;  m_min.y = -860;  m_min.z = -549;
 
-  a_max.x = 1036; a_max.y = 1285; a_max.z = 1104;
-  a_min.x = -1120; a_min.y = -1107; a_min.z = -1067;
+  a_max.x = 1021; a_max.y = 1089; a_max.z = 1193;
+  a_min.x = -1118; a_min.y = -1068; a_min.z = -1137;
 
-  flip = -1;
-
+  inv_acc_x = -1; inv_acc_y = 1; inv_acc_z = -1;
+  inv_mag = -1;
 }
 
 uint8_t lsm303::readAccRegister(uint8_t regAddr)
@@ -91,9 +89,16 @@ void lsm303::readMagnetometerRaw(void)
 void lsm303::readAcceleration(void)
 {
   readAccelerationRaw();
-  a.x = map( a.x, a_min.x, a_max.x, -90, 90) * flip;
-  a.y = map( a.y, a_min.y, a_max.y, -90, 90) * flip;
-  a.z = map( a.z, a_min.z, a_max.z, -90, 90) * flip;
+  a.x = scale( a.x, a_min.x, a_max.x, -90, 90) * inv_acc_x;
+  a.y = scale( a.y, a_min.y, a_max.y, -90, 90) * inv_acc_y;
+  a.z = scale( a.z, a_min.z, a_max.z, -90, 90) * inv_acc_z;
+}
+
+float lsm303::scale(float x, float a1, float a2, float b1, float b2)
+{
+  if(x<a1) return b1;
+  else if(x>a2) return b2;
+  else return (x-a1) / (a2-a1) * (b2-b1) + b1;
 }
 
 // Returns the number of degrees from the -Y axis that it
@@ -134,7 +139,7 @@ int lsm303::heading(vector from)
   vector_cross(&temp_a, &E, &N);
 
   // compute heading
-  int heading = round(atan2(vector_dot(&E, &from), vector_dot(&N, &from)) * 180 / M_PI);
+  int heading = round(atan2(vector_dot(&E, &from), vector_dot(&N, &from)) * 180 / M_PI) * inv_mag;
   if (heading < 0) heading += 360;
   return heading;
 }
@@ -157,13 +162,6 @@ void lsm303::vector_normalize(vector *a)
   a->x /= mag;
   a->y /= mag;
   a->z /= mag;
-}
-
-float lsm303::map(float x, float a1, float a2, float b1, float b2)
-{
-  if(x<a1) return b1;
-  else if(x>a2) return b2;
-  else return (x-a1) / (a2-a1) * (b2-b1) + b1;
 }
 
 
