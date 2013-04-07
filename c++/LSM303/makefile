@@ -1,8 +1,8 @@
+serial: serial.o lsm303.o I2C_bus.o smbus.o
+	g++ serial.o lsm303.o I2C_bus.o smbus.o -o serial.bin
+
 calibrate: calibrate.o lsm303.o I2C_bus.o smbus.o
 	g++ calibrate.o lsm303.o I2C_bus.o smbus.o -o calibrate.bin
-
-serial: serial.o lsm303.o I2C_bus.o smbus.o
-	g++ calibrate.o lsm303.o I2C_bus.o smbus.o -o serial.bin
 
 serial.o: serial.o
 	g++ -c serial.cpp -o serial.o

@@ -32,9 +32,10 @@ int main(void)
       acc_max.z = std::max(acc_max.z, sensor.a.z);
 
       printf("\e[27;1;31m Mag Max: X=%d Y=%d Z=%d :: Mag Min:\e[27;1;31m X=%d Y=%d Z=%d   \e[27;1;34m Acc Max: X=%d Y=%d Z=%d :: Acc Min:\e[27;1;34m X=%d Y=%d Z=%d\e[m\n",
-	     mag_max.x,mag_max.y,mag_max.z,mag_min.x,mag_min.y,mag_min.z,acc_max.x,acc_max.y,acc_max.z,acc_min.x,acc_min.y,acc_min.z);
+	     (int16_t)mag_max.x,(int16_t)mag_max.y,(int16_t)mag_max.z,(int16_t)mag_min.x,(int16_t)mag_min.y,(int16_t)mag_min.z,
+	     (int16_t)acc_max.x,(int16_t)acc_max.y,(int16_t)acc_max.z,(int16_t)acc_min.x,(int16_t)acc_min.y,(int16_t)acc_min.z);
 
-      sleep(1);
+      usleep(100);
     }
 
 }
