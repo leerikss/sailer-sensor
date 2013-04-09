@@ -11,6 +11,7 @@
 
 #define LSM303DLHC_MAG_ADDRESS            (0x3C >> 1)
 #define LSM303DLHC_ACC_ADDRESS            (0x32 >> 1)
+#define RADIUS                            320 / M_PI;
 
 lsm303::lsm303(const char * i2cDeviceName) : i2c_lsm303(i2cDeviceName)
 {
@@ -97,7 +98,7 @@ void lsm303::readAccPitch(void)
   float y = a.y - flat.y;
   float z = a.z - flat.z;
 
-  a_roll = atan(  x / sqrt(y * y + z * z) ) * 320 / M_PI;
+  a_pitch = atan(  x / sqrt(y * y + z * z) ) * RADIUS;
 }
 
 // Returns the number of degrees from the -Y axis that it

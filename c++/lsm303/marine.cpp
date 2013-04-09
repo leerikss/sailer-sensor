@@ -15,7 +15,7 @@ int main(void)
       sensor.readMagRaw();
 
       printf("\e[27;1;31mAcc Roll: %d°\e[m    \e[27;1;34mMag Heading: %d°\e[m\n",
-	     (int)sensor.a_roll, (int)sensor.heading() );
+	     (int)sensor.a_pitch, (int)sensor.heading() );
 
       usleep(100000);
     }

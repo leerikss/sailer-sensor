@@ -79,27 +79,27 @@ class lsm303
   vector m; // magnetometer reading raw data
   vector flat; // x,y,z of values when device is flat (tilted or not)
   float a_pitch; // Accelerometer pich
-  float a_roll; // Accelerometer roll
   
   lsm303(const char * i2cDeviceName);
 
-  void setAccRatios(void);
-  uint8_t readAccRegister(uint8_t regAddr);
-  uint8_t readMagRegister(uint8_t regAddr);
-  void writeAccRegister(uint8_t regAddr, uint8_t byte);
-  void writeMagRegister(uint8_t regAddr, uint8_t bytte);
   void enable(void);
   void readAccRaw(void);
   void readMagRaw(void);
   void readAccPitch(void);
   int heading(void);
   int heading(vector from);
-  static void vector_cross(const vector *a, const vector *b, vector *out);
-  static float vector_dot(const vector *a,const vector *b);
-  static void vector_normalize(vector *a);
     
  private:
   I2CBus i2c_lsm303;
+
+  uint8_t readAccRegister(uint8_t regAddr);
+  uint8_t readMagRegister(uint8_t regAddr);
+  void writeAccRegister(uint8_t regAddr, uint8_t byte);
+  void writeMagRegister(uint8_t regAddr, uint8_t bytte);
+
+  static void vector_cross(const vector *a, const vector *b, vector *out);
+  static float vector_dot(const vector *a,const vector *b);
+  static void vector_normalize(vector *a);
 
   vector m_max; // maximum magnetometer values, used for calibration
   vector m_min; // minimum magnetometer values, used for calibration
