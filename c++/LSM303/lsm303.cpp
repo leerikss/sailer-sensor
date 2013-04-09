@@ -16,15 +16,17 @@ lsm303::lsm303(const char * i2cDeviceName) : i2c_lsm303(i2cDeviceName)
 {
   // Maximum values fetched titling sensor while running calibrate.
 
-  // TODO: Get these from a config file
-  m_max.x = 539;   m_max.y = 336;   m_max.z = 405;
-  m_min.x = -619;  m_min.y = -860;  m_min.z = -549;
+  // Set these values by running ./calibrate.bin and turning the sensor in all directions
+  m_max.x = 568;    m_max.y = 374;    m_max.z = 484;
+  m_min.x = -669;   m_min.y = -924;   m_min.z = -567;
 
-  a_max.x = 1021; a_max.y = 1089; a_max.z = 1193;
-  a_min.x = -1118; a_min.y = -1068; a_min.z = -1137;
+  // Set these values by running ./serial.bin, setting inverted Acc: X,Y,Z values (= * -1)
+  flat.x = 29; flat.y = 13; flat.z = -971;
+  //flat.x = 722; flat.y = 13; flat.z = -632;
+  //flat.x = -134; flat.y = 12; flat.z = -972;
 
-  inv_acc_x = -1; inv_acc_y = 1; inv_acc_z = -1;
-  inv_mag = -1;
+  // Always positive z
+  flat.z = (flat.z<0) ? (flat.z*-1) : flat.z;
 }
 
 uint8_t lsm303::readAccRegister(uint8_t regAddr)
@@ -61,7 +63,7 @@ void lsm303::enable(void)
   writeMagRegister(LSM303_MR_REG, 0x00);
 }
 
-void lsm303::readAccelerationRaw(void)
+void lsm303::readAccRaw(void)
 {
   uint8_t block[6];
 
@@ -74,7 +76,7 @@ void lsm303::readAccelerationRaw(void)
   a.z = ((int16_t)(block[4] | block[5] << 8) >> 4);
 } 
 
-void lsm303::readMagnetometerRaw(void)
+void lsm303::readMagRaw(void)
 {
   uint8_t block[6];
 
@@ -86,19 +88,15 @@ void lsm303::readMagnetometerRaw(void)
   m.z = (int16_t)(block[3] | block[2] << 8);
 }
 
-void lsm303::readAcceleration(void)
+void lsm303::readAccRow(void)
 {
-  readAccelerationRaw();
-  a.x = scale( a.x, a_min.x, a_max.x, -90, 90) * inv_acc_x;
-  a.y = scale( a.y, a_min.y, a_max.y, -90, 90) * inv_acc_y;
-  a.z = scale( a.z, a_min.z, a_max.z, -90, 90) * inv_acc_z;
-}
+  readAccRaw();
+  
+  float x = a.x - flat.x;
+  float y = a.y - flat.y;
+  float z = a.z - flat.z;
 
-float lsm303::scale(float x, float a1, float a2, float b1, float b2)
-{
-  if(x<a1) return b1;
-  else if(x>a2) return b2;
-  else return (x-a1) / (a2-a1) * (b2-b1) + b1;
+  a_roll = atan(  x / sqrt(y * y + z * z) ) * 320 / M_PI;
 }
 
 // Returns the number of degrees from the -Y axis that it
@@ -139,7 +137,7 @@ int lsm303::heading(vector from)
   vector_cross(&temp_a, &E, &N);
 
   // compute heading
-  int heading = round(atan2(vector_dot(&E, &from), vector_dot(&N, &from)) * 180 / M_PI) * inv_mag;
+  int heading = round(atan2(vector_dot(&E, &from), vector_dot(&N, &from)) * 180 / M_PI);
   if (heading < 0) heading += 360;
   return heading;
 }

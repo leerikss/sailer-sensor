@@ -72,31 +72,27 @@ class lsm303
 
   typedef struct vector
   {
-    // int16_t x, y, z;
     float x, y, z;
   } vector;
 
-  vector a; // accelerometer readings
-  vector m; // magnetometer readings
-
-  // Invert values if needed
-  float inv_acc_x;
-  float inv_acc_y;
-  float inv_acc_z;
-  float inv_mag;
-
+  vector a; // accelerometer readings raw data
+  vector m; // magnetometer reading raw data
+  vector flat; // x,y,z of values when device is flat (tilted or not)
+  float a_pitch; // Accelerometer pich
+  float a_roll; // Accelerometer roll
+  
   lsm303(const char * i2cDeviceName);
 
+  void setAccRatios(void);
   uint8_t readAccRegister(uint8_t regAddr);
   uint8_t readMagRegister(uint8_t regAddr);
   void writeAccRegister(uint8_t regAddr, uint8_t byte);
   void writeMagRegister(uint8_t regAddr, uint8_t bytte);
   void enable(void);
-  void readAccelerationRaw(void);
-  void readMagnetometerRaw(void);
-  void readAcceleration(void);
-  static float scale(float x, float a1, float a2, float b1, float b2);
-
+  void readAccRaw(void);
+  void readMagRaw(void);
+  void readAccRow(void);
+  int addTilt(float angle, float tilt);
   int heading(void);
   int heading(vector from);
   static void vector_cross(const vector *a, const vector *b, vector *out);
@@ -110,6 +106,7 @@ class lsm303
   vector m_min; // minimum magnetometer values, used for calibration
   vector a_max; // maximum accelerometer values, used for calibration
   vector a_min; // minimum accelerometer values, used for calibration
+  float cal_mag; // Calibrate magnet
 };
 
 #endif

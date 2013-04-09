@@ -14,8 +14,8 @@ int main(void)
 
   while(1)
     {
-      sensor.readAccelerationRaw();
-      sensor.readMagnetometerRaw();
+      sensor.readAccRaw();
+      sensor.readMagRaw();
 
       mag_min.x = std::min(mag_min.x, sensor.m.x);
       mag_min.y = std::min(mag_min.y, sensor.m.y);
@@ -31,7 +31,7 @@ int main(void)
       acc_max.y = std::max(acc_max.y, sensor.a.y);
       acc_max.z = std::max(acc_max.z, sensor.a.z);
 
-      printf("\e[27;1;31m Mag Max: X=%d Y=%d Z=%d :: Mag Min:\e[27;1;31m X=%d Y=%d Z=%d   \e[27;1;34m Acc Max: X=%d Y=%d Z=%d :: Acc Min:\e[27;1;34m X=%d Y=%d Z=%d\e[m\n",
+      printf("\e[27;1;31m Mag Max: X=%d Y=%d Z=%d    Mag Min:\e[27;1;31m X=%d Y=%d Z=%d   \e[27;1;34m Acc Max: X=%d Y=%d Z=%d    Acc Min:\e[27;1;34m X=%d Y=%d Z=%d\e[m\n",
 	     (int16_t)mag_max.x,(int16_t)mag_max.y,(int16_t)mag_max.z,(int16_t)mag_min.x,(int16_t)mag_min.y,(int16_t)mag_min.z,
 	     (int16_t)acc_max.x,(int16_t)acc_max.y,(int16_t)acc_max.z,(int16_t)acc_min.x,(int16_t)acc_min.y,(int16_t)acc_min.z);
 
