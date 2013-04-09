@@ -91,8 +91,7 @@ class lsm303
   void enable(void);
   void readAccRaw(void);
   void readMagRaw(void);
-  void readAccRow(void);
-  int addTilt(float angle, float tilt);
+  void readAccPitch(void);
   int heading(void);
   int heading(vector from);
   static void vector_cross(const vector *a, const vector *b, vector *out);
@@ -106,7 +105,6 @@ class lsm303
   vector m_min; // minimum magnetometer values, used for calibration
   vector a_max; // maximum accelerometer values, used for calibration
   vector a_min; // minimum accelerometer values, used for calibration
-  float cal_mag; // Calibrate magnet
 };
 
 #endif

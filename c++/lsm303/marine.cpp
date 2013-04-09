@@ -11,7 +11,7 @@ int main(void)
 
   while(1)
     {
-      sensor.readAccRow();
+      sensor.readAccPitch();
       sensor.readMagRaw();
 
       printf("\e[27;1;31mAcc Roll: %d°\e[m    \e[27;1;34mMag Heading: %d°\e[m\n",

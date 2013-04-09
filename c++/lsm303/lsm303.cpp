@@ -24,6 +24,7 @@ lsm303::lsm303(const char * i2cDeviceName) : i2c_lsm303(i2cDeviceName)
   flat.x = 29; flat.y = 13; flat.z = -971;
   //flat.x = 722; flat.y = 13; flat.z = -632;
   //flat.x = -134; flat.y = 12; flat.z = -972;
+  // flat.x = 54; flat.y = -395; flat.z = -895;
 
   // abs flat.z
   flat.z = (flat.z<0) ? (flat.z*-1) : flat.z;
@@ -88,7 +89,7 @@ void lsm303::readMagRaw(void)
   m.z = (int16_t)(block[3] | block[2] << 8);
 }
 
-void lsm303::readAccRow(void)
+void lsm303::readAccPitch(void)
 {
   readAccRaw();
   
