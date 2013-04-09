@@ -16,16 +16,16 @@ lsm303::lsm303(const char * i2cDeviceName) : i2c_lsm303(i2cDeviceName)
 {
   // Maximum values fetched titling sensor while running calibrate.
 
-  // Set these values by running ./calibrate.bin and turning the sensor in all directions
+  // Set these values by running ./calibrate.bin, turn the sensor in all dirs, and copy the Mag values
   m_max.x = 568;    m_max.y = 374;    m_max.z = 484;
   m_min.x = -669;   m_min.y = -924;   m_min.z = -567;
 
-  // Set these values by running ./serial.bin, setting inverted Acc: X,Y,Z values (= * -1)
+  // Set these values by running ./serial.bin and copy the Acc: X,Y,Z values here
   flat.x = 29; flat.y = 13; flat.z = -971;
   //flat.x = 722; flat.y = 13; flat.z = -632;
   //flat.x = -134; flat.y = 12; flat.z = -972;
 
-  // Always positive z
+  // abs flat.z
   flat.z = (flat.z<0) ? (flat.z*-1) : flat.z;
 }
 
