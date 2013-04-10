@@ -1,0 +1,4 @@
+Libraries required to build:
+===========================
+libconfig++9
+

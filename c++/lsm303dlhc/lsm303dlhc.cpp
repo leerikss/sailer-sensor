@@ -1,63 +1,68 @@
-#include"lsm303.h"
+#include"lsm303dlhc.h"
 #include<math.h>
+#include <libconfig.h++>
+
+using namespace libconfig;
 
 /*Conection to Raspberry PI:
   LSM303     Raspberry PI
   VDD    ->  3V3(PIN 1)
   SDA    ->  SDA(PIN 3)
   SCL    ->  SCL(PIN 5)
-  GND    ->  GND(PIN 6)
+  GND    ->  GND(PIN 6)set
 */
 
 #define LSM303DLHC_MAG_ADDRESS            (0x3C >> 1)
 #define LSM303DLHC_ACC_ADDRESS            (0x32 >> 1)
-#define RADIUS                            320 / M_PI;
+#define R                                 320 / M_PI;
 
-lsm303::lsm303(const char * i2cDeviceName) : i2c_lsm303(i2cDeviceName)
+lsm303dlhc::lsm303dlhc(const char *i2cDeviceName, const Setting &cfg) : i2c_lsm303(i2cDeviceName)
 {
-  // Maximum values fetched titling sensor while running calibrate.
-
-  // Set these values by running ./calibrate.bin, turn the sensor in all dirs, and copy the Mag values
-  m_max.x = 568;    m_max.y = 374;    m_max.z = 484;
-  m_min.x = -669;   m_min.y = -924;   m_min.z = -567;
-
-  // Set these values by running ./serial.bin and copy the Acc: X,Y,Z values here
-  flat.x = 29; flat.y = 13; flat.z = -971;
-  //flat.x = 722; flat.y = 13; flat.z = -632;
-  //flat.x = -134; flat.y = 12; flat.z = -972;
-  // flat.x = 54; flat.y = -395; flat.z = -895;
-
-  // abs flat.z
-  flat.z = (flat.z<0) ? (flat.z*-1) : flat.z;
+  // Read in magnetometer settings
+  const Setting &max = cfg["magnetometer"]["max"];
+  max.lookupValue("x", m_max.x);
+  max.lookupValue("y", m_max.y);
+  max.lookupValue("z", m_max.z);
+  const Setting &min = cfg["magnetometer"]["min"];
+  min.lookupValue("x", m_min.x);
+  min.lookupValue("y", m_min.y);
+  min.lookupValue("z", m_min.z);
+  // Read in accelerometer settings
+  const Setting &init = cfg["accelerometer"]["init"];
+  init.lookupValue("x", a_init.x);
+  init.lookupValue("y", a_init.y);
+  init.lookupValue("z", a_init.z);
+  // Acc init must be abs
+  a_init.z = (a_init.z<0) ? (a_init.z*-1) : a_init.z;
 }
 
-uint8_t lsm303::readAccRegister(uint8_t regAddr)
+uint8_t lsm303dlhc::readAccRegister(uint8_t regAddr)
 {
   i2c_lsm303.addrSet(LSM303DLHC_ACC_ADDRESS);
   return i2c_lsm303.readByte(regAddr);
 }
 
-uint8_t lsm303::readMagRegister(uint8_t regAddr)
+uint8_t lsm303dlhc::readMagRegister(uint8_t regAddr)
 {
   i2c_lsm303.addrSet(LSM303DLHC_MAG_ADDRESS);
   return i2c_lsm303.readByte(regAddr);
 }
 
-void lsm303::writeAccRegister(uint8_t regAddr,uint8_t byte)
+void lsm303dlhc::writeAccRegister(uint8_t regAddr,uint8_t byte)
 {
   i2c_lsm303.addrSet(LSM303DLHC_ACC_ADDRESS);
   i2c_lsm303.writeByte(regAddr, byte);
 
 }
 
-void lsm303::writeMagRegister(uint8_t regAddr, uint8_t byte)
+void lsm303dlhc::writeMagRegister(uint8_t regAddr, uint8_t byte)
 {
   i2c_lsm303.addrSet(LSM303DLHC_MAG_ADDRESS);
   i2c_lsm303.writeByte(regAddr, byte);
 
 }
 
-void lsm303::enable(void)
+void lsm303dlhc::enable(void)
 {
   writeAccRegister(LSM303_CTRL_REG1, 0b00100111);
   writeAccRegister(LSM303_CTRL_REG4, 0b00001000);
@@ -65,7 +70,7 @@ void lsm303::enable(void)
   writeMagRegister(LSM303_MR_REG, 0x00);
 }
 
-void lsm303::readAccRaw(void)
+void lsm303dlhc::readAccRaw(void)
 {
   uint8_t block[6];
 
@@ -78,7 +83,7 @@ void lsm303::readAccRaw(void)
   a.z = ((int16_t)(block[4] | block[5] << 8) >> 4);
 } 
 
-void lsm303::readMagRaw(void)
+void lsm303dlhc::readMagRaw(void)
 {
   uint8_t block[6];
 
@@ -90,20 +95,20 @@ void lsm303::readMagRaw(void)
   m.z = (int16_t)(block[3] | block[2] << 8);
 }
 
-void lsm303::readAccPitch(void)
+void lsm303dlhc::readAccPitch(void)
 {
   readAccRaw();
   
-  float x = a.x - flat.x;
-  float y = a.y - flat.y;
-  float z = a.z - flat.z;
+  float x = a.x - a_init.x;
+  float y = a.y - a_init.y;
+  float z = a.z - a_init.z;
 
-  a_pitch = atan(  x / sqrt(y * y + z * z) ) * RADIUS;
+  a_pitch = atan(  x / sqrt(y * y + z * z) ) * R;
 }
 
 // Returns the number of degrees from the -Y axis that it
 // is pointing.
-int lsm303::heading(void)
+int lsm303dlhc::heading(void)
 {
   return heading((vector){0,-1,0});
 }
@@ -119,7 +124,7 @@ int lsm303::heading(void)
 // horizontal plane. The From vector is projected into the horizontal
 // plane and the angle between the projected vector and north is
 // returned.
-int lsm303::heading(vector from)
+int lsm303dlhc::heading(vector from)
 {
   // shift and scale
   m.x = (m.x - m_min.x) / (m_max.x - m_min.x) * 2 - 1.0;
@@ -144,19 +149,19 @@ int lsm303::heading(vector from)
   return heading;
 }
 
-void lsm303::vector_cross(const vector *a,const vector *b, vector *out)
+void lsm303dlhc::vector_cross(const vector *a,const vector *b, vector *out)
 {
   out->x = a->y*b->z - a->z*b->y;
   out->y = a->z*b->x - a->x*b->z;
   out->z = a->x*b->y - a->y*b->x;
 }
 
-float lsm303::vector_dot(const vector *a,const vector *b)
+float lsm303dlhc::vector_dot(const vector *a,const vector *b)
 {
   return a->x*b->x+a->y*b->y+a->z*b->z;
 }
 
-void lsm303::vector_normalize(vector *a)
+void lsm303dlhc::vector_normalize(vector *a)
 {
   float mag = sqrt(vector_dot(a,a));
   a->x /= mag;

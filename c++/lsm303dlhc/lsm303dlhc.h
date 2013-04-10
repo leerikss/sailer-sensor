@@ -1,7 +1,10 @@
-#ifndef lsm303_h
-#define lsm303_h
-#include <stdint.h>
+#ifndef lsm303dlhc_h
+#define lsm303dlhc_h
+
 #include"I2C_Bus.h"
+#include <libconfig.h++>
+
+using namespace libconfig;
 
 // register addresses map
 
@@ -65,7 +68,7 @@
 #define LSM303DLHC_OUT_Y_H     0x07
 #define LSM303DLHC_OUT_Y_L     0x08
 
-class lsm303
+class lsm303dlhc
 {
 
  public:
@@ -77,10 +80,9 @@ class lsm303
 
   vector a; // accelerometer readings raw data
   vector m; // magnetometer reading raw data
-  vector flat; // x,y,z of values when device is flat (tilted or not)
   float a_pitch; // Accelerometer pich
   
-  lsm303(const char * i2cDeviceName);
+  lsm303dlhc(const char * i2cDeviceName, const Setting &cfg);
 
   void enable(void);
   void readAccRaw(void);
@@ -105,6 +107,8 @@ class lsm303
   vector m_min; // minimum magnetometer values, used for calibration
   vector a_max; // maximum accelerometer values, used for calibration
   vector a_min; // minimum accelerometer values, used for calibration
+  vector a_init; // Init accelerometer readings
+
 };
 
 #endif
