@@ -82,7 +82,7 @@ class lsm303dlhc
   vector m; // magnetometer reading raw data
   float a_pitch; // Accelerometer pich
   
-  lsm303dlhc(const char * i2cDeviceName, const Setting &cfg);
+  lsm303dlhc(const char * i2cDeviceName, const Config &cfg);
 
   void enable(void);
   void readAccRaw(void);

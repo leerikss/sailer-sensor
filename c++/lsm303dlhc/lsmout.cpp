@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <cstdlib>
 #include <libconfig.h++>
@@ -20,9 +21,9 @@ void usage(void)
 
 void raw(lsm303dlhc &sensor)
 {
-  printf("\e[27;1;34mAcc = {x=%d, y=%d, z=%d}    \e[27;1;31m Mag = {x=%d, y=%d, z=%d}\e[m\n",
-	 (int16_t)sensor.m.x, (int16_t)sensor.m.y, (int16_t)sensor.m.z, 
-	 (int16_t)sensor.a.x, (int16_t)sensor.a.y, (int16_t)sensor.a.z );
+  printf("\e[27;1;31mAcc = {x=%d.0, y=%d.0, z=%d.0}    \e[27;1;34m Mag = {x=%d.0, y=%d.0, z=%d.0}\e[m\n",
+	 (int16_t)sensor.a.x, (int16_t)sensor.a.y, (int16_t)sensor.a.z,
+	 (int16_t)sensor.m.x, (int16_t)sensor.m.y, (int16_t)sensor.m.z); 
 }
 
 void cal(lsm303dlhc &sensor, lsm303dlhc::vector &mag_min, lsm303dlhc::vector &mag_max, 
@@ -42,15 +43,16 @@ void cal(lsm303dlhc &sensor, lsm303dlhc::vector &mag_min, lsm303dlhc::vector &ma
       acc_max.y = max(acc_max.y, sensor.a.y);
       acc_max.z = max(acc_max.z, sensor.a.z);
 
-      printf("\e[27;1;31mMag max = {x=%d, y=%d z=%d}    Mag min = {x=%d, y=%d, z=%d}    \e[27;1;34mAcc max = {x=%d, y=%d, z=%d}    Acc min = {x=%d, y=%d, z=%d}\e[m\n",
-	     (int16_t)mag_max.x,(int16_t)mag_max.y,(int16_t)mag_max.z,(int16_t)mag_min.x,(int16_t)mag_min.y,(int16_t)mag_min.z,
-	     (int16_t)acc_max.x,(int16_t)acc_max.y,(int16_t)acc_max.z,(int16_t)acc_min.x,(int16_t)acc_min.y,(int16_t)acc_min.z);
+      printf("\e[27;1;31mMag max = {x=%d.0, y=%d.0 z=%d.0}    Mag min = {x=%d.0, y=%d.0, z=%d.0}    \
+\e[27;1;34mAcc max = {x=%d.0, y=%d.0, z=%d.0}    Acc min = {x=%d.0, y=%d.0, z=%d.0}\e[m\n",
+	     (int)mag_max.x,(int)mag_max.y,(int)mag_max.z,(int)mag_min.x,(int)mag_min.y,(int)mag_min.z,
+	     (int)acc_max.x,(int)acc_max.y,(int)acc_max.z,(int)acc_min.x,(int)acc_min.y,(int)acc_min.z);
 
 }
 
 void pih(lsm303dlhc &sensor)
 {
-  printf("\e[27;1;31mAcc Roll: %d°\e[m    \e[27;1;34mMag Heading: %d°\e[m\n",
+  printf("\e[27;1;31mAcc Pitch: %d°\e[m    \e[27;1;34mMag Heading: %d°\e[m\n",
 	 (int)sensor.a_pitch, (int)sensor.heading() );
 }
 
@@ -90,8 +92,7 @@ int main(int argc,char *argv[])
 
   // Init & enable the lsm303dlhc sensor
   const char *fileN = "/dev/i2c-1";
-  const Setting &settings = cfg.getRoot();
-  lsm303dlhc sensor = lsm303dlhc(fileN, settings);
+  lsm303dlhc sensor = lsm303dlhc(fileN, cfg);
   sensor.enable();
 
   // Calibration max/min vectors
@@ -106,30 +107,27 @@ int main(int argc,char *argv[])
   while(1)
   {
     sensor.readMagRaw();
+
     switch(arg)
     {
       case 'r':
 	sensor.readAccRaw();
-	sensor.readMagRaw();
 	raw(sensor);
 	break;
 
       case 'c':
 	sensor.readAccRaw();
-	sensor.readMagRaw();
         cal(sensor,mag_min,mag_max,acc_min,acc_max);
 	break;
 
       case 'p':
 	sensor.readAccPitch();
-	sensor.readMagRaw();
 	pih(sensor);
 	break;
 
 
     }
 
-    // TODO: From configs
     usleep(ms);
   }
 

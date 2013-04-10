@@ -16,22 +16,19 @@ using namespace libconfig;
 #define LSM303DLHC_ACC_ADDRESS            (0x32 >> 1)
 #define R                                 320 / M_PI;
 
-lsm303dlhc::lsm303dlhc(const char *i2cDeviceName, const Setting &cfg) : i2c_lsm303(i2cDeviceName)
-{
+lsm303dlhc::lsm303dlhc(const char *i2cDeviceName, const Config &cfg) : i2c_lsm303(i2cDeviceName)
+{ 
   // Read in magnetometer settings
-  const Setting &max = cfg["magnetometer"]["max"];
-  max.lookupValue("x", m_max.x);
-  max.lookupValue("y", m_max.y);
-  max.lookupValue("z", m_max.z);
-  const Setting &min = cfg["magnetometer"]["min"];
-  min.lookupValue("x", m_min.x);
-  min.lookupValue("y", m_min.y);
-  min.lookupValue("z", m_min.z);
+  m_max.x = cfg.lookup("magnetometer.max.x");
+  m_max.y = cfg.lookup("magnetometer.max.y");
+  m_max.z = cfg.lookup("magnetometer.max.z");
+  m_min.x = cfg.lookup("magnetometer.min.x");
+  m_min.y = cfg.lookup("magnetometer.min.y");
+  m_min.z = cfg.lookup("magnetometer.min.z");
   // Read in accelerometer settings
-  const Setting &init = cfg["accelerometer"]["init"];
-  init.lookupValue("x", a_init.x);
-  init.lookupValue("y", a_init.y);
-  init.lookupValue("z", a_init.z);
+  a_init.x = cfg.lookup("accelerometer.init.x");
+  a_init.y = cfg.lookup("accelerometer.init.y");
+  a_init.z = cfg.lookup("accelerometer.init.z");
   // Acc init must be abs
   a_init.z = (a_init.z<0) ? (a_init.z*-1) : a_init.z;
 }
