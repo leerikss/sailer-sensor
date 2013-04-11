@@ -16,6 +16,14 @@ using namespace libconfig;
 #define LSM303DLHC_ACC_ADDRESS            (0x32 >> 1)
 #define R                                 320 / M_PI;
 
+lsm303dlhc::lsm303dlhc(const char *i2cDeviceName) : i2c_lsm303(i2cDeviceName)
+{
+  // Use some default values if no config is passed
+  m_max.x = 568; m_max.y = 374; m_max.z = 484;
+  m_min.x = -669; m_min.y = -924; m_min.z = -567;
+  a_init.x = 13; a_init.y = 10; a_init.z = 964;
+}
+
 lsm303dlhc::lsm303dlhc(const char *i2cDeviceName, const Config &cfg) : i2c_lsm303(i2cDeviceName)
 { 
   // Read in magnetometer settings
@@ -96,9 +104,9 @@ void lsm303dlhc::readAccPitch(void)
 {
   readAccRaw();
   
-  float x = a.x - a_init.x;
-  float y = a.y - a_init.y;
-  float z = a.z - a_init.z;
+  float x = (float)(a.x - a_init.x);
+  float y = (float)(a.y - a_init.y);
+  float z = (float)(a.z - a_init.z);
 
   a_pitch = atan(  x / sqrt(y * y + z * z) ) * R;
 }
@@ -107,7 +115,7 @@ void lsm303dlhc::readAccPitch(void)
 // is pointing.
 int lsm303dlhc::heading(void)
 {
-  return heading((vector){0,-1,0});
+  return heading((fvector){0,-1,0});
 }
 
 // Returns the number of degrees from the From vector projected into
@@ -121,22 +129,24 @@ int lsm303dlhc::heading(void)
 // horizontal plane. The From vector is projected into the horizontal
 // plane and the angle between the projected vector and north is
 // returned.
-int lsm303dlhc::heading(vector from)
+int lsm303dlhc::heading(fvector from)
 {
-  // shift and scale
-  m.x = (m.x - m_min.x) / (m_max.x - m_min.x) * 2 - 1.0;
-  m.y = (m.y - m_min.y) / (m_max.y - m_min.y) * 2 - 1.0;
-  m.z = (m.z - m_min.z) / (m_max.z - m_min.z) * 2 - 1.0;
+  fvector fm;
 
-  vector temp_a = a;
+  // shift and scale
+  fm.x = (float)(m.x - m_min.x) / (float)(m_max.x - m_min.x) * 2 - 1.0;
+  fm.y = (float)(m.y - m_min.y) / (float)(m_max.y - m_min.y) * 2 - 1.0;
+  fm.z = (float)(m.z - m_min.z) / (float)(m_max.z - m_min.z) * 2 - 1.0;
+
+  fvector temp_a = { (float)a.x, (float)a.y, (float)a.z };
+
   // normalize
   vector_normalize(&temp_a);
-  //vector_normalize(&m);
 
   // compute E and N
-  vector E;
-  vector N;
-  vector_cross(&m, &temp_a, &E);
+  fvector E;
+  fvector N;
+  vector_cross(&fm, &temp_a, &E);
   vector_normalize(&E);
   vector_cross(&temp_a, &E, &N);
 
@@ -146,19 +156,19 @@ int lsm303dlhc::heading(vector from)
   return heading;
 }
 
-void lsm303dlhc::vector_cross(const vector *a,const vector *b, vector *out)
+void lsm303dlhc::vector_cross(const fvector *a,const fvector *b, fvector *out)
 {
   out->x = a->y*b->z - a->z*b->y;
   out->y = a->z*b->x - a->x*b->z;
   out->z = a->x*b->y - a->y*b->x;
 }
 
-float lsm303dlhc::vector_dot(const vector *a,const vector *b)
+float lsm303dlhc::vector_dot(const fvector *a,const fvector *b)
 {
   return a->x*b->x+a->y*b->y+a->z*b->z;
 }
 
-void lsm303dlhc::vector_normalize(vector *a)
+void lsm303dlhc::vector_normalize(fvector *a)
 {
   float mag = sqrt(vector_dot(a,a));
   a->x /= mag;

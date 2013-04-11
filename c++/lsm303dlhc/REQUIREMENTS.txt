@@ -1,0 +1,7 @@
+Required Libraries
+==================
+libconfig++9
+
+Configuration file:
+===================
+lsm303dlhc.cfg

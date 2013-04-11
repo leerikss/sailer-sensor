@@ -73,15 +73,21 @@ class lsm303dlhc
 
  public:
 
-  typedef struct vector
+  typedef struct ivector
+  {
+    int x, y, z;
+  } ivector;
+
+  typedef struct fvector
   {
     float x, y, z;
-  } vector;
+  } fvector;
 
-  vector a; // accelerometer readings raw data
-  vector m; // magnetometer reading raw data
+  ivector a; // accelerometer readings raw data
+  ivector m; // magnetometer reading raw data
   float a_pitch; // Accelerometer pich
-  
+
+  lsm303dlhc(const char * i2cDeviceName);  
   lsm303dlhc(const char * i2cDeviceName, const Config &cfg);
 
   void enable(void);
@@ -89,7 +95,7 @@ class lsm303dlhc
   void readMagRaw(void);
   void readAccPitch(void);
   int heading(void);
-  int heading(vector from);
+  int heading(fvector from);
     
  private:
   I2CBus i2c_lsm303;
@@ -99,15 +105,15 @@ class lsm303dlhc
   void writeAccRegister(uint8_t regAddr, uint8_t byte);
   void writeMagRegister(uint8_t regAddr, uint8_t bytte);
 
-  static void vector_cross(const vector *a, const vector *b, vector *out);
-  static float vector_dot(const vector *a,const vector *b);
-  static void vector_normalize(vector *a);
+  static void vector_cross(const fvector *a, const fvector *b, fvector *out);
+  static float vector_dot(const fvector *a,const fvector *b);
+  static void vector_normalize(fvector *a);
 
-  vector m_max; // maximum magnetometer values, used for calibration
-  vector m_min; // minimum magnetometer values, used for calibration
-  vector a_max; // maximum accelerometer values, used for calibration
-  vector a_min; // minimum accelerometer values, used for calibration
-  vector a_init; // Init accelerometer readings
+  ivector m_max; // maximum magnetometer values, used for calibration
+  ivector m_min; // minimum magnetometer values, used for calibration
+  ivector a_max; // maximum accelerometer values, used for calibration
+  ivector a_min; // minimum accelerometer values, used for calibration
+  ivector a_init; // Init accelerometer readings
 
 };
 

@@ -21,13 +21,13 @@ void usage(void)
 
 void raw(lsm303dlhc &sensor)
 {
-  printf("\e[27;1;31mAcc = {x=%d.0, y=%d.0, z=%d.0}    \e[27;1;34m Mag = {x=%d.0, y=%d.0, z=%d.0}\e[m\n",
-	 (int16_t)sensor.a.x, (int16_t)sensor.a.y, (int16_t)sensor.a.z,
-	 (int16_t)sensor.m.x, (int16_t)sensor.m.y, (int16_t)sensor.m.z); 
+  printf("\e[27;1;31mAcc: {x=%d, y=%d, z=%d}    \e[27;1;34m Mag: {x=%d, y=%d, z=%d}\e[m\n",
+	 sensor.a.x, sensor.a.y, sensor.a.z,
+	 sensor.m.x, sensor.m.y, sensor.m.z); 
 }
 
-void cal(lsm303dlhc &sensor, lsm303dlhc::vector &mag_min, lsm303dlhc::vector &mag_max, 
-	       lsm303dlhc::vector &acc_min, lsm303dlhc::vector &acc_max)
+void cal(lsm303dlhc &sensor, lsm303dlhc::ivector &mag_min, lsm303dlhc::ivector &mag_max, 
+	       lsm303dlhc::ivector &acc_min, lsm303dlhc::ivector &acc_max)
 {
       mag_min.x = min(mag_min.x, sensor.m.x);
       mag_min.y = min(mag_min.y, sensor.m.y);
@@ -43,10 +43,10 @@ void cal(lsm303dlhc &sensor, lsm303dlhc::vector &mag_min, lsm303dlhc::vector &ma
       acc_max.y = max(acc_max.y, sensor.a.y);
       acc_max.z = max(acc_max.z, sensor.a.z);
 
-      printf("\e[27;1;31mMag max = {x=%d.0, y=%d.0 z=%d.0}    Mag min = {x=%d.0, y=%d.0, z=%d.0}    \
-\e[27;1;34mAcc max = {x=%d.0, y=%d.0, z=%d.0}    Acc min = {x=%d.0, y=%d.0, z=%d.0}\e[m\n",
-	     (int)mag_max.x,(int)mag_max.y,(int)mag_max.z,(int)mag_min.x,(int)mag_min.y,(int)mag_min.z,
-	     (int)acc_max.x,(int)acc_max.y,(int)acc_max.z,(int)acc_min.x,(int)acc_min.y,(int)acc_min.z);
+      printf("\e[27;1;31mMag max: {x=%d, y=%d z=%d}    Mag min: {x=%d, y=%d, z=%d}    \
+\e[27;1;34mAcc max: {x=%d, y=%d, z=%d}    Acc min: {x=%d, y=%d, z=%d}\e[m\n",
+	     mag_max.x,mag_max.y,mag_max.z,mag_min.x,mag_min.y,mag_min.z,
+	     acc_max.x,acc_max.y,acc_max.z,acc_min.x,acc_min.y,acc_min.z);
 
 }
 
@@ -96,8 +96,8 @@ int main(int argc,char *argv[])
   sensor.enable();
 
   // Calibration max/min vectors
-  lsm303dlhc::vector mag_min = {32767.0, 32767.0, 32767.0}, mag_max = {-32768.0, -32768.0, -32768.0};
-  lsm303dlhc::vector acc_min = {32767.0, 32767.0, 32767.0}, acc_max = {-32768.0, -32768.0, -32768.0};
+  lsm303dlhc::ivector mag_min = {32767, 32767, 32767}, mag_max = {-32768, -32768, -32768};
+  lsm303dlhc::ivector acc_min = {32767, 32767, 32767}, acc_max = {-32768, -32768, -32768};
 
   // Loop sleep time
   int ms;
