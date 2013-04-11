@@ -73,6 +73,9 @@ class lsm303dlhc
 
  public:
 
+  lsm303dlhc(const char * i2cDeviceName);  
+  lsm303dlhc(const char * i2cDeviceName, const Config &cfg);
+
   typedef struct ivector
   {
     int x, y, z;
@@ -86,9 +89,6 @@ class lsm303dlhc
   ivector a; // accelerometer readings raw data
   ivector m; // magnetometer reading raw data
   float a_pitch; // Accelerometer pich
-
-  lsm303dlhc(const char * i2cDeviceName);  
-  lsm303dlhc(const char * i2cDeviceName, const Config &cfg);
 
   void enable(void);
   void readAccRaw(void);

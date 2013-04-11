@@ -2,7 +2,6 @@
 #include <cstdlib>
 #include <libconfig.h++>
 #include <string.h>
-#include <iostream>
 #include "lsm303dlhc.h"
 
 #define CONFIG_FILE "lsm303dlhc.cfg"
