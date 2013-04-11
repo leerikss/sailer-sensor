@@ -1,12 +1,12 @@
 CPP		:= g++
 CPPFLAGS	:= -Wall
-LIBS		:= -lconfig++
-OBJECTS		:= sailersensor.o lsmpoller.o lsm303dlhc/lsm303dlhc.h
+LIBS		:= -L/usr/local/lib -lconfig++
+OBJECTS		:=  lsmpoller.o sailersensor.o
 
 sailersensor: $(OBJECTS)
-	$(CPP) $(OBJECTS) -o sailersensor.bin
+	$(CPP) $(LIBS) $(OBJECTS) -o sailersensor.bin
 
-sailersensor.o: lsmpoller.cpp
+sailersensor.o: sailersensor.cpp
 	$(CPP) $(LIBS) $(CPPFLAGS) -c sailersensor.cpp -o sailersensor.o
 
 lsmpoller.o: lsmpoller.cpp

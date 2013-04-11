@@ -19,7 +19,7 @@ void usage(void)
 
 void raw(lsm303dlhc &sensor)
 {
-  printf("\e[27;1;31mAcc: {x=%d, y=%d, z=%d}    \e[27;1;34m Mag: {x=%d, y=%d, z=%d}\e[m\n",
+  printf("\e[27;1;31mAcc: {x=%d; y=%d; z=%d;};    \e[27;1;34m Mag: {x=%d; y=%d; z=%d;};\e[m\n",
 	 sensor.a.x, sensor.a.y, sensor.a.z,
 	 sensor.m.x, sensor.m.y, sensor.m.z); 
 }
@@ -41,8 +41,8 @@ void cal(lsm303dlhc &sensor, lsm303dlhc::ivector &mag_min, lsm303dlhc::ivector &
       acc_max.y = max(acc_max.y, sensor.a.y);
       acc_max.z = max(acc_max.z, sensor.a.z);
 
-      printf("\e[27;1;31mMag max: {x=%d, y=%d z=%d}    Mag min: {x=%d, y=%d, z=%d}    \
-\e[27;1;34mAcc max: {x=%d, y=%d, z=%d}    Acc min: {x=%d, y=%d, z=%d}\e[m\n",
+      printf("\e[27;1;31mMag max: {x=%d; y=%d; z=%d;};    Mag min: {x=%d; y=%d; z=%d;};    \
+\e[27;1;34mAcc max: {x=%d; y=%d; z=%d;};    Acc min: {x=%d; y=%d; z=%d;};\e[m\n",
 	     mag_max.x,mag_max.y,mag_max.z,mag_min.x,mag_min.y,mag_min.z,
 	     acc_max.x,acc_max.y,acc_max.z,acc_min.x,acc_min.y,acc_min.z);
 

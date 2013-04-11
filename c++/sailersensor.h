@@ -8,7 +8,6 @@ class sailersensor
 {
  public:
   sailersensor(const Config &cfg);
-
   void run(void);
 };
 

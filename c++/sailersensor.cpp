@@ -5,13 +5,12 @@
 
 #define CONFIG_FILE "sailersensor.cfg"
 
+using namespace std;
 using namespace libconfig;
 
 int main() 
 {
-  // Read the config file
   Config cfg;
-
   try { cfg.readFile(CONFIG_FILE);  }
   catch(const FileIOException &fioex)
   {
@@ -36,7 +35,7 @@ sailersensor::sailersensor(const Config &cfg)
   
 }
 
-sailersensor::run()
+void sailersensor::run(void)
 {
-  printf("Started");
+  printf("Started\n");
 }

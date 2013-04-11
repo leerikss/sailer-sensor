@@ -1,14 +1,22 @@
-lsmout: lsmout.o lsm303dlhc.o I2C_bus.o smbus.o
-	g++ -lconfig++ lsmout.o lsm303dlhc.o I2C_bus.o smbus.o -o lsmout.bin
+CPP		:= g++
+CPPFLAGS	:= -Wall
+LIBS		:= -lconfig++
+OBJECTS		:= lsmout.o lsm303dlhc.o I2C_bus.o smbus.o
 
-lsm303dlhc.o: lsm303dlhc.o
-	g++ -c lsm303dlhc.cpp -o lsm303dlhc.o
+lsmout: $(OBJECTS)
+	$(CPP) $(LIBS) $(CPPFLAGS) $(OBJECTS) -o lsmout.bin
 
-I2C_bus.o: I2C_bus.o
-	g++ -c I2C_bus.cpp -o I2C_bus.o
+lsmout.o: lsmout.cpp
+	$(CPP) $(LIBS) $(CPPFLAGS) -c lsmout.cpp -o lsmout.o
 
-smbus.o: smbus.o
-	g++ -c smbus.c -o smbus.o
+lsm303dlhc.o: lsm303dlhc.cpp
+	$(CPP) $(LIBS) $(CPPFLAGS) -c lsm303dlhc.cpp -o lsm303dlhc.o
+
+I2C_bus.o: I2C_bus.cpp
+	$(CPP) $(LIBS) $(CPPFLAGS) -c I2C_bus.cpp -o I2C_bus.o
+
+smbus.o: smbus.c
+	$(CPP) $(LIBS) $(CPPFLAGS) -c smbus.c -o smbus.o
 
 clean:
 	rm -f *.o
