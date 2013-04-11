@@ -93,7 +93,7 @@ class lsm303dlhc
   void enable(void);
   void readAccRaw(void);
   void readMagRaw(void);
-  void readAccPitch(void);
+  int pitch(void);
   int heading(void);
   int heading(fvector from);
     

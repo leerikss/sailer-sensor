@@ -100,15 +100,13 @@ void lsm303dlhc::readMagRaw(void)
   m.z = (int16_t)(block[3] | block[2] << 8);
 }
 
-void lsm303dlhc::readAccPitch(void)
+int lsm303dlhc::pitch(void)
 {
-  readAccRaw();
-  
   float x = (float)(a.x - a_init.x);
   float y = (float)(a.y - a_init.y);
   float z = (float)(a.z - a_init.z);
 
-  a_pitch = atan(  x / sqrt(y * y + z * z) ) * R;
+  return atan(  x / sqrt(y * y + z * z) ) * R;
 }
 
 // Returns the number of degrees from the -Y axis that it

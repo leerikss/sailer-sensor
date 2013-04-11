@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <cstdlib>
 #include <libconfig.h++>
@@ -53,7 +52,7 @@ void cal(lsm303dlhc &sensor, lsm303dlhc::ivector &mag_min, lsm303dlhc::ivector &
 void pih(lsm303dlhc &sensor)
 {
   printf("\e[27;1;31mAcc Pitch: %d°\e[m    \e[27;1;34mMag Heading: %d°\e[m\n",
-	 (int)sensor.a_pitch, (int)sensor.heading() );
+	 sensor.pitch(), sensor.heading() );
 }
 
 int main(int argc,char *argv[])
@@ -106,22 +105,20 @@ int main(int argc,char *argv[])
   // Main loop
   while(1)
   {
+    sensor.readAccRaw();
     sensor.readMagRaw();
 
     switch(arg)
     {
       case 'r':
-	sensor.readAccRaw();
 	raw(sensor);
 	break;
 
       case 'c':
-	sensor.readAccRaw();
         cal(sensor,mag_min,mag_max,acc_min,acc_max);
 	break;
 
       case 'p':
-	sensor.readAccPitch();
 	pih(sensor);
 	break;
 
