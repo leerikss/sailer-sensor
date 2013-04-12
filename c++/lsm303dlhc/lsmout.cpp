@@ -6,8 +6,8 @@
 
 #define CONFIG_FILE "lsm303dlhc.cfg"
 
-using namespace std;
 using namespace libconfig;
+using namespace std;
 
 void usage(void)
 {

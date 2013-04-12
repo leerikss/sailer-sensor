@@ -14,6 +14,7 @@ class sailersensor
  private:
   libconfig::Config cfg;
   lsmpoller lsmp;
+  int stime;
 };
 
 #endif

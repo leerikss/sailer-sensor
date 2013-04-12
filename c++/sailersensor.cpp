@@ -3,7 +3,6 @@
 #include <cstdlib>
 #include <libconfig.h++>
 #include <boost/thread.hpp>
-//#include <boost/bind.hpp>
 #include "lsmpoller.h"
 #include <unistd.h>
 
@@ -17,6 +16,7 @@ int main()
   try
   {
     sailersensor ss;
+
     ss.init();
     ss.run();
   }
@@ -32,13 +32,14 @@ int main()
     return(EXIT_FAILURE);
   }
   
-  return EXIT_SUCCESS;
+  // return EXIT_SUCCESS;
 }
 
 void sailersensor::init(void)
 {
-  // Read config
+  // Read configs
   cfg.readFile(CONFIG_FILE);
+  stime = cfg.lookup("main_sleep");
 
   // Init lsm303dlhc poller
   lsmp.init(cfg);
@@ -48,12 +49,16 @@ void sailersensor::init(void)
 
 void sailersensor::run(void)
 {
-  cout << "sailorsensor.run() starts" << endl;
-
   // Start lsmpoller thread
-  boost::thread lsmt = boost::thread(&lsmpoller::run, lsmp);
+  boost::thread lsmt = boost::thread(&lsmpoller::run, &lsmp);
 
-  //  lsmt.join();
-  sleep(2);
-  cout << "sailorsensor.run() quit" << endl;
+  while(true)
+  {
+    // TODO: More stuff
+    int p = lsmp.get_pitch();
+    int h = lsmp.get_heading();
+    cout << "Pitch: " << p << ", Heading: " << h << endl;
+
+    usleep(stime);
+  }  
 }
