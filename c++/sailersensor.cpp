@@ -13,11 +13,11 @@ using namespace std;
 
 int main() 
 {
-  // Init
-  sailersensor ss;
   try
   {
+    sailersensor ss;
     ss.init();
+    ss.run();
   }
   catch(const FileIOException &fioex)
   {
@@ -30,9 +30,6 @@ int main()
 	      << " - " << pex.getError() << std::endl;
     return(EXIT_FAILURE);
   }
-
-  // Run  
-  ss.run();
   
   return EXIT_SUCCESS;
 }
