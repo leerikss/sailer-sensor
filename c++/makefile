@@ -1,7 +1,7 @@
 CPP		:= g++
 CPPFLAGS	:= -Wall
 LIBS		:= -L/usr/local/lib -lconfig++
-OBJECTS		:=  lsmpoller.o sailersensor.o
+OBJECTS		:=  sailersensor.o lsmpoller.o
 
 sailersensor: $(OBJECTS)
 	$(CPP) $(LIBS) $(OBJECTS) -o sailersensor.bin

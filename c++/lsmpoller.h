@@ -1,13 +1,13 @@
 #ifndef lsmpoller_h
 #define lsmpoller_h
 #include <libconfig.h++>
-
-using namespace libconfig;
+// #include "sailersensor.h"
 
 class lsmpoller
 {
  public:
-  lsmpoller(const Config &cfg);
+  lsmpoller();
+  void init(libconfig::Config& c);
 };
 
 #endif

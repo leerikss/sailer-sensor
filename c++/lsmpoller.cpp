@@ -1,9 +1,13 @@
 #include "lsmpoller.h"
 #include <libconfig.h++>
+#include <iostream>
 
-using namespace libconfig;
+using namespace std;
 
-lsmpoller::lsmpoller(const Config &cfg)
+lsmpoller::lsmpoller() {}
+
+void lsmpoller::init(libconfig::Config& cfg)
 {
-
+  int z = cfg.lookup("magnetometer.max.z");
+  cout << "max.z = " << z << endl;
 }

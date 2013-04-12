@@ -2,16 +2,23 @@
 #include <iostream>
 #include <cstdlib>
 #include <libconfig.h++>
+#include <boost/thread.hpp>
+#include <boost/bind.hpp>
+#include "lsmpoller.h"
 
 #define CONFIG_FILE "sailersensor.cfg"
 
-using namespace std;
 using namespace libconfig;
+using namespace std;
 
 int main() 
 {
-  Config cfg;
-  try { cfg.readFile(CONFIG_FILE);  }
+  // Init
+  sailersensor ss;
+  try
+  {
+    ss.init();
+  }
   catch(const FileIOException &fioex)
   {
     std::cerr << "I/O error while reading file." << std::endl;
@@ -24,18 +31,21 @@ int main()
     return(EXIT_FAILURE);
   }
 
-  sailersensor ss = sailersensor(cfg);
+  // Run  
   ss.run();
-
+  
   return EXIT_SUCCESS;
 }
 
-sailersensor::sailersensor(const Config &cfg)
+void sailersensor::init(void)
 {
-  
+  // Read config
+  cfg.readFile(CONFIG_FILE);
+
+  // Construct lsm303dlhc poller
+  lsmp.init(cfg);
 }
 
 void sailersensor::run(void)
 {
-  printf("Started\n");
 }
