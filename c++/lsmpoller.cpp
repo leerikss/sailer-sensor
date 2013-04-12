@@ -3,6 +3,9 @@
 #include <iostream>
 #include <unistd.h>
 #include <deque>
+#include "lsm303dlhc/lsm303dlhc.h"
+
+#define  DEV "/dev/i2c-1";
 
 using namespace std;
 
@@ -15,27 +18,28 @@ void lsmpoller::init(libconfig::Config& cfg)
   p_size = cfg.lookup("accelerometer.buffer_size");
   h_size = cfg.lookup("magnetometer.buffer_size");
 
-  // Init queues
-  running = false;
+  // Init device
+  const char *fileN = DEV;
+  sensor = lsm303dlhc(fileN, cfg);
 }
 
 void lsmpoller::run(void)
 {
   running = true;
-  int p = 0; // Testing
-  int h = 0; // Testing
-  
+
+  sensor.enable();
+
   while(running)
   {
-    // TODO: Read accelerometer pitch
+    // Read pitch & add to buffer
+    int p = sensor.pitch();
     add_deque(p_deque, p, p_size);
 
-    // TODO: Read magnetometer heading
+    // Read heading & add to buffer
+    int h = sensor.heading();
     add_deque(h_deque, h, h_size);
 
-    p += 3; // Testing
-    h += 7; // Testing
-
+    // Sleep
     usleep(stime);
   }
 }

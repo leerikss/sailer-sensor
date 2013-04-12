@@ -16,6 +16,10 @@ using namespace libconfig;
 #define LSM303DLHC_ACC_ADDRESS            (0x32 >> 1)
 #define R                                 320 / M_PI;
 
+lsm303dlhc::lsm303dlhc() : i2c_lsm303(NULL)
+{
+}
+
 lsm303dlhc::lsm303dlhc(const char *i2cDeviceName) : i2c_lsm303(i2cDeviceName)
 {
   // Use some default values if no config is passed

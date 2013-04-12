@@ -1,7 +1,8 @@
 CPP		:= g++
 CPPFLAGS	:= -Wall
 LIBS		:= -lconfig++ -lboost_thread
-OBJECTS		:=  sailersensor.o lsmpoller.o
+OBJECTS		:=  sailersensor.o lsmpoller.o lsm303dlhc/lsm303dlhc.o \
+	lsm303dlhc/I2C_bus.o lsm303dlhc/smbus.o
 
 sailersensor: $(OBJECTS)
 	$(CPP) $(LIBS) $(OBJECTS) -o sailersensor.bin

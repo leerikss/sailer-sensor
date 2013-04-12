@@ -73,6 +73,7 @@ class lsm303dlhc
 
  public:
 
+  lsm303dlhc();
   lsm303dlhc(const char * i2cDeviceName);  
   lsm303dlhc(const char * i2cDeviceName, const Config &cfg);
 
