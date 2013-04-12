@@ -1,6 +1,6 @@
 CPP		:= g++
 CPPFLAGS	:= -Wall
-LIBS		:= -L/usr/local/lib -lconfig++
+LIBS		:= -lconfig++ -lboost_thread
 OBJECTS		:=  sailersensor.o lsmpoller.o
 
 sailersensor: $(OBJECTS)

@@ -7,7 +7,9 @@ class lsmpoller
 {
  public:
   lsmpoller();
+
   void init(libconfig::Config& c);
+  void run(void);
 };
 
 #endif

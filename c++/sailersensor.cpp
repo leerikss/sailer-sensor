@@ -3,8 +3,9 @@
 #include <cstdlib>
 #include <libconfig.h++>
 #include <boost/thread.hpp>
-#include <boost/bind.hpp>
+//#include <boost/bind.hpp>
 #include "lsmpoller.h"
+#include <unistd.h>
 
 #define CONFIG_FILE "sailersensor.cfg"
 
@@ -21,13 +22,13 @@ int main()
   }
   catch(const FileIOException &fioex)
   {
-    std::cerr << "I/O error while reading file." << std::endl;
+    cerr << "I/O error while reading file." << endl;
     return(EXIT_FAILURE);
   }
   catch(const ParseException &pex)
   {
-    std::cerr << "Parse error at " << pex.getFile() << ":" << pex.getLine()
-	      << " - " << pex.getError() << std::endl;
+    cerr << "Parse error at " << pex.getFile() << ":" << pex.getLine()
+	      << " - " << pex.getError() << endl;
     return(EXIT_FAILURE);
   }
   
@@ -39,10 +40,20 @@ void sailersensor::init(void)
   // Read config
   cfg.readFile(CONFIG_FILE);
 
-  // Construct lsm303dlhc poller
+  // Init lsm303dlhc poller
   lsmp.init(cfg);
+
+  // TODO: init gpspoller
 }
 
 void sailersensor::run(void)
 {
+  cout << "sailorsensor.run() starts" << endl;
+
+  // Start lsmpoller thread
+  boost::thread lsmt = boost::thread(&lsmpoller::run, lsmp);
+
+  //  lsmt.join();
+  sleep(2);
+  cout << "sailorsensor.run() quit" << endl;
 }
