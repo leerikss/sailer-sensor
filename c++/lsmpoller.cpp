@@ -18,6 +18,8 @@ void lsmpoller::init(libconfig::Config& cfg)
   p_size = cfg.lookup("accelerometer.buffer_size");
   h_size = cfg.lookup("magnetometer.buffer_size");
 
+  // TODO: FIx this, not working
+
   // Init device
   const char *fileN = DEV;
   sensor = lsm303dlhc(fileN, cfg);

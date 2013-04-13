@@ -1,0 +1,12 @@
+Libs:
+=====
+
+libconfig++9
+
+libboost >= 1.49
+- sudo apt-get install libboost-thread-dev
+
+Config file:
+============
+
+sailersensor.cfg
