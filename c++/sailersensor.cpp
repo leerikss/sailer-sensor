@@ -47,13 +47,16 @@ void sailersensor::run(void)
   // Start lsmpoller thread
   boost::thread lsm_t = boost::thread(&lsmpoller::run, &lsm_p);
 
+  // Start gpspoller thread
+  boost::thread gps_t = boost::thread(&gpspoller::run, &gps_p);
+
   while(true)
   {
+    /*
     int p = lsm_p.get_pitch();
     int h = lsm_p.get_heading();
-
-    // TODO: More stuff
     cout << "Pitch: " << p << ", Heading: " << h << endl;
+    */
 
     usleep(s_time);
   }  

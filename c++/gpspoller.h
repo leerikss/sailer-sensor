@@ -2,7 +2,7 @@
 #define gpspoller_h
 
 #include <libconfig.h++>
-#include <deque>
+#include <gps.h>
 
 using namespace std;
 
@@ -17,6 +17,8 @@ class gpspoller
 
  private:
   int s_time;
+  gps_data_t *gpsdata;
 };
+
 
 #endif

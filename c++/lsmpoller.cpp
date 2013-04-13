@@ -21,6 +21,7 @@ lsmpoller::lsmpoller(const Config& cfg) : lsm303(fileN, cfg)
 void lsmpoller::run(void)
 {
   lsm303.enable();
+
   running = true;
 
   while(running)

@@ -10,6 +10,8 @@ boost_thread
 boost_system
 - Tested version: 1.50
 
+libgps
+
 Config file:
 ============
 
