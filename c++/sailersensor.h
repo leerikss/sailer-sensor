@@ -3,16 +3,16 @@
 #include <libconfig.h++>
 #include "lsmpoller.h"
 
-// using namespace libconfig;
+using namespace libconfig;
 
 class sailersensor
 {
  public:
-  void init(void);
+  sailersensor(const Config& cfg);
+
   void run(void);
 
  private:
-  libconfig::Config cfg;
   lsmpoller lsmp;
   int stime;
 };

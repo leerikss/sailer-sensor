@@ -68,12 +68,12 @@ using namespace libconfig;
 #define LSM303DLHC_OUT_Y_H     0x07
 #define LSM303DLHC_OUT_Y_L     0x08
 
+using namespace libconfig;
+
 class lsm303dlhc
 {
 
  public:
-
-  lsm303dlhc();
   lsm303dlhc(const char * i2cDeviceName);  
   lsm303dlhc(const char * i2cDeviceName, const Config &cfg);
 

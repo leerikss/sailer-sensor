@@ -5,14 +5,14 @@
 #include <deque>
 #include "lsm303dlhc/lsm303dlhc.h"
 
+using namespace libconfig;
 using namespace std;
 
 class lsmpoller
 {
  public:
-  lsmpoller();
+  lsmpoller(const Config& c);
 
-  void init(libconfig::Config& c);
   void run(void);
   int get_pitch(void);
   int get_heading(void);

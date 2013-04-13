@@ -5,34 +5,30 @@
 #include <deque>
 #include "lsm303dlhc/lsm303dlhc.h"
 
-#define  DEV "/dev/i2c-1";
-
+using namespace libconfig;
 using namespace std;
 
-lsmpoller::lsmpoller() {}
+const char *fileN = "/dev/i2c-1";
 
-void lsmpoller::init(libconfig::Config& cfg)
+lsmpoller::lsmpoller(const Config& cfg) : sensor(fileN, cfg)
 {
   // Set vals from config
   stime = cfg.lookup("lsm_p_sleep");
   p_size = cfg.lookup("accelerometer.buffer_size");
   h_size = cfg.lookup("magnetometer.buffer_size");
-
-  // TODO: FIx this, not working
-
-  // Init device
-  const char *fileN = DEV;
-  sensor = lsm303dlhc(fileN, cfg);
 }
 
 void lsmpoller::run(void)
 {
-  running = true;
-
   sensor.enable();
+  running = true;
 
   while(running)
   {
+    // Read latest raw data
+    sensor.readMagRaw();
+    sensor.readAccRaw();
+
     // Read pitch & add to buffer
     int p = sensor.pitch();
     add_deque(p_deque, p, p_size);
@@ -64,13 +60,11 @@ float lsmpoller::get_avg(deque<int>& dq)
     // cout << dq[i] << "+";
     avg += dq[i];
   }
-  if( avg > 0.0 )
-  {
-    // cout << "= > avg: " << avg/dq.size() << endl;
-    return avg/dq.size();
-  }
-  else 
+  if(avg == 0)
     return 0;
+
+  // cout << "= > avg: " << avg/dq.size() << endl;
+  return avg/dq.size();
 }
 
 void lsmpoller::add_deque(deque<int>& dq, int& v, unsigned int& s)

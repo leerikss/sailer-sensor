@@ -9,8 +9,6 @@
 #include <fcntl.h>
 #include "smbus.h"
 
-
-
 /*DeviceName path to pherpih np. /dev/i2c-1*/
 I2CBus::I2CBus(const char * devName)
 {

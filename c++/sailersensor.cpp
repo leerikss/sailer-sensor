@@ -2,9 +2,9 @@
 #include <iostream>
 #include <cstdlib>
 #include <libconfig.h++>
-#include <boost/thread.hpp>
-#include "lsmpoller.h"
+#include <boost/thread.hpp> 
 #include <unistd.h>
+#include "lsmpoller.h"
 
 #define CONFIG_FILE "sailersensor.cfg"
 
@@ -15,9 +15,10 @@ int main()
 {
   try
   {
-    sailersensor ss;
-
-    ss.init();
+    // Read configs
+    Config cfg;
+    cfg.readFile(CONFIG_FILE);
+    sailersensor ss = sailersensor(cfg);
     ss.run();
   }
   catch(const FileIOException &fioex)
@@ -35,16 +36,9 @@ int main()
   // return EXIT_SUCCESS;
 }
 
-void sailersensor::init(void)
+sailersensor::sailersensor(const Config& cfg) : lsmp(cfg)
 {
-  // Read configs
-  cfg.readFile(CONFIG_FILE);
   stime = cfg.lookup("main_sleep");
-
-  // Init lsm303dlhc poller
-  lsmp.init(cfg);
-
-  // TODO: init gpspoller
 }
 
 void sailersensor::run(void)
@@ -54,9 +48,10 @@ void sailersensor::run(void)
 
   while(true)
   {
-    // TODO: More stuff
     int p = lsmp.get_pitch();
     int h = lsmp.get_heading();
+
+    // TODO: More stuff
     cout << "Pitch: " << p << ", Heading: " << h << endl;
 
     usleep(stime);
