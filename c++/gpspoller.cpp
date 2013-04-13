@@ -7,8 +7,6 @@
 using namespace libconfig;
 using namespace std;
 
-const char *fileN = "/dev/i2c-1";
-
 gpspoller::gpspoller(const Config& cfg)
 {
   // Set vals from config
