@@ -1,10 +1,9 @@
 Libs:
 =====
 
-libconfig++9
-
-libboost >= 1.49
-- sudo apt-get install libboost-thread-dev
+libconfig++ >= 9
+boost_thread >= 1.50
+boost_system >= 1.50
 
 Config file:
 ============

@@ -36,24 +36,24 @@ int main()
   // return EXIT_SUCCESS;
 }
 
-sailersensor::sailersensor(const Config& cfg) : lsmp(cfg)
+sailersensor::sailersensor(const Config& cfg) : lsm_p(cfg)
 {
-  stime = cfg.lookup("main_sleep");
+  s_time = cfg.lookup("sailersensor_sleep");
 }
 
 void sailersensor::run(void)
 {
   // Start lsmpoller thread
-  boost::thread lsmt = boost::thread(&lsmpoller::run, &lsmp);
+  boost::thread lsm_t = boost::thread(&lsmpoller::run, &lsm_p);
 
   while(true)
   {
-    int p = lsmp.get_pitch();
-    int h = lsmp.get_heading();
+    int p = lsm_p.get_pitch();
+    int h = lsm_p.get_heading();
 
     // TODO: More stuff
     cout << "Pitch: " << p << ", Heading: " << h << endl;
 
-    usleep(stime);
+    usleep(s_time);
   }  
 }

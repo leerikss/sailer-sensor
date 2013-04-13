@@ -23,8 +23,8 @@ class lsmpoller
   void add_deque(deque<int>& q, int& v, unsigned int& s);
   float get_avg(deque<int>& q);
 
-  lsm303dlhc sensor;
-  int stime;
+  lsm303dlhc lsm303;
+  int s_time;
   deque<int> p_deque;
   unsigned int p_size;
   deque<int> h_deque;

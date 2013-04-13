@@ -10,35 +10,35 @@ using namespace std;
 
 const char *fileN = "/dev/i2c-1";
 
-lsmpoller::lsmpoller(const Config& cfg) : sensor(fileN, cfg)
+lsmpoller::lsmpoller(const Config& cfg) : lsm303(fileN, cfg)
 {
   // Set vals from config
-  stime = cfg.lookup("lsm_p_sleep");
+  s_time = cfg.lookup("lsmpoller_sleep");
   p_size = cfg.lookup("accelerometer.buffer_size");
   h_size = cfg.lookup("magnetometer.buffer_size");
 }
 
 void lsmpoller::run(void)
 {
-  sensor.enable();
+  lsm303.enable();
   running = true;
 
   while(running)
   {
     // Read latest raw data
-    sensor.readMagRaw();
-    sensor.readAccRaw();
+    lsm303.readMagRaw();
+    lsm303.readAccRaw();
 
     // Read pitch & add to buffer
-    int p = sensor.pitch();
+    int p = lsm303.pitch();
     add_deque(p_deque, p, p_size);
 
     // Read heading & add to buffer
-    int h = sensor.heading();
+    int h = lsm303.heading();
     add_deque(h_deque, h, h_size);
 
     // Sleep
-    usleep(stime);
+    usleep(s_time);
   }
 }
 

@@ -13,8 +13,8 @@ class sailersensor
   void run(void);
 
  private:
-  lsmpoller lsmp;
-  int stime;
+  lsmpoller lsm_p;
+  int s_time;
 };
 
 #endif
