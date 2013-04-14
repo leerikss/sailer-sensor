@@ -36,9 +36,10 @@ int main()
   // return EXIT_SUCCESS;
 }
 
-sailersensor::sailersensor(const Config& cfg) : lsm_p(cfg)
+sailersensor::sailersensor(const Config& cfg) : lsm_p(cfg), gps_p(cfg)
+  
 {
-  s_time = cfg.lookup("sailersensor_sleep");
+  s_time = cfg.lookup("sailersensor.sleep");
 }
 
 void sailersensor::run(void)

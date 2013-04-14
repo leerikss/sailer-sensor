@@ -2,6 +2,7 @@
 #define sailersensor_h
 #include <libconfig.h++>
 #include "lsmpoller.h"
+#include "gpspoller.h"
 
 using namespace libconfig;
 
@@ -14,6 +15,7 @@ class sailersensor
 
  private:
   lsmpoller lsm_p;
+  gpspoller gps_p;
   int s_time;
 };
 
