@@ -1,9 +1,14 @@
 Libs:
 =====
- 
-libconfig++ >= 9
-boost_thread >= 1.50
-boost_system >= 1.50
+
+libconfig++ 
+- Tested version: 9
+
+boost_thread
+- Tested version: 1.50
+
+boost_system
+- Tested version: 1.50
 
 Config file:
 ============
