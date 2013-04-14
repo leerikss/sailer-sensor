@@ -1,4 +1,4 @@
-CPP		:= g++
+CPP		:= g++ -g
 CPPFLAGS	:= -Wall
 LIBS		:= -lconfig++ -lboost_thread -lboost_system -lgps
 OBJECTS		:=  sailersensor.o gpspoller.o lsmpoller.o lsm303dlhc/lsm303dlhc.o \
