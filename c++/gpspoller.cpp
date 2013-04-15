@@ -21,15 +21,17 @@ void gpspoller::open(gps_data_t* gpsdata)
       cerr << "Unable to connect to device. Trying again..." << endl;
       usleep(s_time);
   }
+  reg(gpsdata);
 }
 
 void gpspoller::reg(gps_data_t* gpsdata)
 {
-  gps_stream(gpsdata, WATCH_ENABLE | WATCH_JSON, NULL);
+  gps_stream(gpsdata, WATCH_ENABLE, NULL);
 }
 
 void gpspoller::close(gps_data_t* gpsdata)
 {
+  gps_stream(gpsdata, WATCH_DISABLE, NULL);
   gps_close(gpsdata);
 }
 
@@ -41,9 +43,6 @@ void gpspoller::run(void)
 
 // Connect to device
   open(gpsdata);
-
-  // Register for updates
-  reg(gpsdata);
 
   running = true;
   while(running)
@@ -68,6 +67,5 @@ void gpspoller::run(void)
   }
 
   // Close
-  gps_stream(gpsdata, WATCH_DISABLE, NULL);
   close(gpsdata);
 }
