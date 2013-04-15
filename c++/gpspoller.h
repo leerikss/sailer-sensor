@@ -16,8 +16,11 @@ class gpspoller
   bool running;
 
  private:
+  void open(gps_data_t* gpsdata);
+  void close(gps_data_t* gpsdata);
+  void reg(gps_data_t* gpsdata);
+
   int s_time;
-  gps_data_t *gpsdata;
 };
 
 

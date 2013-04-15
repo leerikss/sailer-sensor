@@ -29,7 +29,7 @@ int main()
   catch(const ParseException &pex)
   {
     cerr << "Parse error at " << pex.getFile() << ":" << pex.getLine()
-	      << " - " << pex.getError() << endl;
+	 << " - " << pex.getError() << endl;
     return(EXIT_FAILURE);
   }
   
@@ -45,7 +45,7 @@ sailersensor::sailersensor(const Config& cfg) : lsm_p(cfg), gps_p(cfg)
 void sailersensor::run(void)
 {
   // Start lsmpoller thread
-  boost::thread lsm_t = boost::thread(&lsmpoller::run, &lsm_p);
+  // boost::thread lsm_t = boost::thread(&lsmpoller::run, &lsm_p);
 
   // Start gpspoller thread
   boost::thread gps_t = boost::thread(&gpspoller::run, &gps_p);
@@ -53,9 +53,9 @@ void sailersensor::run(void)
   while(true)
   {
     /*
-    int p = lsm_p.get_pitch();
-    int h = lsm_p.get_heading();
-    cout << "Pitch: " << p << ", Heading: " << h << endl;
+      int p = lsm_p.get_pitch();
+      int h = lsm_p.get_heading();
+      cout << "Pitch: " << p << ", Heading: " << h << endl;
     */
 
     usleep(s_time);
