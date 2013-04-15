@@ -48,17 +48,25 @@ void gpspoller::run(void)
   running = true;
   while(running)
   {
-//block for up to .5 seconds
-    if (gps_waiting(gpsdata, 500))
+    //block to wair for data
+    if (gps_waiting(gpsdata, (s_time/1000)))
     {
       if( gps_read(gpsdata) != -1 && gpsdata->status>0 )
-	printf("Latitude = %f, longitud = %f\n", gpsdata_t.fix.latitude, gpsdata_t.fix.longitude);
+      {
+	printf("Latitude = %f, longitude = %f\n", gpsdata_t.fix.latitude, gpsdata_t.fix.longitude);
+      }
     }
-// If waiting timeouted, register again
+    // If waiting timeouted, register again
     else
+    {
+      cout << "Waiting timed out, re-registering" << endl;
       reg(gpsdata);
+    }
 
     // Sleep
     usleep(s_time);
   }
+
+  // Close
+  close(gpsdata);
 }
