@@ -21,11 +21,6 @@ void gpspoller::open(gps_data_t* gpsdata)
       cerr << "Unable to connect to device. Trying again..." << endl;
       usleep(s_time);
   }
-  reg(gpsdata);
-}
-
-void gpspoller::reg(gps_data_t* gpsdata)
-{
   gps_stream(gpsdata, WATCH_ENABLE, NULL);
 }
 
