@@ -59,6 +59,8 @@ void gpspoller::run(void)
 	// TODO: Do stuff
 	printf("Latitude = %f, longitude = %f\n", gpsdata->fix.latitude, gpsdata->fix.longitude);
       }
+      else
+	cerr << "No data retrieved." << endl;
     }
     // Sleep
     usleep(s_time);
