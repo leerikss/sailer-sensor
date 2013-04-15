@@ -68,5 +68,6 @@ void gpspoller::run(void)
   }
 
   // Close
+  gps_stream(gpsdata, WATCH_DISABLE, NULL);
   close(gpsdata);
 }
