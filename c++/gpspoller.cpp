@@ -50,9 +50,12 @@ void gpspoller::run(void)
     //block to wair for data
     if (gps_waiting(gpsdata, (s_time/1000)))
     {
-      if( gps_read(gpsdata) != -1 && gpsdata->status>0 )
+      // Data ok if it has a status, and both latitude and longitude aren't NaN
+      if( gps_read(gpsdata) != -1 && gpsdata->status > 0 && 
+	  !(gpsdata->fix.latitude != gpsdata->fix.latitude) && 
+	  !(gpsdata->fix.longitude != gpsdata->fix.longitude) )
       {
-	printf("Latitude = %f, longitude = %f\n", gpsdata_t.fix.latitude, gpsdata_t.fix.longitude);
+	printf("Latitude = %f, longitude = %f\n", gpsdata->fix.latitude, gpsdata->fix.longitude);
       }
     }
     // If waiting timeouted, register again
