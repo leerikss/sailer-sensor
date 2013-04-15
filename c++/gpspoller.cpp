@@ -20,7 +20,7 @@ void gpspoller::run(void)
 
   if (gps_rec.stream(WATCH_ENABLE|WATCH_JSON) == NULL) {
     cerr << "No GPSD running.\n";
-    return 1;
+    // return 1;
   }
 
   for (;;) {
@@ -31,11 +31,11 @@ void gpspoller::run(void)
 
     if ((newdata = gps_rec.read()) == NULL) {
       cerr << "Read error.\n";
-      return 1;
+      // return 1;
     } else {
-      PROCESS(newdata);
+	cout << newdata;
     }
-  }
+
 
 
 /*

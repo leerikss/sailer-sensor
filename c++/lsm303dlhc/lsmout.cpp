@@ -3,6 +3,7 @@
 #include <libconfig.h++>
 #include <string.h>
 #include "lsm303dlhc.h"
+#include <unistd.h>
 
 #define CONFIG_FILE "lsm303dlhc.cfg"
 

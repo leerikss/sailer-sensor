@@ -3,14 +3,14 @@ Libs:
  
 libconfig++ 
 - Tested version: 9
+-  sudo apt-get install libconfig++9 libconfig++-dev 
 
-boost_thread
+boost_thread, boost_system
 - Tested version: 1.50
-
-boost_system
-- Tested version: 1.50
+- sudo apt-get install libboost-thread1.50-dev libboost-system1.50.0
 
 libgps
+- sudo apt-get install libgps-dev
 
 Config file:
 ============
