@@ -15,29 +15,29 @@ gpspoller::gpspoller(const Config& cfg)
 
 void gpspoller::run(void)
 {
-  // gpsdata buffer
+  // gpsd buffer
   gps_data_t gpsdata_t;
   gps_data_t* gpsdata = &gpsdata_t;
 
-  // Connect to device
+  // Connect to the device
   open(gpsdata);
 
   running = true;
   while(running)
   {
-    // Read without sleeping as fast as the device spits out data.
-    // First wait max 0.5 secs for data from daemon. 
-    // If is valid (lat nor lon is NaNa), proceed
-    if ( gps_waiting(gpsdata, (500) ) & 
-	 ( gps_read(gpsdata) != -1 ) & 
-	 ( gpsdata->status > 0 ) & 
-	 !(gpsdata->fix.latitude  != gpsdata->fix.latitude) &
+    // Read data and loop without sleeping if valid data is retrieved
+    // When sleeping between the readings, a continuous lag would occur,
+    // so reading as fast as possible to get the freshest data
+    if ( gps_waiting(gpsdata, (500) ) && 
+	 ( gps_read(gpsdata) != -1 ) && 
+	 ( gpsdata->status > 0 ) && 
+	 !(gpsdata->fix.latitude  != gpsdata->fix.latitude) &&
 	 !(gpsdata->fix.longitude != gpsdata->fix.longitude) )
     {
       // TODO: Do stuff
       printf("Latitude = %f, longitude = %f\n", gpsdata->fix.latitude, gpsdata->fix.longitude);
     }
-    // If no valid data is received, sleep to spare CPU
+    // If gpsd has no new data, or data is invalid, sleep to spare cpu
     else
     {
       usleep(s_time);
