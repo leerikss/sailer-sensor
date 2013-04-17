@@ -1,7 +1,7 @@
 CPP		:= g++ -g
 CPPFLAGS	:= -Wall
 LIBS		:= -lconfig++ -lboost_thread -lboost_system -lgps
-OBJECTS		:=  sailersensor.o gpspoller.o lsmpoller.o lsm303dlhc/lsm303dlhc.o \
+OBJECTS		:=  sailersensor.o gpspoller.o database.o lsmpoller.o lsm303dlhc/lsm303dlhc.o \
 	lsm303dlhc/I2C_bus.o lsm303dlhc/smbus.o
 
 sailersensor: $(OBJECTS)
@@ -12,6 +12,9 @@ sailersensor.o: sailersensor.cpp
 
 gpspoller.o: gpspoller.cpp
 	$(CPP) $(LIBS) $(CPPFLAGS) -c gpspoller.cpp -o gpspoller.o
+
+database.o: database.cpp
+	$(CPP) $(LIBS) $(CPPFLAGS) -c database.cpp -o database.o
 
 lsmpoller.o: lsmpoller.cpp
 	$(CPP) $(LIBS) $(CPPFLAGS) -c lsmpoller.cpp -o lsmpoller.o

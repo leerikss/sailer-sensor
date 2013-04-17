@@ -35,7 +35,7 @@ void gpspoller::run(void)
 	 !(gpsdata->fix.longitude != gpsdata->fix.longitude) )
     {
       // TODO: Do stuff
-      printf("Latitude = %f, longitude = %f\n", gpsdata->fix.latitude, gpsdata->fix.longitude);
+      printf("Latitude: %f\tLongitude: %f\tTime: %d\n", gpsdata->fix.latitude, gpsdata->fix.longitude, (int)gpsdata->fix.time);
     }
     // If gpsd has no new data, or data is invalid, sleep to spare cpu
     else

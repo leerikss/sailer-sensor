@@ -13,6 +13,9 @@ libgps
 - v. 3.6-4
 - sudo apt-get install libgps-dev
 
+libsqlite3
+- sudo apt-get install libsqlite3-dev
+
 Config file:
 ============
 
