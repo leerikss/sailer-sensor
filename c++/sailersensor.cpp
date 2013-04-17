@@ -5,6 +5,7 @@
 #include <boost/thread.hpp> 
 #include <unistd.h>
 #include "lsmpoller.h"
+#include "dao.h"
 
 #define CONFIG_FILE "sailersensor.cfg"
 
@@ -49,6 +50,9 @@ void sailersensor::run(void)
 
   // Start gpspoller thread
   boost::thread gps_t = boost::thread(&gpspoller::run, &gps_p);
+
+  // Testing
+  dao::getInstance().insertGps();
 
   while(true)
   {
