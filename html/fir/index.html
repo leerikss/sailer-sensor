@@ -26,7 +26,7 @@
 
     <div id="coords">
       <h1>Coordinates</h1>
-      <textarea id="taCoords" style="height:520px">Copy and paste JSON GPS data here or click on map to build a path</textarea>
+      <textarea id="taCoords" style="height:350px">Copy and paste JSON GPS data here or click on map to build a path</textarea>
       <div class="right">
         <input type="button" value="Clear All" onclick="$('#taCoords').val(''); firMap.clearPath([firMap.rawPath,firMap.firPath,firMap.regPath])"/>
         <input type="button" value="Draw Path" onclick="firMap.drawPathFromJson()"/>
@@ -36,7 +36,7 @@
     <div id="coefs">
       <h1>FIR Coefs</h1>
       <!--Copy and paste coefs here-->		
-      <textarea  style="height:120px" id="taCoefs">
+      <textarea  style="height:50px" id="taCoefs">
 0.25
 0.25
 0.25

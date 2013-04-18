@@ -286,7 +286,7 @@ FirTest.prototype.calcLinReg = function()
   this.regPath = this.drawPath(path, '#00FF00');
   
   // Set text
-  $("#headistText").html( "Heading: "+h+" &deg; Distance: "+ dist + " m");
+  $("#headistText").html( "Head: "+h+"&deg; Dist: "+ dist + " m");
 }
 
 FirTest.prototype.getEdges = function()
