@@ -45,8 +45,9 @@ void gpspoller::run(void)
       g.time = (int)gpsdata->fix.time;
       add_deque(g_deque, g, g_size);
 
+/*
       printf("Latitude: %f\tLongitude: %f\tTime: %d\n", gpsdata->fix.latitude, gpsdata->fix.longitude, (int)gpsdata->fix.time);
-
+*/
 
     }
     // If gpsd has no new data, or data is invalid, sleep to spare cpu
@@ -63,6 +64,18 @@ void gpspoller::run(void)
 const gps_struct& gpspoller::getLatestPos(void)
 {
   return g_deque.front();
+}
+
+const float gpspoller::getHeading(void)
+{
+  // TODO: Implement
+  // TODO: Take standstill into account
+}
+
+const float gpospoller::getSpeedInKnots(void)
+{
+  // TODO: Implement
+  // TODO: Take standstill into account
 }
 
 void gpspoller::open(gps_data_t* gpsdata)
@@ -84,8 +97,16 @@ void gpspoller::close(gps_data_t* gpsdata)
 void gpspoller::add_deque(deque<gps_struct>& d, gps_struct& v, unsigned int& s)
 {
   // TODO: Filter out corrupt peak values
+  if( isValidPoint(v)
+  {
+    d.push_front(v);
+    if( d.size() > s )
+      d.pop_back();
+  }
+}
 
-  d.push_front(v);
-  if( d.size() > s )
-    d.pop_back();
+bool gpspoller::isValidPoint(gps_struct& g)
+{
+  // TODO: Implement; don't allow points outside realistic reach
+  return true;
 }

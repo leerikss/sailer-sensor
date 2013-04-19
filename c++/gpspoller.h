@@ -15,6 +15,8 @@ class gpspoller
 
   void run(void);
   const gps_struct& getLatestPos(void);
+  const float getHeading(void);
+  const float getSpeedInKnots(void);
 
   bool running;
 
@@ -22,6 +24,7 @@ class gpspoller
   void open(gps_data_t* gpsdata);
   void close(gps_data_t* gpsdata);
   void add_deque(deque<gps_struct>& d, gps_struct& v, unsigned int& s);
+  bool isValidPoint(gps_struct& g);
 
   int s_time;
   deque<gps_struct> g_deque;
