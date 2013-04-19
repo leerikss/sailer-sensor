@@ -68,12 +68,14 @@ const gps_struct& gpspoller::getLatestPos(void)
 
 const float gpspoller::getHeading(void)
 {
+  return 0;
   // TODO: Implement
   // TODO: Take standstill into account
 }
 
-const float gpospoller::getSpeedInKnots(void)
+const float gpspoller::getSpeedInKnots(void)
 {
+  return 0;
   // TODO: Implement
   // TODO: Take standstill into account
 }
@@ -97,7 +99,7 @@ void gpspoller::close(gps_data_t* gpsdata)
 void gpspoller::add_deque(deque<gps_struct>& d, gps_struct& v, unsigned int& s)
 {
   // TODO: Filter out corrupt peak values
-  if( isValidPoint(v)
+  if( isValidPoint(v) )
   {
     d.push_front(v);
     if( d.size() > s )

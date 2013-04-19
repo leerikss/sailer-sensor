@@ -14,7 +14,8 @@ public:
     return instance;
   }
 
-  void insertGps(const gps_struct& data);
+  bool insertGps(const gps_struct& data);
+  bool insertLsm(const lsm_struct& lsm);
 
 private:
   dao(){};
@@ -23,7 +24,7 @@ private:
 
   void open(void);
   void init(void);
-  void exec(const char* sql);
+  bool query(const char* sql);
   void close(void);
 
   sqlite3 *db;

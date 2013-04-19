@@ -56,11 +56,12 @@ void sailersensor::run(void)
   {
     // TODO: Do this if conf allows
     const gps_struct& g = gps_p.getLatestPos();
+    dao::getInstance().insertGps(g);
 
+    /*
     printf("Lat: %f, Lon: %f, Alt: %f, Time: %d\n", g.latitude, \
 	   g.longitude, g.altitude, g.time );
-
-    dao::getInstance().insertGps(g);
+    */
 
     /*
       int p = lsm_p.get_pitch();
