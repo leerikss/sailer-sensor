@@ -65,8 +65,9 @@ bool dao::query(const char* sql)
   char* error;
   if( sqlite3_exec(db,sql,NULL,NULL,&error) )
   {
-    cerr << "Error executing " << sqlite3_errmsg(db) << endl;
-    sqlite3_free(&error);
+    cerr << "dao::quuery(): Error: " << sqlite3_errmsg(db) \
+	 << " while executing '" << sql << "'" << endl;
+    sqlite3_free(error);
     return false;
   }
   return true;

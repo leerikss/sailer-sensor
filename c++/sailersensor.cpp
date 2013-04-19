@@ -54,21 +54,31 @@ void sailersensor::run(void)
 
   while(true)
   {
-    // TODO: Do this if conf allows
-    const gps_struct& g = gps_p.getLatestPos();
-    dao::getInstance().insertGps(g);
+    try
+    {
+      // TODO: Do this if conf allows
+      const gps_struct& g = gps_p.getLatestPos();
+      dao::getInstance().insertGps(g);
 
-    /*
-    printf("Lat: %f, Lon: %f, Alt: %f, Time: %d\n", g.latitude, \
+      /*
+	printf("Lat: %f, Lon: %f, Alt: %f, Time: %d\n", g.latitude,	\
 	   g.longitude, g.altitude, g.time );
-    */
+      */
 
-    /*
-      int p = lsm_p.get_pitch();
-      int h = lsm_p.get_heading();
-      cout << "Pitch: " << p << ", Heading: " << h << endl;
-    */
-
+      /*
+	int p = lsm_p.get_pitch();
+	int h = lsm_p.get_heading();
+	cout << "Pitch: " << p << ", Heading: " << h << endl;
+      */
+    }
+    catch( const std::exception & ex ) 
+    {
+      cerr << "sailersensor::run(): Error " << ex.what() << endl;
+    }      
+    catch(...)
+    {
+      cerr << "sailersensor::run(): Unexpected Error" << endl;
+    }
     usleep(s_time);
   }  
 }
