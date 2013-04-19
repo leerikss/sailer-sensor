@@ -23,11 +23,10 @@ private:
   void operator=(dao const&);
 
   void open(void);
-  void init(void);
   bool query(const char* sql);
   void close(void);
 
-  sqlite3 *db;
+  sqlite3* db;
   bool inited;
 };
 
