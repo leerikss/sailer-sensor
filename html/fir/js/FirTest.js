@@ -262,21 +262,25 @@ FirTest.prototype.calcLinReg = function()
   var e = this.getEdges();
   var w = this.getDistHaversine(e.minLat, e.minLon, e.minLat, e.maxLon);
   var h = this.getDistHaversine(e.minLat, e.minLon, e.maxLat, e.minLon);
-  var h = 0;
-  
+  var hd = 0;
+
+  console.log("w: "+w+", h: "+h);
+    
   // Get linear regression heading in X-axis
   if( w > h )
   {
+  	console.log("X");
     var o = this.getLinearRegression(this.data.buffLon, this.data.buffLat);
     var path = [ new google.maps.LatLng(o.y1, o.x1), new google.maps.LatLng(o.y2, o.x2) ];
-    h = parseInt( this.getBearing(o.y1,o.x1,o.y2,o.x2) );
+    hd = parseInt( this.getBearing(o.y1,o.x1,o.y2,o.x2) );
   }
   // Get linear regression heading in Y-axis
   else
   {
+  	console.log("Y");
     var o = this.getLinearRegression(this.data.buffLat, this.data.buffLon);
     var path = [ new google.maps.LatLng(o.x1, o.y1), new google.maps.LatLng(o.x2, o.y2) ];
-    h = parseInt( this.getBearing(o.x1,o.y1,o.x2,o.y2) );
+    hd = parseInt( this.getBearing(o.x1,o.y1,o.x2,o.y2) );
   }
   // Get distance
   var d = this.getDistHaversine(o.y1,o.x1,o.y2,o.x2);
@@ -286,7 +290,7 @@ FirTest.prototype.calcLinReg = function()
   this.regPath = this.drawPath(path, '#00FF00');
   
   // Set text
-  $("#headistText").html( "Head: "+h+"&deg; Dist: "+ dist + " m");
+  $("#headistText").html( "Head: "+hd+"&deg; Dist: "+ dist + " m");
 }
 
 FirTest.prototype.getEdges = function()
@@ -298,8 +302,8 @@ FirTest.prototype.getEdges = function()
     var lon = this.data.buffLon[i];
     var lat = this.data.buffLat[i];
     minLon = Math.min(lon,minLon);
-    minLat = Math.min(lat,minLat);
     maxLon = Math.max(lon,maxLon);
+    minLat = Math.min(lat,minLat);
     maxLat = Math.max(lat,maxLat);
   }
   
@@ -335,13 +339,7 @@ FirTest.prototype.getDistHaversine = function(lat1,lon1,lat2,lon2)
 FirTest.prototype.getLinearRegression = function(values_x, values_y)
 {
     // Init variables
-    var sum_x = 0;
-    var sum_y = 0;
-    var sum_xy = 0;
-    var sum_xx = 0;
-    var count = 0;
-    var x = 0;
-    var y = 0;
+    var sum_x = sum_y = sum_xy = sum_xx = count = x = y = 0;
     var values_length = values_x.length;
 
     // Calculate the sum for each of the parts necessary.
