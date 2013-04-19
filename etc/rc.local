@@ -22,6 +22,6 @@ fi
 # sudo /home/pi/WORKING/rpi-mothership-client/client.py $HOSTNAME "From rc.local" >> /home/pi/WORKING/rpi-mothership-client/client.log
 
 # Start sailer-sensor
-su pi -c "/usr/bin/flock -n /home/pi/.sailersensor/.sailersensor.lockfile -c \"/home/pi/WORKING/sailer-sensor/c++/sailersensor.bin\"" &
+su pi -c "/usr/bin/flock -n /home/pi/.sailersensor/sailersensor.lockfile -c \"/home/pi/WORKING/sailer-sensor/c++/sailersensor.bin\"" &
 
 exit 0
