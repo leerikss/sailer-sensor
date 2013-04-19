@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include "lsmpoller.h"
 #include "dao.h"
+#include "structs.h"
 
 #define CONFIG_FILE "sailersensor.cfg"
 
@@ -51,11 +52,16 @@ void sailersensor::run(void)
   // Start gpspoller thread
   boost::thread gps_t = boost::thread(&gpspoller::run, &gps_p);
 
-  // Testing
-  dao::getInstance().insertGps();
-
   while(true)
   {
+    // TODO: Do this if conf allows
+    const gps_struct& g = gps_p.getLatestPos();
+
+    cout << "Latitude: " << g.latitude << ", Longitude: " << g.longitude;
+    cout << ", Altitude: " << g.altitude << ", Time: " << g.time << endl;
+
+    dao::getInstance().insertGps(g);
+
     /*
       int p = lsm_p.get_pitch();
       int h = lsm_p.get_heading();

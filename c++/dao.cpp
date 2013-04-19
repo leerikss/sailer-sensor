@@ -2,6 +2,7 @@
 
 #include <sqlite3.h>
 #include <iostream>
+#include "structs.h"
 
 #define DB          "data/sailorlog.sqlite"
 
@@ -37,7 +38,7 @@ void dao::init(void)
   exec(sql);
 }
 
-void dao::insertGps()
+void dao::insertGps(const gps_struct& data)
 {
   open();
 }

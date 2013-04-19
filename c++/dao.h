@@ -2,6 +2,7 @@
 #define dao_h
 
 #include <sqlite3.h>
+#include "structs.h"
 
 // Singleton class
 class dao
@@ -13,17 +14,7 @@ public:
     return instance;
   }
 
-  struct gps
-  {
-    double latitude,longitude,altitude;
-  };
-
-  struct lsm
-  {
-    int mag_x,mag_y,mag_z,acc_x,acc_y,acc_z;
-  };
-
-  void insertGps(void);
+  void insertGps(const gps_struct& data);
 
 private:
   dao(){};
