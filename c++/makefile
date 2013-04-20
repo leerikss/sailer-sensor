@@ -8,9 +8,6 @@ OBJECTS		:=  sailersensor.o  structs.o mathutil.o gpspoller.o dao.o \
 sailersensor: $(OBJECTS)
 	$(CPP) $(LIBS) $(OBJECTS) -o sailersensor.bin
 
-#tcp_client.o: tcp_client.h
-#	$(CPP) $(CPPFLAGS) -c tcp_client.h -o tcp_client.o
-
 scructs.o: structs.cpp
 	$(CPP) $(CPPFLAGS) -c structs.cpp -o structs.o
 

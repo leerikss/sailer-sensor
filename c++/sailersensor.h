@@ -17,6 +17,8 @@ private:
   lsmpoller lsm_p;
   gpspoller gps_p;
   int s_time;
+  int display_ip;
+  int display_port;
 };
 
 #endif

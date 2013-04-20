@@ -7,7 +7,7 @@
 #include "lsmpoller.h"
 #include "dao.h"
 #include "structs.h"
-#include "tcp_client.h"
+#include "socketclient.h"
 
 #define CONFIG_FILE "/home/pi/WORKING/sailer-sensor/c++/sailersensor.cfg"
 
@@ -43,6 +43,8 @@ sailersensor::sailersensor(const Config& cfg) : lsm_p(cfg), gps_p(cfg)
   
 {
   s_time = cfg.lookup("sailersensor.sleep");
+  display_ip = cfg.lookup("sailersensor.display_ip");
+  display_port = cfg.lookup("sailersensor.display_port");
 }
 
 void sailersensor::run(void)
@@ -56,15 +58,12 @@ void sailersensor::run(void)
 
   pthread_create(&gps_t, NULL, &gpspoller::startThread, &gps_p);
 
-  tcp_client s;
+  socketclient s;
 
   while(true)
   {
     try
     {
-      s.conn("0.0.0.0",3333);
-      s.send_data("Fuck u");
-
       // TODO: Do this if conf allows
       const gps_struct& g = gps_p.getLatestPos();
       dao::getInstance().insertGps(g);
@@ -80,6 +79,14 @@ void sailersensor::run(void)
 	cout << "Sailersensor: Pitch: " << p << ", Heading: " << h << endl;
       */
 
+      /*
+// TODO
+      if(s.conn(display_ip,display_port) )
+      {
+	s.send_data("");
+	s.close();
+      }
+      */
     }
     catch( const std::exception & ex ) 
     {
