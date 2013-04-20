@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <libconfig.h++>
 // #include <boost/thread.hpp> 
+#include <pthread.h>
 #include <unistd.h>
 #include "lsmpoller.h"
 #include "dao.h"
@@ -50,6 +51,8 @@ void sailersensor::run(void)
   // boost::thread lsm_t = boost::thread(&lsmpoller::run, &lsm_p);
 
   // Start gpspoller thread
+  pthread_t gps_t;
+  pthread_create(&gps_t, NULL, &gpspoller::startRun, &gps_p);
   // boost::thread gps_t = boost::thread(&gpspoller::run, &gps_p);
 
   while(true)

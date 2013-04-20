@@ -16,7 +16,7 @@ gpspoller::gpspoller(const Config& cfg)
   g_size = cfg.lookup("gpspoller.buffer_size");
 }
 
-void gpspoller::run(void)
+void* gpspoller::run(void)
 {
   // gpsd buffer
   gps_data_t gpsdata_t;
@@ -58,6 +58,8 @@ void gpspoller::run(void)
 
   // Close
   close(gpsdata);
+
+  return 0;
 }
 
 const gps_struct& gpspoller::getLatestPos(void)
