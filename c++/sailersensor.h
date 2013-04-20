@@ -8,12 +8,12 @@ using namespace libconfig;
 
 class sailersensor
 {
- public:
+public:
   sailersensor(const Config& cfg);
 
   void run(void);
 
- private:
+private:
   lsmpoller lsm_p;
   gpspoller gps_p;
   int s_time;

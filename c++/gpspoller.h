@@ -10,15 +10,15 @@ using namespace std;
 
 class gpspoller
 {
- public:
+public:
   gpspoller(const libconfig::Config& c);
 
-  // Thread method
-  void* run(void);
-  static void* startRun(void* context)
+  // Thread methods
+  static void* startThread(void* context)
   {
     return ((gpspoller*)context)->run();
   }
+  void* run(void);
 
   const gps_struct& getLatestPos(void);
   const float getHeading(void);
@@ -26,7 +26,7 @@ class gpspoller
   
   bool running;
 
- private:
+private:
   void open(gps_data_t* gpsdata);
   void close(gps_data_t* gpsdata);
   void add_deque(deque<gps_struct>& d, gps_struct& v, unsigned int& s);

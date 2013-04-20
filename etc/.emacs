@@ -7,9 +7,14 @@
 (setq make-backup-files nil)
 
 ;; Fix fucked up indentation
-(setq-default c-basic-offset 2)
+;; (setq-default c-basic-offset 2)
 (setq c-default-style "linux"
           c-basic-offset 2)
+
+;; Spaces for tabs
+(setq c-basic-indent 2)
+(setq tab-width 4)
+(setq indent-tabs-mode nil)
 
 ;; Match parenthesis in code
 (show-paren-mode 1)

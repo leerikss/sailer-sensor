@@ -32,11 +32,11 @@ void* gpspoller::run(void)
     // When sleeping between the readings, a continuous lag would occur,
     // so reading as fast as possible to get the freshest data
     if ( gps_waiting(gpsdata, (500) ) && 
-	 ( gps_read(gpsdata) != -1 ) && 
-	 ( gpsdata->status > 0 ) && 
-	 !(gpsdata->fix.latitude  != gpsdata->fix.latitude) &&
-	 !(gpsdata->fix.longitude != gpsdata->fix.longitude) &&
-	 !(gpsdata->fix.altitude != gpsdata->fix.altitude) )
+         ( gps_read(gpsdata) != -1 ) && 
+         ( gpsdata->status > 0 ) && 
+         !(gpsdata->fix.latitude  != gpsdata->fix.latitude) &&
+         !(gpsdata->fix.longitude != gpsdata->fix.longitude) &&
+         !(gpsdata->fix.altitude != gpsdata->fix.altitude) )
     {
       // Add to deque
       gps_struct g;
@@ -85,8 +85,8 @@ void gpspoller::open(gps_data_t* gpsdata)
 {
   while( gps_open("localhost", DEFAULT_GPSD_PORT, gpsdata) < 0 )
   {
-      cerr << "Unable to connect to device. Trying again..." << endl;
-      usleep(s_time);
+    cerr << "Unable to connect to device. Trying again..." << endl;
+    usleep(s_time);
   }
   gps_stream(gpsdata, WATCH_ENABLE, NULL);
 }

@@ -31,7 +31,7 @@ int main()
   catch(const ParseException &pex)
   {
     cerr << "Parse error at " << pex.getFile() << ":" << pex.getLine()
-	 << " - " << pex.getError() << endl;
+         << " - " << pex.getError() << endl;
     return(EXIT_FAILURE);
   }
   
@@ -48,11 +48,12 @@ void sailersensor::run(void)
 {
   // Start lsmpoller thread
   pthread_t lsm_t;
-  pthread_create(&lsm_t, NULL, &lsmpoller::startRun, &lsm_p);
+  pthread_create(&lsm_t, NULL, &lsmpoller::startThread, &lsm_p);
 
   // Start gpspoller thread
   pthread_t gps_t;
-  pthread_create(&gps_t, NULL, &gpspoller::startRun, &gps_p);
+
+  pthread_create(&gps_t, NULL, &gpspoller::startThread, &gps_p);
 
   while(true)
   {
@@ -63,14 +64,14 @@ void sailersensor::run(void)
       dao::getInstance().insertGps(g);
 
       /*
-      printf("Sailersensor: Lat: %f, Lon: %f, Alt: %f, Time: %d\n", g.latitude, \
-	   g.longitude, g.altitude, g.time );
+	printf("Sailersensor: Lat: %f, Lon: %f, Alt: %f, Time: %d\n", g.latitude, \
+	g.longitude, g.altitude, g.time );
       */
 
       /*
-      int p = lsm_p.get_pitch();
-      int h = lsm_p.get_heading();
-      cout << "Sailersensor: Pitch: " << p << ", Heading: " << h << endl;
+	int p = lsm_p.get_pitch();
+	int h = lsm_p.get_heading();
+	cout << "Sailersensor: Pitch: " << p << ", Heading: " << h << endl;
       */
 
     }

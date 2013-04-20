@@ -10,11 +10,11 @@ using namespace std;
 
 class lsmpoller
 {
- public:
+public:
   lsmpoller(const Config& c);
 
   void* run(void);
-  static void* startRun(void* context)
+  static void* startThread(void* context)
   {
     return ((lsmpoller*)context)->run();
   }
@@ -24,7 +24,7 @@ class lsmpoller
 
   bool running;
 
- private:
+private:
   void add_deque(deque<int>& q, int& v, unsigned int& s);
   float get_avg(deque<int>& q);
 

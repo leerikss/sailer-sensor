@@ -6,6 +6,6 @@ class mathutil
 public:
 
 private:
-}
+};
 
 #endif
