@@ -11,6 +11,8 @@ FAIL="\e[00;31m[Failed]\e[00m"
 
 test -f $DAEMON || exit 0
 
+. /lib/lsb/init-functions
+
 # Start the service sailersensor
 
 ### main logic ###
@@ -38,7 +40,12 @@ case "$1" in
 	fi
         ;;
     status)
-        status_of_proc -p $PIDFILE $DAEMON $NAME && exit 0 || exit $?
+	if [ -n "$PID" ]; 
+	then
+	    /bin/echo "Sailsensor is running"
+	else
+	    /bin/echo "Sailsensor is not running"
+	fi
         ;;
     restart|reload|condrestart)
         $0 stop
