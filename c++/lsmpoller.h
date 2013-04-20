@@ -13,7 +13,12 @@ class lsmpoller
  public:
   lsmpoller(const Config& c);
 
-  void run(void);
+  void* run(void);
+  static void* startRun(void* context)
+  {
+    return ((lsmpoller*)context)->run();
+  }
+
   int get_pitch(void);
   int get_heading(void);
 

@@ -2,7 +2,6 @@
 #include <iostream>
 #include <cstdlib>
 #include <libconfig.h++>
-// #include <boost/thread.hpp> 
 #include <pthread.h>
 #include <unistd.h>
 #include "lsmpoller.h"
@@ -48,12 +47,12 @@ sailersensor::sailersensor(const Config& cfg) : lsm_p(cfg), gps_p(cfg)
 void sailersensor::run(void)
 {
   // Start lsmpoller thread
-  // boost::thread lsm_t = boost::thread(&lsmpoller::run, &lsm_p);
+  pthread_t lsm_t;
+  pthread_create(&lsm_t, NULL, &lsmpoller::startRun, &lsm_p);
 
   // Start gpspoller thread
   pthread_t gps_t;
   pthread_create(&gps_t, NULL, &gpspoller::startRun, &gps_p);
-  // boost::thread gps_t = boost::thread(&gpspoller::run, &gps_p);
 
   while(true)
   {
@@ -64,15 +63,16 @@ void sailersensor::run(void)
       dao::getInstance().insertGps(g);
 
       /*
-	printf("Lat: %f, Lon: %f, Alt: %f, Time: %d\n", g.latitude,	\
+      printf("Sailersensor: Lat: %f, Lon: %f, Alt: %f, Time: %d\n", g.latitude, \
 	   g.longitude, g.altitude, g.time );
       */
 
       /*
-	int p = lsm_p.get_pitch();
-	int h = lsm_p.get_heading();
-	cout << "Pitch: " << p << ", Heading: " << h << endl;
+      int p = lsm_p.get_pitch();
+      int h = lsm_p.get_heading();
+      cout << "Sailersensor: Pitch: " << p << ", Heading: " << h << endl;
       */
+
     }
     catch( const std::exception & ex ) 
     {

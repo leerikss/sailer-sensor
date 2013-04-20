@@ -18,7 +18,7 @@ lsmpoller::lsmpoller(const Config& cfg) : lsm303(fileN, cfg)
   h_size = cfg.lookup("magnetometer.buffer_size");
 }
 
-void lsmpoller::run(void)
+void* lsmpoller::run(void)
 {
   lsm303.enable();
 
@@ -41,6 +41,8 @@ void lsmpoller::run(void)
     // Sleep
     usleep(s_time);
   }
+
+  return 0;
 }
 
 int lsmpoller::get_pitch(void)

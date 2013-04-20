@@ -13,13 +13,12 @@ class gpspoller
  public:
   gpspoller(const libconfig::Config& c);
 
+  // Thread method
   void* run(void);
-  
   static void* startRun(void* context)
   {
     return ((gpspoller*)context)->run();
   }
-  // static void* startRun(void* context);
 
   const gps_struct& getLatestPos(void);
   const float getHeading(void);
