@@ -1,0 +1,51 @@
+#!/bin/bash
+
+NAME=sailersensor.bin
+PATH=/home/pi/WORKING/sailer-sensor/c++/$NAME
+LOCK=/var/lock/sailersensor
+LOG=/var/log/sailersensor.log
+NAME=sailersensor
+
+OK="\e[00;32m[Ok]\e[00m"
+FAIL="\e[00;31m[Failed]\e[00m"
+
+test -f $DAEMON || exit 0
+
+# Start the service sailersensor
+
+### main logic ###
+case "$1" in
+    start) 
+	if [ -f $LOCK ];
+	then 
+	    /bin/echo -e "Sailsensor is already running $FAIL"
+	else
+	    /bin/echo  -n "Starting sailersensor..."
+	    /bin/touch $LOCK
+            $PATH >> $LOG 2>&1 &
+	    /bin/echo -e "$OK"
+	fi
+	;;
+    stop)
+	if [ ! -f $LOCK ]; then
+	    /bin/echo -e "Sailsensor is not running $FAIL"
+	else
+	    /bin/echo  -n "Stopping sailersensor..."
+	    /bin/rm -f $LOCK
+	    PID=$(/bin/pidof "sailersensor.bin")
+	    $(/bin/kill $PID)
+	    /bin/echo -e "$OK"
+	fi
+        ;;
+    status)
+        status_of_proc -p $PIDFILE $DAEMON $NAME && exit 0 || exit $?
+        ;;
+    restart|reload|condrestart)
+        stop
+        start
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|restart|reload|status}"
+        exit 2
+esac
+exit 0

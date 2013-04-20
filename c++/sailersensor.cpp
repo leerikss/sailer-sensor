@@ -8,7 +8,7 @@
 #include "dao.h"
 #include "structs.h"
 
-#define CONFIG_FILE "sailersensor.cfg"
+#define CONFIG_FILE "/home/pi/WORKING/sailer-sensor/c++/sailersensor.cfg"
 
 using namespace libconfig;
 using namespace std;

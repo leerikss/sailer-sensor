@@ -4,7 +4,7 @@
 #include <iostream>
 #include "structs.h"
 
-#define DB               "data/sailorlog.sqlite"
+#define DB               "/home/pi/WORKING/sailer-sensor/c++/data/sailorlog.sqlite"
 
 #define  SQL_INSERT_GPS  "INSERT INTO gps(latitude,longitude,altitude) " \
   "VALUES (%f,%f,%f)";
