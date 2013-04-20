@@ -35,7 +35,8 @@ void gpspoller::run(void)
 	 ( gps_read(gpsdata) != -1 ) && 
 	 ( gpsdata->status > 0 ) && 
 	 !(gpsdata->fix.latitude  != gpsdata->fix.latitude) &&
-	 !(gpsdata->fix.longitude != gpsdata->fix.longitude) )
+	 !(gpsdata->fix.longitude != gpsdata->fix.longitude) &&
+	 !(gpsdata->fix.altitude != gpsdata->fix.altitude) )
     {
       // Add to deque
       gps_struct g;
