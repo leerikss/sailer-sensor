@@ -41,8 +41,8 @@ case "$1" in
         status_of_proc -p $PIDFILE $DAEMON $NAME && exit 0 || exit $?
         ;;
     restart|reload|condrestart)
-        stop
-        start
+        $0 stop
+        $0 start
         ;;
     *)
         echo $"Usage: $0 {start|stop|restart|reload|status}"
