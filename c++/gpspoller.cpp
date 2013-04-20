@@ -44,11 +44,9 @@ void gpspoller::run(void)
       g.altitude = gpsdata->fix.altitude;
       g.time = (int)gpsdata->fix.time;
       add_deque(g_deque, g, g_size);
-
 /*
       printf("Latitude: %f\tLongitude: %f\tTime: %d\n", gpsdata->fix.latitude, gpsdata->fix.longitude, (int)gpsdata->fix.time);
 */
-
     }
     // If gpsd has no new data, or data is invalid, sleep to spare cpu
     else
