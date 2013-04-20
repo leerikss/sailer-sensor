@@ -46,8 +46,16 @@ void dao::open(void)
 
 bool dao::insertGps(const gps_struct& g)
 {
+  // Don't input invalid values
+  if(g.latitude < -90 || g.latitude > 90 )
+    return false;
+  if(g.longitude < -180 || g.longitude > 180 )
+    return false;
+
   open();
+
   const char* sql = SQL_INSERT_GPS;
+
   return query( \
     sqlite3_mprintf(sql, g.latitude,g.longitude,g.altitude) );
 }
@@ -55,7 +63,9 @@ bool dao::insertGps(const gps_struct& g)
 bool dao::insertLsm(const lsm_struct& l)
 {
   open();
+
   const char* sql = SQL_INSERT_LSM;
+
   return query( \
     sqlite3_mprintf(sql,l.mag_x,l.mag_y,l.mag_z,l.acc_x,l.acc_y,l.acc_z));
 }

@@ -108,6 +108,12 @@ void gpspoller::add_deque(deque<gps_struct>& d, gps_struct& v, unsigned int& s)
 
 bool gpspoller::isValidPoint(gps_struct& g)
 {
+  if(g.latitude < -90 || g.latitude > 90 )
+    return false;
+  if(g.longitude < -180 || g.longitude > 180 )
+
+    return false;
   // TODO: Implement; don't allow points outside realistic reach
+
   return true;
 }
