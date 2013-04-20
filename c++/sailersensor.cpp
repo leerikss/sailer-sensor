@@ -7,6 +7,7 @@
 #include "lsmpoller.h"
 #include "dao.h"
 #include "structs.h"
+#include "tcp_client.h"
 
 #define CONFIG_FILE "/home/pi/WORKING/sailer-sensor/c++/sailersensor.cfg"
 
@@ -55,10 +56,15 @@ void sailersensor::run(void)
 
   pthread_create(&gps_t, NULL, &gpspoller::startThread, &gps_p);
 
+  tcp_client s;
+
   while(true)
   {
     try
     {
+      s.conn("0.0.0.0",3333);
+      s.send_data("Fuck u");
+
       // TODO: Do this if conf allows
       const gps_struct& g = gps_p.getLatestPos();
       dao::getInstance().insertGps(g);
