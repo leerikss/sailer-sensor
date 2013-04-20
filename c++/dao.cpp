@@ -46,7 +46,7 @@ void dao::open(void)
 
 bool dao::insertGps(const gps_struct& g)
 {
-  // Don't input invalid values
+  // Don't input corrupt latitude/longitude
   if(g.latitude < -90 || g.latitude > 90 )
     return false;
   if(g.longitude < -180 || g.longitude > 180 )
