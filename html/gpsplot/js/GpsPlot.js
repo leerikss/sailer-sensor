@@ -200,7 +200,7 @@ GpsPlot.prototype.hsdOut = function(data)
   // Print heading,speed,distance
   $("#heading").html( data.heading + "&deg;" );
   // $("#speed").html( data.speed+" m" );
-  $("#distance").html( data.distance );
+  $("#distance").html( data.distance+" m" );
 
   // Draw path
   this.hsdPath = this.drawPath(data.path, '#FF0000');
