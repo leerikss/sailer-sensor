@@ -16,7 +16,7 @@ Number.prototype.toBrng = function() {  // convert radians to degrees (as bearin
 /***************
  * CONSTRUCTOR *
  **************/
-function FirTest() 
+function GpsPlot() 
 {
   // Init map 
   var options = 
@@ -27,21 +27,6 @@ function FirTest()
     zoom: 18
     };
 
-  this.map = new google.maps.Map( $("#map")[0], options );
-  this.rawPath = new google.maps.Polyline([]);
-  this.firPath = new google.maps.Polyline([]);
-  this.regPath = new google.maps.Polyline([]);
-
-  // Map listener
-  var _this = this;
-  google.maps.event.addListener(
-    this.map, "click", 
-    function(event) { 
-      // Update textarea JSON
-      _this.updateJson(event); 
-      // Draw path on map
-      _this.drawPathFromJson(); 
-    });
 
   // Select all when textarea clicked
   $("textarea").focus(function() {
@@ -54,25 +39,19 @@ function FirTest()
 	  return false;
 	});    	
     });
-	
-	// Init data object
-	this.data = 
-  {
-    buffInit: true,
-    buffLat: [],
-    buffLon: [],
-    buffSize: -1,
-    firBuffSize: 5,
-    coefs: this.parseFirCoefs(),
-    latCount: 0,
-    lonCount: 0,
-  };
+
+  this.map = new google.maps.Map( $("#map")[0], options );
+  this.rawPath = new google.maps.Polyline([]);
+  this.rawCs = [];
+  this.hsdPath = new google.maps.Polyline([]);
+  this.json = null;
+  this.hsdFrom = -5;
 };
 
 /***************
  * MAP METHODS *
  **************/
-FirTest.prototype.drawPath = function(path, color)
+GpsPlot.prototype.drawPath = function(path, color)
 {
   return new google.maps.Polyline({
     path: path,
@@ -83,40 +62,51 @@ FirTest.prototype.drawPath = function(path, color)
   });
 }
 
-FirTest.prototype.drawPathFromJson = function()
+GpsPlot.prototype.drawCircles= function(path, color)
+{
+  var cs = [];
+  for(var i in path)
+  {
+    var opts =
+    {
+      map: this.map,
+      strokeWeight: 0,
+      fillColor: color,
+      fillOpacity: 0.5,
+      center: path[i],
+      radius: 0.1
+    };
+    cs.push( new google.maps.Circle(opts) );
+  }
+  return cs;
+}
+
+GpsPlot.prototype.drawPathFromJson = function()
 {
   try
   {
-    var json = jQuery.parseJSON( $("#taCoords").val() );
+    this.json = jQuery.parseJSON( $("#taCoords").val() );
 
-    // Empty buffer
-    this.data.buffer = [];
-
-    // Init values
-    var bounds = new google.maps.LatLngBounds();
     var path = [];
-    this.data.buffLat = [];
-    this.data.buffLon = [];
-    
-    for(var i in json)
+    for(var i in this.json)
     {
       // Append to Google arrays
-      var o = json[i];
+      var o = this.json[i];
       var ll = new google.maps.LatLng( o.latitude, o.longitude );
       path.push( ll );
-      bounds.extend( ll );
-	  
-      // Add to buffer
-      this.addToBuffer( this.data.buffLat, this.data.buffSize, parseFloat( o.latitude ) );
-      this.addToBuffer( this.data.buffLon, this.data.buffSize, parseFloat( o.longitude ) );
     }
     
     // Clear previous paths
-    this.clearPath([this.rawPath,this.firPath, this.regPath]);
+    this.clearPath([this.rawPath,this.rawCs,this.hsdPath]);
 
     // Draw new path
     this.rawPath = this.drawPath(path, '#0000FF');
-    
+
+    // Draw circles
+    this.rawCs = this.drawCircles(path, '#000000');
+
+    // Fit to map
+    this.fitPath( path );
   }
   catch(e)
   {
@@ -125,63 +115,123 @@ FirTest.prototype.drawPathFromJson = function()
   }
 };
 
-FirTest.prototype.drawFirPath = function()
+GpsPlot.prototype.fitPath = function(path)
 {
-  try
+  var bounds = new google.maps.LatLngBounds();
+  for(var i in path)
   {
-    // Get JSON
-    var json = jQuery.parseJSON( $("#taCoords").val() );
-    var buffFirLat = [];
-    var buffFirLon = [];
-    var path = [];
-    for(var i=0; i<json.length; i++)
-    {
-      var o = json[i];
-      var lat = parseFloat(o.latitude);
-      var lon = parseFloat(o.longitude);
-      
-      // Init/fill buffers from first values
-      if(i==0)
-      {
-        buffFirLat = this.getFilledArray(this.data.coefs.length, lat);
-        buffFirLon = this.getFilledArray(this.data.coefs.length, lon);
-      }
-      
-      // Add to buffers
-      this.addToBuffer( buffFirLat, this.data.firBuffSize, parseFloat( o.latitude ) );
-      this.addToBuffer( buffFirLon, this.data.firBuffSize, parseFloat( o.longitude ) );
-      
-      // Get FIR filtered lat/lon values
-      lat = this.getFirValue( lat, buffFirLat, this.data.coefs );
-      lon = this.getFirValue( lon, buffFirLon, this.data.coefs );
-      var ll = new google.maps.LatLng( lat, lon );
-      
-      path.push( ll );
-    }		
-
-    // Clear previous fir path
-    this.clearPath( [this.firPath] );
-
-    // Draw new path
-    this.firPath = this.drawPath(path, '#FF0000');    
+    bounds.extend( path[i] );
   }
-  catch(e)
+
+  if( !this.map.getBounds().contains( path[i] ) )
+    this.map.panTo( path[i] );
+//    this.map.fitBounds( bounds );
+}
+
+GpsPlot.prototype.hsdPrev = function()
+{
+  // Clear previous path
+  this.clearPath([this.hsdPath]);
+
+  // Get json
+  if(this.json == null)
+    this.json = jQuery.parseJSON( $("#taCoords").val() );      
+
+  // Get from & step
+  var step = parseInt( $("#buffer").val() );
+  this.hsdFrom -= step;
+  var to = this.hsdFrom + step;
+  if(this.hsdFrom <= 0)
   {
-
-    alert("Action failed");
-    console.error(e.stack);
+    this.hsdFrom = 0;
+    to = step;
   }
-};
 
-FirTest.prototype.clearPath = function(paths)
+  // Build lats lons array
+  var lats = [];
+  var lons = [];
+  for(var i = this.hsdFrom; i < to; i++)
+  {
+    lats.push( parseFloat( this.json[i].latitude ) );
+    lons.push( parseFloat( this.json[i].longitude ) );
+  }
+
+  // Get data & output
+  var data = this.getHsdData(lats,lons);
+  this.hsdOut(data);
+}
+
+GpsPlot.prototype.hsdNext = function()
+{
+  // Clear previous path
+  this.clearPath([this.hsdPath]);
+
+  // Get json
+  if(this.json == null)
+    this.json = jQuery.parseJSON( $("#taCoords").val() );      
+
+  // Get from & step
+  var step = parseInt( $("#buffer").val() );
+  this.hsdFrom += step;
+  var to = this.hsdFrom + step;
+  if( to >= this.json.length )
+  {
+    to = this.json.length;
+    this.hsdFrom = to - step;
+  }
+
+  // Build lats lons array
+  var lats = [];
+  var lons = [];
+  for(var i=this.hsdFrom; i<to; i++)
+  {
+    lats.push( parseFloat( this.json[i].latitude ) );
+    lons.push( parseFloat( this.json[i].longitude ) );
+  }
+
+  // Get data & output
+  var data = this.getHsdData(lats,lons);
+  this.hsdOut(data);
+}
+
+
+GpsPlot.prototype.hsdOut = function(data)
+{
+  // Print heading,speed,distance
+  $("#heading").html( data.heading + "&deg;" );
+  // $("#speed").html( data.speed+" m" );
+  $("#distance").html( data.distance );
+
+  // Draw path
+  this.hsdPath = this.drawPath(data.path, '#FF0000');
+
+  // Fit to map
+  this.fitPath( data.path );
+}
+
+GpsPlot.prototype.clearPath = function(paths)
 {
   for(p in paths)
   {
-    paths[p].setPath([]);
+    var p = paths[p];
+
+    // Clear polygon paths
+    if( p.setPath )
+      p.setPath([]);
+
+    // Clear circles
+    else if( p.length )
+    {
+      for(var c in p)
+      {
+	p[c].setMap(null);
+      }
+    }
+
   }
 };
 
-FirTest.prototype.updateJson = function(event)
+GpsPlot.prototype.updateJson = function(event)
 {
   var v = $("#taCoords").val();
 
@@ -204,103 +254,47 @@ FirTest.prototype.updateJson = function(event)
   $("#taCoords").val( '[' + v + nv + ']'); 
 };
 
-/***************
- * FIR METHODS *
- **************/
-FirTest.prototype.parseFirCoefs = function(coefs)
-{
-  var txt = $("#taCoefs").val();
-  var arr = txt.split("\n");
-  var result = [];
-  for(var i=0; i<arr.length; i += 1)
-  {
-    var coef = parseFloat( arr[i] );
-    if( !isNaN(coef) )
-      result.push(coef);
-  }
-  return result;
-};
-
-FirTest.prototype.getFirValue = function(val, oldVals, coefs)
-{
-  var result = 0, index = oldVals.length;
-  for(var i=0; i<coefs.length; i++)
-  {
-    result += coefs[i] * oldVals[--index];
-    if( index < 0 ) index = ( oldVals.length );
-  }
-  return result;
-};
-
-/****************
- * MISC METHODS *
- ***************/
-FirTest.prototype.getFilledArray = function(len,val)
-{
-  var arr = new Array(len);
-  while(--len >= 0) { arr[len] = val; }
-  return arr;
-};
-
-FirTest.prototype.addToBuffer = function(buffer,bufferSize,val)
-{
-  // TODO: Check isValidPoint() first
-  
-	buffer.push( val );
-	while( bufferSize > 0 && buffer.length > bufferSize ) 
-  { 
-    buffer.shift(); 
-  }
-};
-
 /*****************************
  * HEADING, DISTANCE METHODS *
  ****************************/
-FirTest.prototype.calcLinReg = function()
+GpsPlot.prototype.getHsdData = function(lats,lons)
 {
   // Determine direction based of width & height
-  var e = this.getEdges();
+  var e = this.getEdges(lats,lons);
   var w = this.getDistHaversine(e.minLat, e.minLon, e.minLat, e.maxLon);
   var h = this.getDistHaversine(e.minLat, e.minLon, e.maxLat, e.minLon);
   var hd = 0;
 
-  console.log("w: "+w+", h: "+h);
-    
   // Get linear regression heading in X-axis
   if( w > h )
   {
-  	console.log("X");
-    var o = this.getLinearRegression(this.data.buffLon, this.data.buffLat);
+    var o = this.getLinearRegression(lons, lats);
     var path = [ new google.maps.LatLng(o.y1, o.x1), new google.maps.LatLng(o.y2, o.x2) ];
     hd = parseInt( this.getBearing(o.y1,o.x1,o.y2,o.x2) );
   }
   // Get linear regression heading in Y-axis
   else
   {
-  	console.log("Y");
-    var o = this.getLinearRegression(this.data.buffLat, this.data.buffLon);
+    var o = this.getLinearRegression(lats, lons);
     var path = [ new google.maps.LatLng(o.x1, o.y1), new google.maps.LatLng(o.x2, o.y2) ];
     hd = parseInt( this.getBearing(o.x1,o.y1,o.x2,o.y2) );
   }
   // Get distance
   var d = this.getDistHaversine(o.y1,o.x1,o.y2,o.x2);
   var dist = (d*1000).toFixed(1);
-  
-  // Draw
-  this.regPath = this.drawPath(path, '#00FF00');
-  
-  // Set text
-  $("#headistText").html( "Head: "+hd+"&deg; Dist: "+ dist + " m");
+
+  return { path: path, heading: hd, distance: dist }; 
 }
 
-FirTest.prototype.getEdges = function()
+  GpsPlot.prototype.getEdges = function(lats,lons)
 {
   var minLon = 181; var maxLon = -181;
   var minLat = 91; var maxLat = -91;
-  for(i in this.data.buffLon)
+  for(i in lons)
   {
-    var lon = this.data.buffLon[i];
-    var lat = this.data.buffLat[i];
+    var lon = lons[i];
+    var lat = lats[i];
+
     minLon = Math.min(lon,minLon);
     maxLon = Math.max(lon,maxLon);
     minLat = Math.min(lat,minLat);
@@ -310,7 +304,7 @@ FirTest.prototype.getEdges = function()
   return { minLat: minLat, maxLat: maxLat, minLon: minLon, maxLon: maxLon }
 };
 
-FirTest.prototype.getBearing = function(lat1,lon1,lat2,lon2)
+GpsPlot.prototype.getBearing = function(lat1,lon1,lat2,lon2)
 {
   lat1 = lat1.toRad(); lat2 = lat2.toRad();
   var dLon = (lon2-lon1).toRad();
@@ -321,7 +315,7 @@ FirTest.prototype.getBearing = function(lat1,lon1,lat2,lon2)
   return Math.atan2(y, x).toBrng();
 }
 
-FirTest.prototype.getDistHaversine = function(lat1,lon1,lat2,lon2)
+GpsPlot.prototype.getDistHaversine = function(lat1,lon1,lat2,lon2)
 {
   var R = 6371; // earth's mean radius in km
   var dLat = (lat2-lat1).toRad();
@@ -336,7 +330,7 @@ FirTest.prototype.getDistHaversine = function(lat1,lon1,lat2,lon2)
   return d;
 }
 
-FirTest.prototype.getLinearRegression = function(values_x, values_y)
+GpsPlot.prototype.getLinearRegression = function(values_x, values_y)
 {
     // Init variables
     var sum_x = sum_y = sum_xy = sum_xx = sum_yy = count = x = y = 0;
@@ -353,6 +347,9 @@ FirTest.prototype.getLinearRegression = function(values_x, values_y)
         sum_xy += x*y;
         sum_yy += y*y;
         count++;
+
+	console.log(x+","+y);
+
     }
 
     var b = (count*sum_xy - sum_x*sum_y) / (count*sum_xx - sum_x*sum_x);
@@ -364,15 +361,13 @@ FirTest.prototype.getLinearRegression = function(values_x, values_y)
     var x2 = values_x[values_x.length-1];
     var y2 = x2 * b + a;
     
-    console.log("a: "+a+", b: "+b);
-    
     return { x1: x1, y1: y1, x2: x2, y2: y2 }
 }
 
 /*******
 * TODO *
 *******/
-FirTest.prototype.isValidPoint = function(oldPoint,newPoint)
+GpsPlot.prototype.isValidPoint = function(oldPoint,newPoint)
 {
   // TODO: Test if newPoint is within acceptable range compared to oldPoint
   // - If it is return true
@@ -381,18 +376,18 @@ FirTest.prototype.isValidPoint = function(oldPoint,newPoint)
   //   - If global counet > n set n = 0 and return true
 };
 
-FirTest.prototype.getLatestPosition = function()
+GpsPlot.prototype.getLatestPosition = function()
 {
   // TODO: Return latest position from array
 };
 
-FirTest.prototype.getHeading = function()
+GpsPlot.prototype.getHeading = function()
 {
   // TODO: 1. Check if standstill. If so, return 0
   // TODO: 2. Calculate linear regression angle
 };
 
-FirTest.prototype.getSpeed = function()
+GpsPlot.prototype.getSpeed = function()
 {
   // TODO: 1. Check if standstill. If so, return 0
   // TODO: 2. Calculate length of simple linear regression/time = speed

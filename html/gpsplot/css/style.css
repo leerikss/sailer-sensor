@@ -1,0 +1,72 @@
+html,body {
+    background-color: #BFCFFF;
+    margin: 0px;
+    padding:0px;
+    width: 100%;
+    height: 100%;
+    font-family: Arial;
+    font-size:11pt;
+}
+
+#forms {
+    float:left;
+    width:20%;
+    height: 95%;
+}
+
+#map {
+    float:right;
+    width:80%;
+    height: 100%;
+}
+
+#coords, #hsd {
+    padding-left: 20px;
+    padding-right:20px;
+}
+
+#coords { height: 70%; }
+#coords .title { height:5%; }
+#coords .data { height:80%; }
+#coords .btns { height:5%; float: right;  padding-top: 5px; }
+
+#hsd {  height: 25%; }
+#hsd .title { height:10%; }
+#hsd .data { height:60%; }
+#hsd .btns { height:10%; float: right; padding-top: 5px; }
+
+h1 {
+    font-size: 12pt;
+}
+
+textarea {
+    width: 100%;
+    height:100%;
+}
+
+#hsdBox {
+    border: 1px solid black;
+    padding: 10px;
+    font-size: 10pt;
+}
+
+.name {
+    float:left;
+    width:40%;
+    font-weight: bold;
+    text-align: right;
+}
+
+.value {
+    float:right;
+    width:55%;
+    text-align:left;
+}
+
+.clear {
+    clear:both;
+}
+
+#buffer {
+    margin-top:-2px;
+}

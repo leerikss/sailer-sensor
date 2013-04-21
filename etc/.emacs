@@ -1,3 +1,4 @@
+;; Where additional plugins are found
 (add-to-list 'load-path "~/elisp")
 
 ;; Show highlight 
@@ -25,6 +26,12 @@
 ;; Show linenumbers
 (require 'linum)
 (global-linum-mode 1)
+
+;; CSS-mode
+(autoload 'css-mode "css-mode" "Mode for editing CSS files" t)
+(setq auto-mode-alist
+      (append '(("\\.css$" . css-mode))
+	      auto-mode-alist))
 
 ;; Smoother scrolling
 ;; (setq scroll-step 1 scroll-conservatively 10000)
