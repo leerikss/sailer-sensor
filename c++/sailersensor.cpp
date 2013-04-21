@@ -18,6 +18,8 @@ int main()
 {
   try
   {
+    // TODO: Get config from argument
+
     // Read configs
     Config cfg;
     cfg.readFile(CONFIG_FILE);
@@ -39,38 +41,49 @@ int main()
   // return EXIT_SUCCESS;
 }
 
-sailersensor::sailersensor(const Config& cfg) : lsm_p(cfg), gps_p(cfg)
-  
+sailersensor::sailersensor(const Config& cfg) : db(cfg), lsm_p(cfg), gps_p(cfg)
 {
   s_time = cfg.lookup("sailersensor.sleep");
   display_ip = cfg.lookup("sailersensor.display_ip");
   display_port = cfg.lookup("sailersensor.display_port");
+  store_data = cfg.lookup("sailersensor.store_data");
 }
 
 void sailersensor::run(void)
 {
   // Start lsmpoller thread
-  pthread_t lsm_t;
-  pthread_create(&lsm_t, NULL, &lsmpoller::startThread, &lsm_p);
+  // pthread_t lsm_t;
+  // pthread_create(&lsm_t, NULL, &lsmpoller::startThread, &lsm_p);
 
   // Start gpspoller thread
   pthread_t gps_t;
-
   pthread_create(&gps_t, NULL, &gpspoller::startThread, &gps_p);
 
-  socketclient s;
+  // Init socket
+  // socketclient s;
+
+  // Cache previous values
+  double prevLat,prevLon;
 
   while(true)
   {
     try
     {
-      // TODO: Do this if conf allows
-      const gps_struct& g = gps_p.getLatestPos();
-      dao::getInstance().insertGps(g);
+      // Store raw gps data into db
+      if( store_data )
+      {
+	const gps_struct& g = gps_p.getLatestPos();
+	if( g.lat != prevLat && g.lon != prevLon )
+	{
+	  db.insertGps(g);
+	  prevLat = g.lat;
+	  prevLon = g.lon;
+	}
+      }
 
       /*
-	printf("Sailersensor: Lat: %f, Lon: %f, Alt: %f, Time: %d\n", g.latitude, \
-	g.longitude, g.altitude, g.time );
+	printf("Sailersensor: Lat: %f, Lon: %f, Alt: %f, Time: %d\n", g.lat, \
+	g.lon, g.alt, g.time );
       */
 
       /*
@@ -80,7 +93,8 @@ void sailersensor::run(void)
       */
 
       /*
-// TODO
+
+      // Send to socket
       if(s.conn(display_ip,display_port) )
       {
 	s.send_data("");

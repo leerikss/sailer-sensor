@@ -16,10 +16,15 @@ gpspoller::gpspoller(const Config& cfg)
   g_size = cfg.lookup("gpspoller.buffer_size");
 }
 
+gpspoller::~gpspoller()
+{
+  gps_data_t* gpsdata = &gpsdata_t;
+  close(gpsdata);
+}
+
 void* gpspoller::run(void)
 {
   // gpsd buffer
-  gps_data_t gpsdata_t;
   gps_data_t* gpsdata = &gpsdata_t;
 
   // Connect to the device
@@ -40,10 +45,13 @@ void* gpspoller::run(void)
     {
       // Add to deque
       gps_struct g;
-      g.latitude = gpsdata->fix.latitude;
-      g.longitude = gpsdata->fix.longitude;
-      g.altitude = gpsdata->fix.altitude;
+      g.lat = gpsdata->fix.latitude;
+      g.lon = gpsdata->fix.longitude;
+      g.alt = gpsdata->fix.altitude;
       g.time = (int)gpsdata->fix.time;
+      g.sat = gpsdata->satellites_used;
+      g.epx = gpsdata->fix.epx;
+      g.epy = gpsdata->fix.epy;
       add_deque(g_deque, g, g_size);
 
       // printf("Latitude: %f\tLongitude: %f\tTime: %d\n", gpsdata->fix.latitude, gpsdata->fix.longitude, (int)gpsdata->fix.time);
@@ -111,9 +119,9 @@ void gpspoller::add_deque(deque<gps_struct>& d, gps_struct& v, unsigned int& s)
 bool gpspoller::isValidPoint(gps_struct& g)
 {
   // Filter out corrupt latitude/longitude
-  if(g.latitude < -90 || g.latitude > 90 )
+  if(g.lat < -90 || g.lat > 90 )
     return false;
-  if(g.longitude < -180 || g.longitude > 180 )
+  if(g.lon < -180 || g.lon > 180 )
     return false;
 
   // TODO: Implement; don't allow points outside realistic reach

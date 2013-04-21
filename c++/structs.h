@@ -8,8 +8,8 @@ struct lsm_struct
 
 struct gps_struct
 {
-  float latitude,longitude,altitude;
-  int time;
+  double lat,lon,alt,epx,epy;
+  int time,sat;
 };
 
 #endif

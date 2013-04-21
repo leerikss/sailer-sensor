@@ -3,6 +3,8 @@
 #include <libconfig.h++>
 #include "lsmpoller.h"
 #include "gpspoller.h"
+#include "structs.h"
+#include "dao.h"
 
 using namespace libconfig;
 
@@ -14,11 +16,13 @@ public:
   void run(void);
 
 private:
+  dao db;
   lsmpoller lsm_p;
   gpspoller gps_p;
   int s_time;
-  int display_ip;
+  const char* display_ip;
   int display_port;
+  bool store_data;
 };
 
 #endif
