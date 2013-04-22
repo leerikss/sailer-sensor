@@ -133,10 +133,12 @@ GpsPlot.prototype.step = function(step)
   this.start += step;
   var steps = parseInt( $("#stepBuff").val() );
   var end = this.start + steps;
-  if( this.start < 0 )  .start = 0;
+  if( this.start < 0 ) 
+    this.start = 0;
   if( this.start > this.json.length-1-steps )
     this.start = this.json.length-1-steps;
-  if( end < steps - 1 )  = steps-1;
+  if( end < steps - 1 ) 
+    end = steps-1;
   if( end > this.json.length-1 ) 
     end = this.json.length-1;
     
