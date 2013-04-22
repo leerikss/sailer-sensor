@@ -26,6 +26,12 @@ function GpsPlot()
     zoom: 18
   };
 
+  $(document).keypress(function(e){
+  	console.log(e.which);
+    if (e.which == 110){ $("#next").click(); }
+    if (e.which == 112){ $("#prev").click(); }
+  });
+
   this.map = new google.maps.Map( $("#map")[0], options );
   
   this.rawPath = new google.maps.Polyline([]);
@@ -127,35 +133,40 @@ GpsPlot.prototype.step = function(step)
   this.start += step;
   var steps = parseInt( $("#stepBuff").val() );
   var end = this.start + steps;
-  if( this.start < 0 ) 
-    this.start = 0;
+  if( this.start < 0 )  .start = 0;
   if( this.start > this.json.length-1-steps )
     this.start = this.json.length-1-steps;
-  if( end < steps - 1 ) 
-    end = steps-1;
+  if( end < steps - 1 )  = steps-1;
   if( end > this.json.length-1 ) 
     end = this.json.length-1;
     
-  // Get array slice
+  // Get array slice as buffer
   var buff = this.json.slice(this.start, end);
-  // Get linear regression line
+  
+  // Get linear regression line of buffer
   var line = this.getLinRegLine( buff );
-  // Get distance
-  var d = this.getDistHaversine(line.x1, line.y1, line.x2, line.y2);
-  var dm = (d * 1000);
-  // Get heading
-  var heading = this.getBearing(line.x1, line.y1, line.x2, line.y2);
-  // Get time diff between first and last point
-  var time = this.getTimeDiff( buff[buff.length-1].time, buff[0].time );
-  // Get speed(s)
-  var ms = ( dm / time ) * 1000;
+  
+  // Get time diff between first and last point in buffer
+  var time = this.getTimeDiff( buff[buff.length-1].time , buff[0].time );
+	
+  // Get distance in meters
+  var d = this.getDistHaversine( line.x1, line.y1, line.x2, line.y2 );
+  var meters = (d * 1000);
+  
+  // Get speed in ms, kmh & knots
+  var ms = ( meters / time ) * 1000;
   var kmh = ms * this.MS_TO_KMH;
   var knots = ms * this.MS_TO_KNOT;  
   
+  // Get heading
+  var heading = this.getBearing(line.x1, line.y1, line.x2, line.y2);
+  
   // Output calculated data
   $("#heading").html( heading.toFixed(1) + "&deg;" );
-  $("#speed").html( kmh.toFixed(1)+" km/h<br/>" + knots.toFixed(1)+" knots" );
-  $("#distance").html( dm.toFixed(1)+" m" );
+  $("#speed").html( kmh.toFixed(1) + " km/h<br/>" + 
+  	knots.toFixed(1)+" knots" );
+  $("#distance").html( meters.toFixed(1) + " m" );
+  
   // Output last point data
   var lastPoint = buff[buff.length - 1];
   $("#sats").html( lastPoint.satellites );
@@ -166,7 +177,8 @@ GpsPlot.prototype.step = function(step)
   this.clearGraphics([this.linPath]);
   
   // Draw path
-  var path = [ new google.maps.LatLng(line.x1, line.y1), new google.maps.LatLng(line.x2, line.y2) ];
+  var path = [ new google.maps.LatLng(line.x1, line.y1), 
+  	new google.maps.LatLng(line.x2, line.y2) ];
   this.linPath = this.drawPath(path, '#FF0000', 1);
 
   // Fit path to map
@@ -179,33 +191,17 @@ GpsPlot.prototype.drawFirPath = function()
   if(!this.json)
     this.json = jQuery.parseJSON( $("#gps").val() ); 
     
-  // Parse input
-  var buffSize = parseInt( $("#firBuff").val() );
-  var coefs = this.parseFirCoefs();
-  
-  var buffFirLat = []; var buffFirLon = []; var path = [];
-  for(var i=0; i<this.json.length; i++)
+  // Get FIR filtered values
+  var firVals = this.getFirArray(this.json);
+
+  // Build path  
+  var path = [];
+  for(var i in firVals)
   {
-    var o = this.json[i];
+    var o = firVals[i];
     var lat = parseFloat(o.latitude);
     var lon = parseFloat(o.longitude);
-      
-    // Init/fill buffers from first values
-    if(i==0)
-    {
-      buffFirLat = this.getFilledArray(coefs.length, lat);
-      buffFirLon = this.getFilledArray(coefs.length, lon);
-    }
-      
-    // Add to buffers
-    this.addToBuffer( buffFirLat, buffSize, parseFloat( o.latitude ) );
-    this.addToBuffer( buffFirLon, buffSize, parseFloat( o.longitude ) );
-      
-    // Get FIR filtered lat/lon values
-    lat = this.getFirValue( lat, buffFirLat, coefs );
-    lon = this.getFirValue( lon, buffFirLon, coefs );
     var ll = new google.maps.LatLng( lat, lon );
-      
     path.push( ll );
   }		
 
@@ -316,6 +312,40 @@ GpsPlot.prototype.addToBuffer = function(buffer,bufferSize,val)
     buffer.shift(); 
   }
 };
+
+GpsPlot.prototype.getFirArray = function(buff)
+{
+  // Parse coefs
+  var coefs = this.parseFirCoefs();
+
+  var buffFirLat = []; var buffFirLon = []; var result = [];
+  
+  for(var i=0; i<buff.length; i++)
+  {
+    var o = buff[i];
+    var lat = parseFloat(o.latitude);
+    var lon = parseFloat(o.longitude);
+      
+    // First round init buffers
+    if(i==0)
+    {
+      buffFirLat = this.getFilledArray(coefs.length, lat);
+      buffFirLon = this.getFilledArray(coefs.length, lon);
+    }
+      
+    // Add to buffers latest values
+    this.addToBuffer( buffFirLat, coefs.length, lat );
+    this.addToBuffer( buffFirLon, coefs.length, lon );
+      
+    // Get FIR filtered lat/lon values
+    var firLat = this.getFirValue( lat, buffFirLat, coefs );
+    var firLon = this.getFirValue( lon, buffFirLon, coefs );
+      
+    result.push( { latitude: firLat, longitude: firLon } );
+  }
+  
+  return result;
+}
 
 GpsPlot.prototype.getFirValue = function(val, oldVals, coefs)
 {

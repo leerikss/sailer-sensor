@@ -6743,16 +6743,13 @@
         <br class="clear"/>
     </fieldset>
     <div class="btns">
-      <input type="button" value="Prev" onclick="gpsPlot.step(-1);"/>
-      <input type="button" value="Next" onclick="gpsPlot.step(1)"/>
+      <input type="button" value="Prev" id="prev" onclick="gpsPlot.step(-1);"/>
+      <input type="button" value="Next" id="next" onclick="gpsPlot.step(1)"/>
     </div>
     <br class="clear"/>
     
     <fieldset id="fir">
       <legend>FIR Path</legend>
-        <span class="name">Buffer:</span>
-        <input type="text" class="value input"id="firBuff" value="5">
-        <br class="clear"/>
         <span class="name">Coefs:</span>
         <textarea rows="4" class="value input" id="firCoefs">
 0.25
