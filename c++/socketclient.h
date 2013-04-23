@@ -1,6 +1,3 @@
-/**
-   C++ client example using sockets
-*/
 #include<iostream>    //cout
 #include<stdio.h> //printf
 #include<string.h>    //strlen

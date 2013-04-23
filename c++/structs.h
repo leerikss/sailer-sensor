@@ -9,7 +9,7 @@ struct lsm_struct
 struct gps_struct
 {
   double lat,lon,alt,epx,epy;
-  int time,sat;
+  int time, sat;
 };
 
 #endif

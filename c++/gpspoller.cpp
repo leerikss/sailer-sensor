@@ -5,6 +5,7 @@
 #include <gps.h>
 #include <deque>
 #include "structs.h"
+#include "mathutil.h"
 
 using namespace libconfig;
 using namespace std;
@@ -13,7 +14,11 @@ gpspoller::gpspoller(const Config& cfg)
 {
   // Set vals from config
   s_time = cfg.lookup("gpspoller.sleep");
-  g_size = cfg.lookup("gpspoller.buffer_size");
+  buff_size = cfg.lookup("gpspoller.buffer_size");
+  buff_skip_dist_m = cfg.lookup("gpspoller.buffer_skip_dist_m");
+  buff_skip_dist_max = cfg.lookup("gpspoller.buffer_skip_dist_max");
+  buff_skip_min_sec = cfg.lookup("gpspoller.buffer_skip_min_sec");
+  buff_skip_dist_count = 0;
 }
 
 gpspoller::~gpspoller()
@@ -52,9 +57,9 @@ void* gpspoller::run(void)
       g.sat = gpsdata->satellites_used;
       g.epx = gpsdata->fix.epx;
       g.epy = gpsdata->fix.epy;
-      add_deque(g_deque, g, g_size);
-
-      // printf("Latitude: %f\tLongitude: %f\tTime: %d\n", gpsdata->fix.latitude, gpsdata->fix.longitude, (int)gpsdata->fix.time);
+      add_deque(g_deque, g, buff_size);
+      
+      printf("Latitude: %f\tLongitude: %f\tTime: %d\n", gpsdata->fix.latitude, gpsdata->fix.longitude, (int)gpsdata->fix.time);
 
     }
     // If gpsd has no new data, or data is invalid, sleep to spare cpu
@@ -105,18 +110,19 @@ void gpspoller::close(gps_data_t* gpsdata)
   gps_close(gpsdata);
 }
 
-void gpspoller::add_deque(deque<gps_struct>& d, gps_struct& v, unsigned int& s)
+void gpspoller::add_deque(deque<gps_struct>& d, gps_struct& g, 
+			  unsigned int& s)
 {
-  // TODO: Filter out corrupt peak values
-  if( isValidPoint(v) )
+  // Add to deque if valid
+  if( isValidPoint(d, g) )
   {
-    d.push_front(v);
+    d.push_front(g);
     if( d.size() > s )
       d.pop_back();
   }
 }
 
-bool gpspoller::isValidPoint(gps_struct& g)
+bool gpspoller::isValidPoint(deque<gps_struct>& d, gps_struct& g)
 {
   // Filter out corrupt latitude/longitude
   if(g.lat < -90 || g.lat > 90 )
@@ -124,7 +130,45 @@ bool gpspoller::isValidPoint(gps_struct& g)
   if(g.lon < -180 || g.lon > 180 )
     return false;
 
-  // TODO: Implement; don't allow points outside realistic reach
+  // If no previous records, skip rest
+  if( d.size() == 0 )
+    return true;
+
+  // Get previous record
+  gps_struct& g2 = d.front();
+
+  // Distance between records
+  double dist = mathutil::getDistHaver( g.lat, g.lon,
+				     g2.lat, g2.lon) * 1000;
+
+  // Time difference between records
+  int secDiff = ( g.time - g2.time );
+
+  // Skip records arriving too fast
+  if( secDiff < buff_skip_min_sec )
+    return false;
+
+  // Record too far away
+  if( dist >= buff_skip_dist_m )
+  {
+    buff_skip_dist_count++;
+    if( buff_skip_dist_count > buff_skip_dist_max )
+    {
+      cerr << "Retrieved too many continuous distant points. "\
+	"Treating point as valid." << endl;
+      buff_skip_dist_count = 0;
+      return true;
+    }
+    else
+    {
+      cerr << "Retrieved a too distant point, treating it as an error,"\
+	" m = " << dist << endl;
+      return false;
+    }
+  }
+  // Remember to decrease nr of distant points
+  else if( buff_skip_dist_count > 0 )
+    buff_skip_dist_count--;
 
   return true;
 }

@@ -30,13 +30,18 @@ public:
 private:
   void open(gps_data_t* gpsdata);
   void close(gps_data_t* gpsdata);
-  void add_deque(deque<gps_struct>& d, gps_struct& v, unsigned int& s);
-  bool isValidPoint(gps_struct& g);
+  void add_deque(deque<gps_struct>& d, gps_struct& g, unsigned int& s);
+  bool isValidPoint(deque<gps_struct>& d, gps_struct& g);
 
   gps_data_t gpsdata_t;
-  int s_time;
   deque<gps_struct> g_deque;
-  unsigned int g_size;
+  int buff_skip_dist_count;
+
+  int s_time;
+  unsigned int buff_size;
+  int buff_skip_dist_m;
+  int buff_skip_dist_max;
+  int buff_skip_min_sec;
 };
 
 
