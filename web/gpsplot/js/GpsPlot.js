@@ -322,7 +322,7 @@ GpsPlot.prototype.drawPath = function(id, path, color, opa)
   this.paths[id] = new google.maps.Polyline({
     path: path,
     strokeColor: color,
-    strokeOpacity: opa,
+    strokeOpacity: 1,
     strokeWeight: 4,
     map: this.map
   });
@@ -345,7 +345,7 @@ GpsPlot.prototype.drawDots = function(id, path, color)
       map: this.map,
       strokeWeight: 0,
       fillColor: color,
-      fillOpacity: 0.5,
+      fillOpacity: 1,
       center: path[i],
       radius: 0.5
     };
@@ -363,9 +363,10 @@ GpsPlot.prototype.fitPath = function(path)
     bounds.extend( path[i] );
   }
 
-  if( !this.map.getBounds().contains( path[0] ) )
-    this.map.panTo( path[0] );
-//    this.map.fitBounds( bounds );
+  //if( !this.map.getBounds().contains( path[0] ) )
+  //  this.map.panTo( path[0] );
+  
+  this.map.fitBounds( bounds );
 }
 
 /*******************
