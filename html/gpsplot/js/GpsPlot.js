@@ -18,6 +18,7 @@ Number.prototype.toBrng = function() {  // convert radians to degrees (as bearin
  **************/
 function GpsPlot() 
 {
+  // Init Goolge Map
   var options = 
   {
     mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -25,28 +26,32 @@ function GpsPlot()
     scaleControl: true,
     zoom: 18
   };
+  this.map = new google.maps.Map( $("#map")[0], options );
 
+  // Can use "P" and "N" to step next/previous
   $(document).keypress(function(e){
-  	console.log(e.which);
     if (e.which == 110){ $("#next").click(); }
     if (e.which == 112){ $("#prev").click(); }
   });
-
-  this.map = new google.maps.Map( $("#map")[0], options );
   
-  this.rawPath = new google.maps.Polyline([]);
-  this.rawDots = [];
-  this.linPath = new google.maps.Polyline([]);
-  this.firPath = new google.maps.Polyline([]);
-  
+  // Holder of currently loaded json
   this.json = null;
-  this.start = -1;
-  this.errCount = 0;
   
+  // Colors & paths
+  this.RAW_COLS = ['#0000FF','#8904B1'];
+  this.rawCol = [];
+  this.colIndex = 0;
+  this.FIR_COL = '#00FF00';
+  this.STEP_COL = '#FF0000';
+  this.paths = [];
+
+  // Step calculations  
+  this.stepIndex = [];
+  this.errCount = 0;
   this.REC_MIN_SECS = 1;
-  this.REC_MAX_DIST = 10;
+  this.REC_MAX_DIST_M = 50;
   this.ERR_MAX_COUNT = 3;
-  this.STAND_STILL_M = 1;
+  this.STAND_STILL_M = 3;
   this.MS_TO_KMH = 3.6;
   this.MS_TO_KNOT = 1.94384449244;
 };
@@ -54,23 +59,64 @@ function GpsPlot()
 /**************************
  * METHODS CALLED FROM UI * 
  *************************/
-GpsPlot.prototype.clearAll = function()
+GpsPlot.prototype.load = function(n, url)
 {
-  this.clearGraphics([this.rawPath, this.rawDots, this.linPath, this.firPath]);
-  this.start = -1;
+  var _this = this;
+  $.getJSON(url, function(data) {
+  
+    // Init
+    _this.json = data;
+    _this.id = url;
+    $("#file").html( n.innerText.substr(0,14) );
+    
+    // Don't redraw if already drawn
+    if( _this.paths['raw_'+url] )
+      return;
+
+    // Set color
+    var col = _this.setRawCol( _this.id);
+    
+    // Draw raw path
+    _this.drawRaw(data);
+
+    // Reset all previous steps
+    _this.resetSteps();
+    _this.stepIndex[_this.id] = -1;
+  });
+}
+
+GpsPlot.prototype.hide = function(id)
+{
+  this.deletePath('raw_'+id);
+  this.deletePath('dot_'+id);
 };
- 
+
+GpsPlot.prototype.reset = function()
+{
+  // Delete all paths
+  for(var id in this.paths) 
+  { 
+    this.deletePath(id); 
+  }
+  this.resetSteps();
+  $("#file").html( "" );
+  this.json = false;
+};
+
 GpsPlot.prototype.cleanUpJson = function()
 {
-  // Parse json
-  var json = jQuery.parseJSON( $("#gps").val() );
-    
-  // Buil new json array
+  if(!this.json)
+  {
+    alert("No JSON loaded");
+    return;
+  }
+  
+  // Build new json array
   var newJson = [];
   var prev_point = false;
-  for(var i in json)
+  for(var i in this.json)
   {
-    var curr_point = json[i];
+    var curr_point = this.json[i];
 
     // First time set prevPoint to current point
     if(!prev_point)
@@ -84,70 +130,61 @@ GpsPlot.prototype.cleanUpJson = function()
     }
   }
 
-  // Cache new json
+  // Debug
+  console.log( "Originl length: "+this.json.length );
+  console.log( "New length: "+newJson.length );
+
+  // Set new json
   this.json = newJson;
 
-  // Clear all previous paths
-  this.clearAll();
-    
-  // Debug
-  console.log( "Originl length: "+json.length );
-  console.log( "New length: "+newJson.length );
-    
-  // Set new json data into textarea
-  $("#gps").val( JSON.stringify(newJson, null, 2) );
-};
-
-GpsPlot.prototype.drawPathFromJson = function()
-{
-  // Parse json
-  this.json = jQuery.parseJSON( $("#gps").val() );
-
-  var path = [];
-  for(var i in this.json)
-  {
-    // Append to Google arrays
-    var o = this.json[i];
-    var ll = new google.maps.LatLng( o.latitude, o.longitude );
-    path.push( ll );
-  }
-    
-  // Clear all
-  this.clearAll();
-
-  // Draw new path
-  this.rawPath = this.drawPath(path, '#0000FF');
-
-  // Draw circles
-  this.rawDots = this.drawCircles(path, '#000000');
-
-  // Fit to map
-  this.fitPath( path );
+  // Reset step
+  this.resetSteps();
+  $("#file").html( "" );
+  
+  // Redraw
+  this.drawRaw();
+  
+  // Popup & add text
+  $("#json").val( JSON.stringify(newJson, undefined, 2) );
+  $("#popup").css({
+    left: ( $(window).width()/2 - $('#popup').width()/2 ),
+    top: ( $(window).height()/2 - $('#popup').height()/2 ),
+  });
+  $("#popup").fadeIn(500);
+  $("#close").click(function(){
+    $("#popup").fadeOut(500);
+  });
 };
 
 GpsPlot.prototype.step = function(step)
 {
-  // Parse json
-  this.json = jQuery.parseJSON( $("#gps").val() );      
+  if(!this.json)
+  {
+    alert("No JSON loaded");
+    return;
+  }
 
   // Start & end indexes
-  this.start += step;
+  this.stepIndex[this.id] += step;
   var steps = parseInt( $("#stepBuff").val() );
-  var end = this.start + steps;
-  if( this.start < 0 ) 
-    this.start = 0;
-  if( this.start > this.json.length-1-steps )
-    this.start = this.json.length-1-steps;
+  var end = this.stepIndex[this.id] + steps;
+  if( this.stepIndex[this.id] < 0 ) 
+    this.stepIndex[this.id] = 0;
+  if( this.stepIndex[this.id] > this.json.length-1-steps )
+    this.stepIndex[this.id] = this.json.length-1-steps;
   if( end < steps - 1 ) 
     end = steps-1;
   if( end > this.json.length-1 ) 
     end = this.json.length-1;
     
   // Get array slice as buffer
-  var buff = this.json.slice(this.start, end);
+  var buff = this.json.slice(this.stepIndex[this.id], end);
   
   // Get linear regression line of buffer
-  var line = this.getLinRegLine( buff );
+  var e = this.getEdges(buff);
+  var lats = this.getNewArrayByProp(buff, "latitude");
+  var lons = this.getNewArrayByProp(buff, "longitude");
+  var line = this.getLinRegLine( e, lats, lons );
   
   // Get time diff between first and last point in buffer
   var time = this.getTimeDiff( buff[buff.length-1].time , buff[0].time );
@@ -165,11 +202,11 @@ GpsPlot.prototype.step = function(step)
   var heading = this.getBearing(line.x1, line.y1, line.x2, line.y2);
   
   // Get standstill
-  var standstill = this.isStandStill(buff);
+  var standstill = this.isStandStill(e);
   
   // Output calculated data
   $("#heading").html( heading.toFixed(1) + "&deg;" );
-  $("#speed").html( kmh.toFixed(1) + " km/h<br/>" + 
+  $("#speed").html( kmh.toFixed(1) + // " km/h<br/>" + 
   	knots.toFixed(1)+" knots" );
   $("#distance").html( meters.toFixed(1) + " m" );
   $("#standstill").html( standstill );
@@ -180,13 +217,10 @@ GpsPlot.prototype.step = function(step)
   $("#epx").html( lastPoint.epx );
   $("#epy").html( lastPoint.epy );
 
-  // Clear previous path
-  this.clearGraphics([this.linPath]);
-  
-  // Draw path
+  // Construct & draw path
   var path = [ new google.maps.LatLng(line.x1, line.y1), 
   	new google.maps.LatLng(line.x2, line.y2) ];
-  this.linPath = this.drawPath(path, '#FF0000', 1);
+  this.drawPath('step', path, this.STEP_COL, 1);
 
   // Fit path to map
   this.fitPath( path );
@@ -194,10 +228,11 @@ GpsPlot.prototype.step = function(step)
 
 GpsPlot.prototype.drawFirPath = function()
 {
-  // Parse json
   if(!this.json)
-    this.json = jQuery.parseJSON( $("#gps").val() ); 
-    
+  {
+    alert("No JSON loaded");
+    return;
+  }    
   // Get FIR filtered values
   var firVals = this.getFirArray(this.json);
 
@@ -212,41 +247,79 @@ GpsPlot.prototype.drawFirPath = function()
     path.push( ll );
   }		
 
-  // Clear previous fir path
-  this.clearGraphics( [this.firPath] );
-
-  // Draw new path
-  this.firPath = this.drawPath(path, '#00FF00');  
+  // Draw fir path
+  this.drawPath('fir', path, this.FIR_COL);  
 
   // Fit path to map
   this.fitPath( path );  
 }
 
-GpsPlot.prototype.clearGraphics = function(g)
+GpsPlot.prototype.clearFirPath = function()
 {
-  for(p in g)
-  {
-    var p = g[p];
-
-    // Clear polygon paths
-    if( p.setPath ) p.setPath([]);
-
-    // Clear circles
-    else if( p.length )
-    {
-      for(var c in p) {  p[c].setMap(null); }
-    }
-  }
-};
+  this.paths['fir'].setPath([]);
+}
 
  /**********************
  * MAP DRAWING METHODS *
  **********************/
-GpsPlot.prototype.drawPath = function(path, color, opa)
+GpsPlot.prototype.setRawCol = function(id)
 {
+  if( this.rawCol[id] )
+    return;
+  this.rawCol[id] = this.RAW_COLS[this.colIndex];
+  this.colIndex++;
+  if( this.colIndex >= this.RAW_COLS.length )
+    this.colIndex = 0;
+  return this.rawCol[id];
+}
+
+GpsPlot.prototype.drawRaw = function()
+{
+  // Append to Google path array
+  var path = [];
+  for(var i in this.json)
+  {
+    var o = this.json[i];
+    var ll = new google.maps.LatLng( parseFloat(o.latitude), parseFloat(o.longitude) );
+    path.push( ll );
+  }
+    
+  // Draw path + dots
+  this.drawPath('raw_'+this.id, path, this.rawCol[this.id] );
+  this.drawDots('dot_'+this.id, path, this.rawCol[this.id] );
+
+  // Fit to map
+  this.fitPath( path );
+};
+
+GpsPlot.prototype.deletePath = function(id)
+{
+  var o = this.paths[id];
+  if(!o) return;
+  
+  // Clear polygon
+  if(o.setPath) o.setPath([]);
+    
+  // Clear dots
+  else if(o.length )
+  {
+    for(var d in o) {  o[d].setMap(null); }
+  }
+  
+  this.paths[id] = false;
+}
+
+GpsPlot.prototype.drawPath = function(id, path, color, opa)
+{
+  // Clear previous path
+  if( this.paths[id] )
+    this.paths[id].setPath([]);
+
+  // Was opacity passed
   opa = (!opa) ? 0.5 : opa;
   
-  return new google.maps.Polyline({
+  // Draw & cache path
+  this.paths[id] = new google.maps.Polyline({
     path: path,
     strokeColor: color,
     strokeOpacity: opa,
@@ -255,8 +328,15 @@ GpsPlot.prototype.drawPath = function(path, color, opa)
   });
 }
 
-GpsPlot.prototype.drawCircles = function(path, color)
+GpsPlot.prototype.drawDots = function(id, path, color)
 {
+  // Clear previous dots
+  if( this.paths[id] )
+  {
+    for(var d in this.paths[id]) {  this.paths[id][d].setMap(null); }
+  }
+
+  // Draw & cache dots
   var cs = [];
   for(var i in path)
   {
@@ -271,7 +351,8 @@ GpsPlot.prototype.drawCircles = function(path, color)
     };
     cs.push( new google.maps.Circle(opts) );
   }
-  return cs;
+  
+  this.paths[id] = cs;
 }
 
 GpsPlot.prototype.fitPath = function(path)
@@ -282,8 +363,8 @@ GpsPlot.prototype.fitPath = function(path)
     bounds.extend( path[i] );
   }
 
-  if( !this.map.getBounds().contains( path[i] ) )
-    this.map.panTo( path[i] );
+  if( !this.map.getBounds().contains( path[0] ) )
+    this.map.panTo( path[0] );
 //    this.map.fitBounds( bounds );
 }
 
@@ -368,10 +449,19 @@ GpsPlot.prototype.getFirValue = function(val, oldVals, coefs)
 /***************************
  * STEP DATA MATH METHODS *
  **************************/
- GpsPlot.prototype.getTimeDiff = function(t1, t2)
+GpsPlot.prototype.resetSteps = function()
 {
-  var time1 = Date.parse( t1 );
-  var time2 = Date.parse( t2 );
+  for(var i in this.stepIndex)
+  {
+    this.stepIndex[i] = -1;
+  }
+}
+
+GpsPlot.prototype.getTimeDiff = function(t1, t2)
+{
+  var time1 = (typeof(t1) == "string") ? Date.parse( t1 ) : new Date(t1 * 1000);
+  var time2 = (typeof(t2) == "string") ? Date.parse( t2 ) : new Date(t2 * 1000);
+  
   return ( time1 - time2 );
 }
 
@@ -383,19 +473,20 @@ GpsPlot.prototype.isValidPoint = function(curr_point, prev_point)
     parseFloat(prev_point.longitude) ) * 1000;
 
   // Get time difference between two points
-  var time = this.getTimeDiff( curr_point.time , prev_point.time ) * 1000;
-
-   // Record arrived too fast  
+  var time = this.getTimeDiff( curr_point.time , prev_point.time ) / 1000;
+  
+  /*
   if( time < this.REC_MIN_SECS )
   {
     console.log("Skipping point: Time difference < "+this.REC_MIN_SECS+" secs");
     return false;
   }	
+  */
   
   // Found an unrealistic jump
-  if( dist >= this.REC_MAX_DIST )
+  if( dist >= this.REC_MAX_DIST_M ) // && time < this.REC_MAX_DIST_S )
   {
-    console.log("Skipping point: Distance > "+this.REC_MAX_DIST+" m");
+    console.log("Skipping point: Distance > "+this.REC_MAX_DIST_M+" m");
     
     this.errCount++;
     
@@ -415,13 +506,10 @@ GpsPlot.prototype.isValidPoint = function(curr_point, prev_point)
   return true;
 }
 
-GpsPlot.prototype.isStandStill = function(buff)
+GpsPlot.prototype.isStandStill = function(e)
 {
-  var e = this.getEdges(buff);
   var w = this.getDistHaversine(e.minLat, e.minLon, e.minLat, e.maxLon) * 1000;
   var h = this.getDistHaversine(e.minLat, e.minLon, e.maxLat, e.minLon) * 1000;
-  
-  console.log(w+","+h);
   
   if(w < this.STAND_STILL_M && h < this.STAND_STILL_M )
   	return "<b>true</b>";
@@ -439,15 +527,11 @@ GpsPlot.prototype.getNewArrayByProp = function(arr,prop)
   return newArr;
 }
 
-GpsPlot.prototype.getLinRegLine = function(buff)
+GpsPlot.prototype.getLinRegLine = function(e, lats, lons)
 {
   // Determine direction based of width & height
-  var e = this.getEdges(buff);
   var w = this.getDistHaversine(e.minLat, e.minLon, e.minLat, e.maxLon);
   var h = this.getDistHaversine(e.minLat, e.minLon, e.maxLat, e.minLon);
-  
-  var lats = this.getNewArrayByProp(buff, "latitude");
-  var lons = this.getNewArrayByProp(buff, "longitude");
   
   var hd = 0;
   

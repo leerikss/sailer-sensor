@@ -12,10 +12,6 @@ fieldset {
   background-color: #E8E8E8;
 }
 
-textarea {
-    width: 99%;
-}
-
 #forms {
     float:left;
     width:20%;
@@ -34,19 +30,21 @@ textarea {
     height: 100%;
 }
 
-#coords { height: 45%; }
-#coords #gps { height:90%; }
+.name, .left {
+    float:left;
+}
 
+.value, .right {
+    float:right;
+}
 
 .name {
-    float:left;
     width:40%;
     font-weight: bold;
     text-align: right;
 }
 
 .value {
-    float:right;
     width:55%;
     text-align:left;
 }
@@ -56,9 +54,26 @@ textarea {
 }
 
 .input {
-    margin-top:-2px;
+    width: 30px;
 }
 
 .btns {
   float: right;  padding-top: 5px; 
+}
+
+/* POPUP */
+#popup {
+  display: none;
+  padding: 10px;
+  border: 1px outset black;
+  position: absolute;
+  width: 800px;
+  height: 600px;
+  opacity: 0.9;
+  background-image:url('../img/squairy_light.png');
+}
+
+#popup textarea {
+  width: 770px;
+  height: 530px;
 }

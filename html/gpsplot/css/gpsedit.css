@@ -1,0 +1,16 @@
+.selection {
+	position: absolute;
+	border: 1px solid #89B;
+	background: #BCE;
+	background-color: #BEC;
+	border-color: #8B9;
+}
+
+.dropped {
+	background-color: #EBC;
+	border-color: #B89;
+	}	
+.active {  
+	background-color: #CEB;
+	border-color: #9B8;
+}
