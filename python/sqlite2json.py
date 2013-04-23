@@ -1,9 +1,9 @@
 import sqlite3
 import json
 
-sql = "SELECT latitude,longitude,altitude FROM gps;"
+sql = "SELECT sat_time,latitude,longitude,altitude,satellites,epx,epy FROM gps;"
 args=(-1,)
-database = "../c++/data/sailorlog.sqlite"
+database = "../c++/data/sailerlog.sqlite"
 
 def main():
     try:
@@ -12,7 +12,8 @@ def main():
         cursor = conn.cursor()
         rows = []
         for row in cursor.execute(sql):
-            rows.append( {'latitude': row[0], 'longitude': row[1], 'altitude': row[2]} )
+            rows.append( { 'time': row[0], 'latitude': row[1], 'longitude': row[2], \
+                               'altitude': row[3], 'satellites': row[4], 'epx': row[5], 'epy': row[6] });
         print(json.dumps(rows) )
 
     except Exception as ex:

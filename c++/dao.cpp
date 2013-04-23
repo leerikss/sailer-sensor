@@ -7,7 +7,8 @@
 
 #define SQL_CREATE_TABLES "CREATE TABLE IF NOT EXISTS gps ("	\
   "id INTEGER PRIMARY KEY,"					\
-  "time DATETIME DEFAULT CURRENT_TIMESTAMP,"			\
+  "time INTEGER DEFAULT CURRENT_TIMESTAMP,"			\
+  "sat_time INTEGER,"						\
   "latitude REAL,"						\
   "longitude REAL,"						\
   "altitude REAL,"						\
@@ -16,7 +17,7 @@
   "epy REAL);"							\
   "CREATE TABLE IF NOT EXISTS lsm303dlhc ("			\
   "id INTEGER PRIMARY KEY,"					\
-  "time DATETIME DEFAULT CURRENT_TIMESTAMP,"			\
+  "time INTEGER DEFAULT CURRENT_TIMESTAMP,"			\
   "mag_x INTEGER,"						\
   "mag_y INTEGER,"						\
   "mag_z INTEGER,"						\
@@ -24,8 +25,8 @@
   "acc_y INTEGER,"						\
   "acc_z INTEGER);"
 
-#define  SQL_INSERT_GPS  "INSERT INTO gps(latitude,longitude,altitude," \
-  "satellites,epx,epy) VALUES (%f,%f,%f,%d,%f,%f)";
+#define  SQL_INSERT_GPS  "INSERT INTO gps(sat_time,latitude," \
+  "longitude,altitude,satellites,epx,epy) VALUES (%d,%f,%f,%f,%d,%f,%f)";
 
 #define SQL_INSERT_LSM    "INSERT INTO lsm303dlhc(mag_x,mag_y,mag_z,"	\
   "acc_x,acc_y,acc_z) VALUES (%f,%f,%f,%f,%f,%f)";
@@ -63,7 +64,7 @@ bool dao::insertGps(const gps_struct& g)
   const char* sql = SQL_INSERT_GPS;
 
   return query( \
-    sqlite3_mprintf(sql, g.lat, g.lon, g.alt, g.sat, g.epx, g.epy) );
+    sqlite3_mprintf(sql, g.time, g.lat, g.lon, g.alt, g.sat, g.epx, g.epy) );
 }
 
 bool dao::insertLsm(const lsm_struct& l)
