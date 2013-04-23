@@ -43,9 +43,10 @@ function GpsPlot()
   this.start = -1;
   this.errCount = 0;
   
-  this.STAND_STILL_DIST = 2;
-  this.ERR_DIST_M = 10;
+  this.REC_MIN_SECS = 1;
+  this.REC_MAX_DIST = 10;
   this.ERR_MAX_COUNT = 3;
+  this.STAND_STILL_M = 1;
   this.MS_TO_KMH = 3.6;
   this.MS_TO_KNOT = 1.94384449244;
 };
@@ -163,11 +164,15 @@ GpsPlot.prototype.step = function(step)
   // Get heading
   var heading = this.getBearing(line.x1, line.y1, line.x2, line.y2);
   
+  // Get standstill
+  var standstill = this.isStandStill(buff);
+  
   // Output calculated data
   $("#heading").html( heading.toFixed(1) + "&deg;" );
   $("#speed").html( kmh.toFixed(1) + " km/h<br/>" + 
   	knots.toFixed(1)+" knots" );
   $("#distance").html( meters.toFixed(1) + " m" );
+  $("#standstill").html( standstill );
   
   // Output last point data
   var lastPoint = buff[buff.length - 1];
@@ -377,25 +382,26 @@ GpsPlot.prototype.isValidPoint = function(curr_point, prev_point)
     parseFloat(curr_point.longitude), parseFloat(prev_point.latitude), 
     parseFloat(prev_point.longitude) ) * 1000;
 
-  // Is in standstill
-  // TODO: Maybe compare to average of buffered n points?
-  if( dist <= this.STAND_STILL_DIST )
+  // Get time difference between two points
+  var time = this.getTimeDiff( curr_point.time , prev_point.time ) * 1000;
+
+   // Record arrived too fast  
+  if( time < this.REC_MIN_SECS )
   {
-    // TODO: Mark that we're in standstill
-    console.log("Found a standstill point");
+    console.log("Skipping point: Time difference < "+this.REC_MIN_SECS+" secs");
     return false;
-  }
+  }	
   
-  // Found an unrealistic jump within
-  if( dist >= this.ERR_DIST_M )
+  // Found an unrealistic jump
+  if( dist >= this.REC_MAX_DIST )
   {
-    console.log("Found an errorous peak point");
+    console.log("Skipping point: Distance > "+this.REC_MAX_DIST+" m");
     
     this.errCount++;
     
     if( this.errCount > this.ERR_MAX_COUNT )
     {
-      console.log("Found too many continuous error peaks. Nomore assuming they're errors");
+      console.log("Found too many distance errors. No more assuming they're errors");
       this.errCount = 0;
       return true;
     }
@@ -408,6 +414,20 @@ GpsPlot.prototype.isValidPoint = function(curr_point, prev_point)
       
   return true;
 }
+
+GpsPlot.prototype.isStandStill = function(buff)
+{
+  var e = this.getEdges(buff);
+  var w = this.getDistHaversine(e.minLat, e.minLon, e.minLat, e.maxLon) * 1000;
+  var h = this.getDistHaversine(e.minLat, e.minLon, e.maxLat, e.minLon) * 1000;
+  
+  console.log(w+","+h);
+  
+  if(w < this.STAND_STILL_M && h < this.STAND_STILL_M )
+  	return "<b>true</b>";
+  	
+  return "false";  
+};
 
 GpsPlot.prototype.getNewArrayByProp = function(arr,prop)
 {
