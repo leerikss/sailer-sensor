@@ -45,6 +45,7 @@ void* gpspoller::run(void)
          ( gps_read(gpsdata) != -1 ) && 
          ( gpsdata->status > 0 ) && 
 	 (int)gpsdata->fix.time != 0 &&
+	 gpsdata->satellites_used != 0 &&
          !(gpsdata->fix.latitude  != gpsdata->fix.latitude) &&
          !(gpsdata->fix.longitude != gpsdata->fix.longitude) &&
          !(gpsdata->fix.altitude != gpsdata->fix.altitude) )
@@ -60,7 +61,7 @@ void* gpspoller::run(void)
       g.epy = gpsdata->fix.epy;
       add_deque(g_deque, g, buff_size);
       
-      printf("Latitude: %f\tLongitude: %f\tTime: %d\n", gpsdata->fix.latitude, gpsdata->fix.longitude, (int)gpsdata->fix.time);
+      // printf("Latitude: %f\tLongitude: %f\tTime: %d\n", gpsdata->fix.latitude, gpsdata->fix.longitude, (int)gpsdata->fix.time);
 
     }
     // If gpsd has no new data, or data is invalid, sleep to spare cpu
@@ -126,11 +127,9 @@ void gpspoller::add_deque(deque<gps_struct>& d, gps_struct& g,
 bool gpspoller::isValidPoint(deque<gps_struct>& d, gps_struct& g)
 {
   // Filter out corrupt latitude/longitude/time
-  if(g.lat < -90 || g.lat > 90 )
+  if(g.lat < -90 || g.lat > 90 || g.lon < -180 || g.lon > 180 )
     return false;
-  if(g.lon < -180 || g.lon > 180 )
-    return false;
-  if(g.time == 0)
+  if(g.time == 0 || g.sat == 0)
     return false;
 
   // If no previous records, skip rest
