@@ -40,11 +40,11 @@ case "$1" in
 	fi
         ;;
     status)
-	if [ -n "$PID" ]; 
-	then
-	    /bin/echo "Sailsensor is running"
+	if [ -f $LOCK ];
+	then 
+	    /bin/echo -e "Sailsensor is running."
 	else
-	    /bin/echo "Sailsensor is not running"
+	    /bin/echo  -n "Starting is not running"
 	fi
         ;;
     restart|reload|condrestart)

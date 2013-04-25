@@ -44,6 +44,7 @@ void* gpspoller::run(void)
     if ( gps_waiting(gpsdata, (500) ) && 
          ( gps_read(gpsdata) != -1 ) && 
          ( gpsdata->status > 0 ) && 
+	 (int)gpsdata->fix.time != 0 &&
          !(gpsdata->fix.latitude  != gpsdata->fix.latitude) &&
          !(gpsdata->fix.longitude != gpsdata->fix.longitude) &&
          !(gpsdata->fix.altitude != gpsdata->fix.altitude) )
@@ -124,10 +125,12 @@ void gpspoller::add_deque(deque<gps_struct>& d, gps_struct& g,
 
 bool gpspoller::isValidPoint(deque<gps_struct>& d, gps_struct& g)
 {
-  // Filter out corrupt latitude/longitude
+  // Filter out corrupt latitude/longitude/time
   if(g.lat < -90 || g.lat > 90 )
     return false;
   if(g.lon < -180 || g.lon > 180 )
+    return false;
+  if(g.time == 0)
     return false;
 
   // If no previous records, skip rest
