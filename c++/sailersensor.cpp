@@ -22,7 +22,7 @@ int main()
   {
     // TODO: Get config from argument
 
-/*
+    /*
     // Read configs
     Config cfg;
     cfg.readFile(CONFIG_FILE);
@@ -30,41 +30,22 @@ int main()
     // ss.run();
     */
 
-/*
     // TEST
-    deque<point> ps;
-    point p1, p2, p3;
-    p1.x = 24.965609;
-    p1.y = 60.187655;
-    ps.push_back(p1);
-
-    p2.x = 24.965439;
-    p2.y = 60.187459;
-    ps.push_back(p2);
-
-    p3.x = 24.965495;
-    p3.y = 60.187665;
-    ps.push_back(p3);
-
-    line l = mathutil::getLinReg(ps);
-    printf("%f,%f,%f,%f\n",l.p1.x, l.p1.y, l.p2.x, l.p2.y);
-*/
-
-    // TEST
-/*
-  {"epx": 10.628, "epy": 13.002, "altitude": 34.304, "longitude": 24.967242, "satellites": 8, "time": 747594000, "latitude": 60.186609}, {"epx": 10.628, "epy": 13.002, "altitude": 32.806, "longitude": 24.967193, "satellites": 8, "time":\
-  747594001, "latitude": 60.186615}, {"epx": 10.628, "epy": 13.002, "altitude": 31.55, "longitude": 24.96712, "satellites": 8, "time": 747594003, "latitude": 60.186616}, {"epx": 10.628, "epy": 13.002, "altitude": 29.812, "longitude": 24\
- .967095, "satellites": 8, "time": 747594004, "latitude": 60.186626}, {"epx": 10.628, "epy": 13.002, "altitude": 29.392, "longitude": 24.967062, "satellites": 8, "time": 747594005, "latitude": 60.186632}, {"epx": 10.628, "epy": 13.002, \
- "altitude": 28.522, "longitude": 24.967037, "satellites": 8, "time": 747594006, "latitude": 60.186646}
- */
-/*
-    double lat1=60.187655;
-    double lon1=24.965609;
-    double lat2=60.187459;
-    double lon2=24.965439;
-    double b = mathutil::getBearing(lat1,lon1,lat2,lon2);
-    printf("Bearing: %f\n",b);
-*/
+    deque<gps> gs;
+    gps g1,g2,g3,g4,g5,g6;
+    g1.lon=24.967242; g1.lat=60.186609; g1.time=747594000;
+    g2.lon=24.967193; g2.lat=60.186615; g2.time=747594001;
+    g3.lon=24.96712; g3.lat=60.186616; g3.time=747594003;
+    g4.lon=24.967095; g4.lat=60.186626; g4.time=747594004;
+    g5.lon=24.967062; g5.lat=60.186632; g5.time=747594005;
+    gs.push_back(g1);
+    gs.push_back(g2);
+    gs.push_back(g3);
+    gs.push_back(g4);
+    gs.push_back(g5);
+    double h = mathutil::getHeading(gs);
+    double s = mathutil::getSpeedInKnots(gs);
+    printf("h=%f,s=%f\n",h,s);
 
   }
   catch(const FileIOException &fioex)

@@ -8,6 +8,27 @@
 
 using namespace std;
 
+double mathutil::getHeading(deque<gps>& gs)
+{
+  line l = getLine(gs);
+  return getBearing(l.p1.x, l.p1.y, l.p2.x, l.p2.y);
+}
+
+double mathutil::getSpeedInKnots(deque<gps>& gs)
+{
+  // Get distance in meters
+  line l = getLine(gs);
+  double meters = getDistHaver( l.p1.x, l.p1.y, l.p2.x, l.p2.y ) * 1000;
+  // Get time
+  int stime = gs.at(0).time;
+  int etime = gs.at( gs.size() - 1).time;
+  int time = etime - stime;
+  // Get knots
+  double ms = ( meters / time );
+  double kn =  ms * MS_TO_KNOT;
+  return kn;
+}
+
 double mathutil::getDistHaver(const double& lat1, const double& lon1,
 				 const double& lat2, const double& lon2)
 {
@@ -38,27 +59,6 @@ double mathutil::getBearing(const double& lat1, const double& lon1,
 
   double b = toBearing( atan2(y,x) );
   return b;
-}
-
-double mathutil::getHeading(deque<gps>& gs)
-{
-  line l = getLine(gs);
-  return getBearing(l.p1.y, l.p1.x, l.p2.y, l.p2.x);
-}
-
-double mathutil::getSpeedInKnots(deque<gps>& gs)
-{
-  // Get distance in meters
-  line l = getLine(gs);
-  double meters = getDistHaver( l.p1.y, l.p1.x, l.p2.y, l.p2.x ) * 1000;
-  // Get time
-  int stime = gs.at(0).time;
-  int etime = gs.at( gs.size() ).time;
-  int time = etime - stime;
-  // Get knots
-  double ms = ( meters / (double)time ) * 1000.0;
-  double kn =  ms * MS_TO_KNOT;
-  return kn;
 }
 
 line mathutil::getLine(const deque<gps>& gs)
@@ -144,6 +144,7 @@ line mathutil::getLinReg(const deque<point>& points)
   l.p1.y = l.p1.x * b + a;
   l.p2.x = points.at(len-1).x;
   l.p2.y = l.p2.x * b + a;
+
   return l;
 }
 
