@@ -51,7 +51,7 @@ void* gpspoller::run(void)
          !(gpsdata->fix.altitude != gpsdata->fix.altitude) )
     {
       // Add to deque
-      gps_struct g;
+      gps g;
       g.lat = gpsdata->fix.latitude;
       g.lon = gpsdata->fix.longitude;
       g.alt = gpsdata->fix.altitude;
@@ -77,7 +77,7 @@ void* gpspoller::run(void)
   return 0;
 }
 
-const gps_struct& gpspoller::getLatestPos(void)
+const gps& gpspoller::getLatestPos(void)
 {
   return g_deque.front();
 }
@@ -112,7 +112,7 @@ void gpspoller::close(gps_data_t* gpsdata)
   gps_close(gpsdata);
 }
 
-void gpspoller::add_deque(deque<gps_struct>& d, gps_struct& g, 
+void gpspoller::add_deque(deque<gps>& d, gps& g, 
 			  unsigned int& s)
 {
   // Add to deque if valid
@@ -124,7 +124,7 @@ void gpspoller::add_deque(deque<gps_struct>& d, gps_struct& g,
   }
 }
 
-bool gpspoller::isValidPoint(deque<gps_struct>& d, gps_struct& g)
+bool gpspoller::isValidPoint(deque<gps>& d, gps& g)
 {
   // Filter out corrupt latitude/longitude/time
   if(g.lat < -90 || g.lat > 90 || g.lon < -180 || g.lon > 180 )
@@ -137,7 +137,7 @@ bool gpspoller::isValidPoint(deque<gps_struct>& d, gps_struct& g)
     return true;
 
   // Get previous record
-  gps_struct& g2 = d.front();
+  gps& g2 = d.front();
 
   // Distance between records
   double dist = mathutil::getDistHaver( g.lat, g.lon,

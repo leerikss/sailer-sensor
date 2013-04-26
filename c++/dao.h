@@ -11,8 +11,8 @@ public:
   dao(const libconfig::Config& c);
   ~dao();
 
-  bool insertGps(const gps_struct& data);
-  bool insertLsm(const lsm_struct& lsm);
+  bool insertGps(const gps& data);
+  bool insertLsm(const lsm& lsm);
 
 private:
   void open(void);

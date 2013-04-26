@@ -59,7 +59,7 @@ void dao::close(void)
 }
 
 
-bool dao::insertGps(const gps_struct& g)
+bool dao::insertGps(const gps& g)
 {
   const char* sql = SQL_INSERT_GPS;
 
@@ -67,7 +67,7 @@ bool dao::insertGps(const gps_struct& g)
     sqlite3_mprintf(sql, g.time, g.lat, g.lon, g.alt, g.sat, g.epx, g.epy) );
 }
 
-bool dao::insertLsm(const lsm_struct& l)
+bool dao::insertLsm(const lsm& l)
 {
   const char* sql = SQL_INSERT_LSM;
 

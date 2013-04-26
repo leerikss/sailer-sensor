@@ -1,7 +1,7 @@
 CPP		:= g++ -g
 CPPFLAGS	:= -Wall
 LIBS		:= -lconfig++ -lgps -lsqlite3
-OBJECTS		:=  sailersensor.o  gpspoller.o dao.o \
+OBJECTS		:=  sailersensor.o  mathutil.o gpspoller.o dao.o \
 	lsmpoller.o lsm303dlhc/lsm303dlhc.o \
 	lsm303dlhc/I2C_bus.o lsm303dlhc/smbus.o
 
@@ -10,6 +10,9 @@ sailersensor: $(OBJECTS)
 
 sailersensor.o: sailersensor.cpp
 	$(CPP) $(CPPFLAGS) -c sailersensor.cpp -o sailersensor.o
+
+mathutil.o: mathutil.cpp
+	$(CPP) $(CPPFLAGS) -c mathutil.cpp -o mathutil.o
 
 gpspoller.o: gpspoller.cpp
 	$(CPP) $(CPPFLAGS) -c gpspoller.cpp -o gpspoller.o

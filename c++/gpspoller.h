@@ -21,7 +21,7 @@ public:
   }
   void* run(void);
 
-  const gps_struct& getLatestPos(void);
+  const gps& getLatestPos(void);
   const float getHeading(void);
   const float getSpeedInKnots(void);
   
@@ -30,11 +30,11 @@ public:
 private:
   void open(gps_data_t* gpsdata);
   void close(gps_data_t* gpsdata);
-  void add_deque(deque<gps_struct>& d, gps_struct& g, unsigned int& s);
-  bool isValidPoint(deque<gps_struct>& d, gps_struct& g);
+  void add_deque(deque<gps>& d, gps& g, unsigned int& s);
+  bool isValidPoint(deque<gps>& d, gps& g);
 
   gps_data_t gpsdata_t;
-  deque<gps_struct> g_deque;
+  deque<gps> g_deque;
   int buff_skip_dist_count;
 
   int s_time;

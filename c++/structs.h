@@ -1,15 +1,30 @@
 #ifndef structs_h
 #define structs_h
 
-struct lsm_struct
+struct lsm
 {
   int mag_x, mag_y, mag_z, acc_x, acc_z, acc_y;
 };
 
-struct gps_struct
+struct gps
 {
   double lat,lon,alt,epx,epy;
   int time, sat;
+};
+
+struct point
+{
+  double x,y;
+};
+
+struct line
+{
+  point p1,p2;
+};
+
+struct bound
+{
+  point min,max;
 };
 
 #endif
