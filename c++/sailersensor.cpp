@@ -8,45 +8,26 @@
 #include "dao.h"
 #include "structs.h"
 #include "socketclient.h"
-#include "mathutil.h" // <-- Remove
-#include <deque> // <-- Remove
-
-#define CONFIG_FILE "/home/pi/WORKING/sailer-sensor/c++/sailersensor.cfg"
 
 using namespace libconfig;
 using namespace std;
 
-int main() 
+int main(int argc,char *argv[]) 
 {
   try
   {
-    // TODO: Get config from argument
+    // Config passed as argument
+    if(argc != 2)
+    {
+      cerr << "sailersensor requires one argument only defining the path to the config file." << endl;
+      return(EXIT_FAILURE);
+    }
 
-    /*
     // Read configs
     Config cfg;
-    cfg.readFile(CONFIG_FILE);
+    cfg.readFile(argv[1]);
     sailersensor ss = sailersensor(cfg);
-    // ss.run();
-    */
-
-    // TEST
-    deque<gps> gs;
-    gps g1,g2,g3,g4,g5,g6;
-    g1.lon=24.967242; g1.lat=60.186609; g1.time=747594000;
-    g2.lon=24.967193; g2.lat=60.186615; g2.time=747594001;
-    g3.lon=24.96712; g3.lat=60.186616; g3.time=747594003;
-    g4.lon=24.967095; g4.lat=60.186626; g4.time=747594004;
-    g5.lon=24.967062; g5.lat=60.186632; g5.time=747594005;
-    gs.push_back(g1);
-    gs.push_back(g2);
-    gs.push_back(g3);
-    gs.push_back(g4);
-    gs.push_back(g5);
-    double h = mathutil::getHeading(gs);
-    double s = mathutil::getSpeedInKnots(gs);
-    printf("h=%f,s=%f\n",h,s);
-
+    ss.run();
   }
   catch(const FileIOException &fioex)
   {
@@ -73,16 +54,18 @@ sailersensor::sailersensor(const Config& cfg) : db(cfg), lsm_p(cfg), gps_p(cfg)
 
 void sailersensor::run(void)
 {
+  
+  /*
   // Start lsmpoller thread
-  // pthread_t lsm_t;
-  // pthread_create(&lsm_t, NULL, &lsmpoller::startThread, &lsm_p);
+  pthread_t lsm_t;
+  pthread_create(&lsm_t, NULL, &lsmpoller::startThread, &lsm_p);
 
   // Start gpspoller thread
   pthread_t gps_t;
   pthread_create(&gps_t, NULL, &gpspoller::startThread, &gps_p);
 
   // Init socket
-  // socketclient s;
+  socketclient s;
 
   // Cache previous values
   double prevLat,prevLon;
@@ -91,38 +74,32 @@ void sailersensor::run(void)
   {
     try
     {
-      // Store raw gps data into db
-      if( store_data )
+      ig( !gps_p.isHalted() && ( g.lat != prevLat && g.lon != prevLon ) )
       {
-	const gps& g = gps_p.getLatestPos();
-	if( g.lat != prevLat && g.lon != prevLon )
-	{
-	  db.insertGps(g);
-	  prevLat = g.lat;
-	  prevLon = g.lon;
-	}
-      }
+	const gps& g = gps_p.getData();
 
-      /*
+	// Store into db
+	if( store_data )
+	  db.insertGps(g);
+
+	prevLat = g.lat;
+	prevLon = g.lon;
+
 	printf("Sailersensor: Lat: %f, Lon: %f, Alt: %f, Time: %d\n", g.lat, \
 	g.lon, g.alt, g.time );
-      */
+      }
 
-      /*
-	int p = lsm_p.get_pitch();
-	int h = lsm_p.get_heading();
-	cout << "Sailersensor: Pitch: " << p << ", Heading: " << h << endl;
-      */
+      int p = lsm_p.get_pitch();
+      int h = lsm_p.get_heading();
 
-      /*
+      cout << "Sailersensor: Pitch: " << p << ", Heading: " << h << endl;
 
-      // Send to socket
+      // Send to display
       if(s.conn(display_ip,display_port) )
       {
 	s.send_data("");
 	s.close();
       }
-      */
     }
     catch( const std::exception & ex ) 
     {
@@ -134,4 +111,6 @@ void sailersensor::run(void)
     }
     usleep(s_time);
   }  
+  */
+
 }

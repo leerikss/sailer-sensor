@@ -5,6 +5,7 @@ PATH=/home/pi/WORKING/sailer-sensor/c++/$NAME
 LOCK=/var/lock/sailersensor
 LOG=/var/log/sailersensor.log
 NAME=sailersensor
+CONFIG=/home/pi/WORKING/sailer-sensor/c++/sailersensor.cfg
 
 OK="\e[00;32m[Ok]\e[00m"
 FAIL="\e[00;31m[Failed]\e[00m"
@@ -24,7 +25,7 @@ case "$1" in
 	else
 	    /bin/echo  -n "Starting sailersensor..."
 	    /bin/touch $LOCK
-            $PATH >> $LOG 2>&1 &
+            $PATH "$CONFIG" >> $LOG 2>&1 &
 	    /bin/echo -e "$OK"
 	fi
 	;;

@@ -3,12 +3,12 @@
 
 struct lsm
 {
-  int mag_x, mag_y, mag_z, acc_x, acc_z, acc_y;
+  int mag_x, mag_y, mag_z, mag_h,acc_x, acc_z, acc_y;
 };
 
 struct gps
 {
-  double lat,lon,alt,epx,epy;
+  double lat,lon,alt,epx,epy,dist,head,knots;
   int time, sat;
 };
 

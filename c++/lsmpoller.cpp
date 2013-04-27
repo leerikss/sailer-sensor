@@ -72,7 +72,7 @@ float lsmpoller::get_avg(deque<int>& dq)
 
 void lsmpoller::add_deque(deque<int>& d, int& v, unsigned int& s)
 {
-  d.push_front(v);
+  d.push_back(v);
   if( d.size() > s )
-    d.pop_back();
+    d.pop_front();
 }

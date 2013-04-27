@@ -11,9 +11,10 @@ using namespace libconfig;
 using namespace std;
 
 gpspoller::gpspoller(const Config& cfg)
-{
+{    
   // Set vals from config
   s_time = cfg.lookup("gpspoller.sleep");
+  halt_m = cfg.lookup("gpspoller.halt_m");
   buff_size = cfg.lookup("gpspoller.buffer_size");
   buff_skip_dist_m = cfg.lookup("gpspoller.buffer_skip_dist_m");
   buff_skip_dist_max = cfg.lookup("gpspoller.buffer_skip_dist_max");
@@ -59,9 +60,12 @@ void* gpspoller::run(void)
       g.sat = gpsdata->satellites_used;
       g.epx = gpsdata->fix.epx;
       g.epy = gpsdata->fix.epy;
-      add_deque(g_deque, g, buff_size);
+      add_deque(g);
       
-      // printf("Latitude: %f\tLongitude: %f\tTime: %d\n", gpsdata->fix.latitude, gpsdata->fix.longitude, (int)gpsdata->fix.time);
+/*
+      printf("Latitude: %f\tLongitude: %f\tTime: %d\n", gpsdata->fix.latitude, \
+      gpsdata->fix.longitude, (int)gpsdata->fix.time);
+*/
 
     }
     // If gpsd has no new data, or data is invalid, sleep to spare cpu
@@ -77,23 +81,99 @@ void* gpspoller::run(void)
   return 0;
 }
 
-const gps& gpspoller::getLatestPos(void)
+const gps gpspoller::getData(void)
 {
-  return g_deque.front();
+  // Init
+  gps g = g_deque.back();
+  setBounds();
+
+  line l = getLine();
+  
+  // Set heading
+  double h = mathutil::getBearing(l.p1.x, l.p1.y, l.p2.x, l.p2.y);
+  g.head = h;
+
+  // Set distance in meters
+  double m = mathutil::getDistHaver( l.p1.x, l.p1.y, l.p2.x, l.p2.y ) * 1000;
+  g.dist = m;
+
+  // Get speed
+  int st = g_deque.at(0).time;
+  int et = g_deque.at( g_deque.size() - 1).time;
+  int t = et - st;
+  double ms = ( m / t );
+  double kn =  ms * MS_TO_KNOT;
+  g.knots = kn;
+
+  return g;
 }
 
-const float gpspoller::getHeading(void)
+const bool gpspoller::isHalted(void)
 {
-  return 0;
-  // TODO: Implement
-  // TODO: Take standstill into account
+  setBounds();
+  double m = mathutil::getDistHaver( bnd.min.x, bnd.min.y, bnd.max.x, bnd.max.y ) * 1000;  
+  if(m <= (double)halt_m)
+    return true;
+  return false;
 }
 
-const float gpspoller::getSpeedInKnots(void)
+void gpspoller::setBounds(void)
 {
-  return 0;
-  // TODO: Implement
-  // TODO: Take standstill into account
+  bnd.min.x=181; bnd.max.x=-181;
+  bnd.min.y=91; bnd.max.y=-91;
+  for(int i=0; i<(int)g_deque.size(); i++)
+  {
+    gps g = g_deque.at(i);
+    bnd.min.x = min(g.lon,bnd.min.x);
+    bnd.min.y = min(g.lat,bnd.min.y);
+    bnd.max.x = max(g.lon,bnd.max.x);
+    bnd.max.y = max(g.lat,bnd.max.y);
+  }
+}
+
+// TODO: Find out a more elegant way of retrieving the line without 
+// flipping the linear regression arguments based on direction
+line gpspoller::getLine(void)
+{
+  double w = mathutil::getDistHaver( bnd.min.y, bnd.min.x, bnd.min.y, bnd.max.x);
+  double h = mathutil::getDistHaver( bnd.min.y, bnd.min.x, bnd.max.y, bnd.min.x);
+
+  // Build deque of points dependent on axis we're moving in
+  deque<point> ps;
+  for(int i=0;i<(int)g_deque.size(); i++)
+  {
+    gps g = g_deque.at(i);
+
+    point p;
+
+    if( w > h )
+    {
+      p.x = g.lon; 
+      p.y = g.lat;
+    }
+    else
+    {
+      p.x = g.lat; 
+      p.y = g.lon;
+    }
+
+    ps.push_back( p );
+  }
+
+  // Return line, flip other way around when heading in x-axis
+  line l1 = mathutil::getLinReg(ps);
+
+  if( w > h )
+  {
+    line l2;
+    l2.p1.x = l1.p1.y; 
+    l2.p1.y = l1.p1.x;
+    l2.p2.x = l1.p2.y; 
+    l2.p2.y = l1.p2.x;
+    return l2;
+  }
+  else
+    return l1;
 }
 
 void gpspoller::open(gps_data_t* gpsdata)
@@ -112,19 +192,18 @@ void gpspoller::close(gps_data_t* gpsdata)
   gps_close(gpsdata);
 }
 
-void gpspoller::add_deque(deque<gps>& d, gps& g, 
-			  unsigned int& s)
+void gpspoller::add_deque(gps& g)
 {
   // Add to deque if valid
-  if( isValidPoint(d, g) )
+  if( isValidPoint(g) )
   {
-    d.push_front(g);
-    if( d.size() > s )
-      d.pop_back();
+    g_deque.push_back(g);
+    if( g_deque.size() > buff_size )
+      g_deque.pop_front();
   }
 }
 
-bool gpspoller::isValidPoint(deque<gps>& d, gps& g)
+bool gpspoller::isValidPoint(gps& g)
 {
   // Filter out corrupt latitude/longitude/time
   if(g.lat < -90 || g.lat > 90 || g.lon < -180 || g.lon > 180 )
@@ -133,11 +212,11 @@ bool gpspoller::isValidPoint(deque<gps>& d, gps& g)
     return false;
 
   // If no previous records, skip rest
-  if( d.size() == 0 )
+  if( g_deque.size() == 0 )
     return true;
 
   // Get previous record
-  gps& g2 = d.front();
+  gps& g2 = g_deque.back();
 
   // Distance between records
   double dist = mathutil::getDistHaver( g.lat, g.lon,

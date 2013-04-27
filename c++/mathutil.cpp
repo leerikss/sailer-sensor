@@ -4,30 +4,7 @@
 #include "structs.h"
 #include <deque>
 
-#define MS_TO_KNOT    1.94384449244;
-
 using namespace std;
-
-double mathutil::getHeading(deque<gps>& gs)
-{
-  line l = getLine(gs);
-  return getBearing(l.p1.x, l.p1.y, l.p2.x, l.p2.y);
-}
-
-double mathutil::getSpeedInKnots(deque<gps>& gs)
-{
-  // Get distance in meters
-  line l = getLine(gs);
-  double meters = getDistHaver( l.p1.x, l.p1.y, l.p2.x, l.p2.y ) * 1000;
-  // Get time
-  int stime = gs.at(0).time;
-  int etime = gs.at( gs.size() - 1).time;
-  int time = etime - stime;
-  // Get knots
-  double ms = ( meters / time );
-  double kn =  ms * MS_TO_KNOT;
-  return kn;
-}
 
 double mathutil::getDistHaver(const double& lat1, const double& lon1,
 				 const double& lat2, const double& lon2)
@@ -58,61 +35,6 @@ double mathutil::getBearing(const double& lat1, const double& lon1,
   double x = cos(dLat1)*sin(dLat2)-sin(dLat1)*cos(dLat2)*cos(dLon);
 
   double b = toBearing( atan2(y,x) );
-  return b;
-}
-
-line mathutil::getLine(const deque<gps>& gs)
-{
-  bound b = getBounds(gs);
-  double w = getDistHaver( b.min.y, b.min.x, b.min.y, b.max.x);
-  double h = getDistHaver( b.min.y, b.min.x, b.max.y, b.min.x);
-
-  // Build deque of points dependent on axis we're moving in
-  deque<point> ps;
-  for(int i=0;i<(int)gs.size(); i++)
-  {
-    gps g = gs.at(i);
-    point p;
-
-    if( w > h )
-    {
-      p.x = g.lon; p.y = g.lat;
-    }
-    else
-    {
-      p.x = g.lat; p.y = g.lon;
-    }
-
-    ps.push_back( p );
-  }
-
-  // Return line, flip other way around when heading in x-axis
-  line l1 = getLinReg(ps);
-
-  if( w > h )
-  {
-    line l2;
-    l2.p1.x = l1.p1.y; l2.p1.y = l1.p1.x;
-    l2.p2.x = l1.p2.y; l2.p2.y = l1.p2.x;
-    return l2;
-  }
-  else
-    return l1;
-}
-
-bound mathutil::getBounds(const deque<gps>& gs)
-{
-  bound b;
-  b.min.x=181; b.max.x=-181;
-  b.min.y=91; b.max.y=-91;
-  for(int i=0; i<(int)gs.size(); i++)
-  {
-    gps g = gs.at(i);
-    b.min.x = min(g.lon,b.min.x);
-    b.min.y = min(g.lat,b.min.y);
-    b.max.x = max(g.lon,b.max.x);
-    b.max.y = max(g.lat,b.max.y);
-  }
   return b;
 }
 
@@ -148,6 +70,11 @@ line mathutil::getLinReg(const deque<point>& points)
   return l;
 }
 
+double mathutil::toBearing(const double& v)
+{
+  return fmod( ( toDegree(v) + 360 ), 360 );
+}
+
 double mathutil::toRadian(const double& v)
 {
   return v * M_PI /180;
@@ -158,7 +85,3 @@ double mathutil::toDegree(const double& v)
   return v * 180 / M_PI;
 }
 
-double mathutil::toBearing(const double& v)
-{
-  return fmod( ( toDegree(v) + 360 ), 360 );
-}

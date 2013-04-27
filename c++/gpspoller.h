@@ -6,6 +6,8 @@
 #include <deque>
 #include "structs.h"
 
+#define MS_TO_KNOT    1.94384449244;
+
 using namespace std;
 
 class gpspoller
@@ -20,24 +22,30 @@ public:
     return ((gpspoller*)context)->run();
   }
   void* run(void);
-
-  const gps& getLatestPos(void);
-  const float getHeading(void);
-  const float getSpeedInKnots(void);
+  // Public access
+  const gps getData(void);
+  const bool isHalted(void);
   
   bool running;
 
 private:
+  double getHeading(deque<gps>& gs);
+  double getSpeedInKnots(deque<gps>& gs);
+  void setBounds(void);
+  line getLine(void);
   void open(gps_data_t* gpsdata);
   void close(gps_data_t* gpsdata);
-  void add_deque(deque<gps>& d, gps& g, unsigned int& s);
-  bool isValidPoint(deque<gps>& d, gps& g);
+  void add_deque(gps& g);
+  bool isValidPoint(gps& g);
 
   gps_data_t gpsdata_t;
   deque<gps> g_deque;
   int buff_skip_dist_count;
 
   int s_time;
+  bound bnd;
+  // Config vals
+  int halt_m;
   unsigned int buff_size;
   int buff_skip_dist_m;
   int buff_skip_dist_max;
