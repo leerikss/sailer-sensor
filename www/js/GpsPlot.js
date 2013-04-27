@@ -206,8 +206,8 @@ GpsPlot.prototype.step = function(step)
   
   // Output calculated data
   $("#heading").html( heading.toFixed(1) + "&deg;" );
-  $("#speed").html( kmh.toFixed(1) + // " km/h<br/>" + 
-  	knots.toFixed(1)+" knots" );
+  // $("#speed").html( kmh.toFixed(1)+" km/h" ); // knots.toFixed(1)+" knots" );
+  $("#speed").html( knots.toFixed(1)+" knots" );
   $("#distance").html( meters.toFixed(1) + " m" );
   $("#standstill").html( standstill );
   
@@ -223,7 +223,7 @@ GpsPlot.prototype.step = function(step)
   this.drawPath('step', path, this.STEP_COL, 1);
 
   // Fit path to map
-  this.fitPath( path );
+  // this.fitPath( path );
 }
 
 GpsPlot.prototype.drawFirPath = function()

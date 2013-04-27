@@ -32,7 +32,7 @@ define("DATA", "data/");
 <?php
 if ($handle = opendir(DATA)) 
 {
-    $blacklist = array('.', '..', '*.php', '.DS_Store', 'gpx');
+    $blacklist = array('.', '..', '.DS_Store', 'gpx');
     while (false !== ($file = readdir($handle))) 
     {
         if (!in_array($file, $blacklist)) 
