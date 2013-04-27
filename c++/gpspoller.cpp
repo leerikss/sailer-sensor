@@ -1,6 +1,7 @@
 #include "gpspoller.h"
 #include <libconfig.h++>
 #include <iostream>
+#include <sstream>
 #include <unistd.h>
 #include <gps.h>
 #include <deque>
@@ -10,7 +11,7 @@
 using namespace libconfig;
 using namespace std;
 
-gpspoller::gpspoller(const Config& cfg)
+gpspoller::gpspoller(const Config& cfg) : logger(cfg)
 {    
   // Set vals from config
   s_time = cfg.lookup("gpspoller.sleep");
@@ -61,12 +62,6 @@ void* gpspoller::run(void)
       g.epx = gpsdata->fix.epx;
       g.epy = gpsdata->fix.epy;
       add_deque(g);
-      
-/*
-      printf("Latitude: %f\tLongitude: %f\tTime: %d\n", gpsdata->fix.latitude, \
-      gpsdata->fix.longitude, (int)gpsdata->fix.time);
-*/
-
     }
     // If gpsd has no new data, or data is invalid, sleep to spare cpu
     else
@@ -187,7 +182,7 @@ void gpspoller::open(gps_data_t* gpsdata)
 {
   while( gps_open("localhost", DEFAULT_GPSD_PORT, gpsdata) < 0 )
   {
-    cerr << "Unable to connect to device. Trying again..." << endl;
+    logger.error("Unable to connect to device. Trying again...");
     usleep(s_time);
   }
   gps_stream(gpsdata, WATCH_ENABLE, NULL);
@@ -242,15 +237,17 @@ bool gpspoller::isValidPoint(gps& g)
     buff_skip_dist_count++;
     if( buff_skip_dist_count > buff_skip_dist_max )
     {
-      cerr << "Retrieved too many continuous distant points. "\
-	"Treating point as valid." << endl;
+      logger.error("Retrieved too many continuous distant points. "	\
+		   "Treating point as valid.");
       buff_skip_dist_count = 0;
       return true;
     }
     else
     {
-      cerr << "Retrieved a too distant point, treating it as an error,"\
-	" m = " << dist << endl;
+      ostringstream ss;
+      ss << "Retrieved a too distant point, treating it as an error. ";
+      ss << "Distance: " << dist << " meters";
+      logger.error( ss.str() );
       return false;
     }
   }

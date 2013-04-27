@@ -4,6 +4,7 @@
 #include <sqlite3.h>
 #include "structs.h"
 #include <libconfig.h++>
+#include "log.h"
 
 #define SQL_CREATE_TABLES "CREATE TABLE IF NOT EXISTS gps ("	\
   "id INTEGER PRIMARY KEY,"					\
@@ -50,6 +51,8 @@ private:
   void open(void);
   void close(void);
   bool query(const char* sql);
+
+  log logger;
   const char* db_file;
   sqlite3* db;
 };
