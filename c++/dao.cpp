@@ -47,8 +47,8 @@ bool dao::insertLsm(const lsm& l)
   const char* sql = SQL_INSERT_LSM;
 
   return query( \
-    sqlite3_mprintf(sql,l.mag_x,l.mag_y,l.mag_z,l.mag_h,\
-		    l.acc_x,l.acc_y,l.acc_z));
+    sqlite3_mprintf(sql, l.m.x, l.m.y, l.m.z, l.m.h,\
+		    l.a.x, l.a.y, l.a.z, l.a.p));
 }
 
 bool dao::query(const char* sql)

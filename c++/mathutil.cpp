@@ -85,3 +85,11 @@ double mathutil::toDegree(const double& v)
   return v * 180 / M_PI;
 }
 
+double mathutil::round(double v, int to)
+{
+  double places = pow(10.0, to);
+  double v2 = v * places;
+  double v3 = ( (v2 - floor(v2) ) >= 0.5) ? ceil(v2) : floor(v2);
+  return v3 / places;
+}
+

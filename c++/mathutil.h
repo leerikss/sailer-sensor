@@ -22,6 +22,7 @@ public:
   static double toBearing(const double& v);
   static double toRadian(const double& v);
   static double toDegree(const double& v);
+  static double round(double value, int to);
 private:
 };
 

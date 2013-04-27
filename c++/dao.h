@@ -16,8 +16,8 @@
   "epx REAL,"							\
   "epy REAL,"							\
   "dist REAL,"							\
-  "head REAL,"								\
-  "knots REAL);"								\
+  "head REAL,"							\
+  "knots REAL);"						\
   "CREATE TABLE IF NOT EXISTS lsm303dlhc ("			\
   "id INTEGER PRIMARY KEY,"					\
   "time INTEGER DEFAULT CURRENT_TIMESTAMP,"			\
@@ -27,15 +27,15 @@
   "mag_h REAL,"							\
   "acc_x INTEGER,"						\
   "acc_y INTEGER,"						\
-  "acc_z INTEGER);"
+  "acc_z INTEGER,"						\
+  "acc_p REAL);"
 
-#define  SQL_INSERT_GPS  "INSERT INTO gps(sat_time,latitude," \
-  "longitude,altitude,satellites,epx,epy,dist,head,knots) "\
+#define  SQL_INSERT_GPS  "INSERT INTO gps(sat_time,latitude,"	\
+  "longitude,altitude,satellites,epx,epy,dist,head,knots) "	\
   "VALUES (%d,%f,%f,%f,%d,%f,%f,%f,%f,%f)";
 
-#define SQL_INSERT_LSM    "INSERT INTO lsm303dlhc(mag_x,mag_y,mag_z,mag_h,"	\
-  "acc_x,acc_y,acc_z) VALUES (%f,%f,%f,%f,%f,%f,%f)";
-
+#define SQL_INSERT_LSM    "INSERT INTO lsm303dlhc(mag_x,mag_y,mag_z,mag_h," \
+  "acc_x,acc_y,acc_z,acc_p) VALUES (%d,%d,%d,%f,%d,%d,%d,%f)";
 
 class dao
 {
@@ -44,7 +44,7 @@ public:
   ~dao();
 
   bool insertGps(const gps& data);
-  bool insertLsm(const lsm& lsm);
+  bool insertLsm(const lsm& l);
 
 private:
   void open(void);

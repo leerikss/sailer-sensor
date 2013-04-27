@@ -44,6 +44,7 @@ private:
 
   int s_time;
   bound bnd;
+
   // Config vals
   int halt_m;
   unsigned int buff_size;

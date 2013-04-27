@@ -1,9 +1,22 @@
 #ifndef structs_h
 #define structs_h
 
+struct mag
+{
+  int x,y,z;
+  double h;
+};
+
+struct acc
+{
+  int x,y,z;
+  double p;
+};
+
 struct lsm
 {
-  int mag_x, mag_y, mag_z, mag_h,acc_x, acc_z, acc_y;
+  mag m;
+  acc a;
 };
 
 struct gps

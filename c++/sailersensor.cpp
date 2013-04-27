@@ -1,4 +1,5 @@
 #include "sailersensor.h"
+#include <sstream>
 #include <iostream>
 #include <cstdlib>
 #include <libconfig.h++>
@@ -8,6 +9,14 @@
 #include "dao.h"
 #include "structs.h"
 #include "socketclient.h"
+#include <iomanip>
+#include <cmath>
+#include "mathutil.h"
+
+#define MSG_GPS_HEAD  "GH"
+#define MSG_GPS_SPEED "GS"
+#define MSG_MAG_HEAD  "MH"
+#define MSG_ACC_PITCH "AP"
 
 using namespace libconfig;
 using namespace std;
@@ -41,7 +50,7 @@ int main(int argc,char *argv[])
     return(EXIT_FAILURE);
   }
   
-  // return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
 
 sailersensor::sailersensor(const Config& cfg) : db(cfg), lsm_p(cfg), gps_p(cfg)
@@ -55,7 +64,6 @@ sailersensor::sailersensor(const Config& cfg) : db(cfg), lsm_p(cfg), gps_p(cfg)
 void sailersensor::run(void)
 {
   
-  /*
   // Start lsmpoller thread
   pthread_t lsm_t;
   pthread_create(&lsm_t, NULL, &lsmpoller::startThread, &lsm_p);
@@ -68,38 +76,79 @@ void sailersensor::run(void)
   socketclient s;
 
   // Cache previous values
-  double prevLat,prevLon;
+  int p_gh, p_mh, p_ap;
+  double p_gs;
 
   while(true)
   {
     try
     {
-      ig( !gps_p.isHalted() && ( g.lat != prevLat && g.lon != prevLon ) )
+      stringstream msg;
+
+      // Handle GPS
+      const gps& g = gps_p.getData();
+      bool h = gps_p.isHalted();
+
+      // Store gps data into db
+      if( store_data && !h )
+	db.insertGps(g);
+      
+      // Halt message
+      if(h)
       {
-	const gps& g = gps_p.getData();
+	msg << MSG_GPS_HEAD << "- ";
+	msg << MSG_GPS_SPEED << "- ";
+      }
+      // Build normal message
+      else 
+      {
+	int gh = static_cast<int>(g.head);
+	double gs = mathutil::round(g.knots,1);
 
-	// Store into db
-	if( store_data )
-	  db.insertGps(g);
-
-	prevLat = g.lat;
-	prevLon = g.lon;
-
-	printf("Sailersensor: Lat: %f, Lon: %f, Alt: %f, Time: %d\n", g.lat, \
-	g.lon, g.alt, g.time );
+	if( gh != p_gh )
+	{
+	  msg << MSG_GPS_HEAD << gh << " ";
+	  p_gh = gh;
+	}
+	if( gs != p_gs )
+	{
+	  msg << MSG_GPS_SPEED << fixed << setprecision(1) << gs << " ";
+	  p_gs = gs;
+	}
       }
 
-      int p = lsm_p.get_pitch();
-      int h = lsm_p.get_heading();
+      // Handle lsm303dlhc
+      const lsm& l = lsm_p.getData();
+      int ap = abs( static_cast<int>(l.a.p) );
+      int mh = static_cast<int>(l.m.h);
 
-      cout << "Sailersensor: Pitch: " << p << ", Heading: " << h << endl;
+      // Store lsm data into db
+      if( store_data && (ap != p_ap || mh != p_mh) )
+	db.insertLsm(l);
 
+      // Build message
+      if( mh != p_mh )
+      {
+	msg << MSG_MAG_HEAD << mh << " ";
+	p_mh = mh;
+      }
+      if( ap != p_ap )
+      {
+	msg << MSG_ACC_PITCH << ap << " ";
+	p_ap = ap;
+      }
+
+      // Debug
+      cout << "Message: " << msg.str() << endl;
+
+      /*
       // Send to display
       if(s.conn(display_ip,display_port) )
       {
-	s.send_data("");
+	s.send_data( msg.str() );
 	s.close();
       }
+      */
     }
     catch( const std::exception & ex ) 
     {
@@ -111,6 +160,4 @@ void sailersensor::run(void)
     }
     usleep(s_time);
   }  
-  */
-
 }

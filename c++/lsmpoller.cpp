@@ -3,6 +3,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <deque>
+#include "structs.h"
 #include "lsm303dlhc/lsm303dlhc.h"
 
 using namespace libconfig;
@@ -14,8 +15,8 @@ lsmpoller::lsmpoller(const Config& cfg) : lsm303(fileN, cfg)
 {
   // Set vals from config
   s_time = cfg.lookup("lsmpoller.sleep");
-  p_size = cfg.lookup("accelerometer.buffer_size");
-  h_size = cfg.lookup("magnetometer.buffer_size");
+  a_size = cfg.lookup("accelerometer.buffer_size");
+  m_size = cfg.lookup("magnetometer.buffer_size");
 }
 
 void* lsmpoller::run(void)
@@ -26,17 +27,23 @@ void* lsmpoller::run(void)
 
   while(running)
   {
-    // Read latest raw data
-    lsm303.readMagRaw();
+    // Read accelerometer
+    acc a;
     lsm303.readAccRaw();
+    a.x = lsm303.a.x;
+    a.y = lsm303.a.y;
+    a.z = lsm303.a.z;
+    a.p = lsm303.pitch();
+    add_a_deque(a);
 
-    // Read pitch & add to buffer
-    int p = lsm303.pitch();
-    add_deque(p_deque, p, p_size);
-
-    // Read heading & add to buffer
-    int h = lsm303.heading();
-    add_deque(h_deque, h, h_size);
+    // Read magnetometer
+    mag m;
+    lsm303.readMagRaw();
+    m.x = lsm303.m.x;
+    m.y = lsm303.m.y;
+    m.z = lsm303.m.z;
+    m.h = lsm303.heading();
+    add_m_deque(m);
 
     // Sleep
     usleep(s_time);
@@ -45,34 +52,62 @@ void* lsmpoller::run(void)
   return 0;
 }
 
-int lsmpoller::get_pitch(void)
+const lsm lsmpoller::getData(void)
 {
-  return get_avg(p_deque);
+  lsm l;
+
+  if( a_deque.empty() || m_deque.empty() )
+    return l;
+
+  acc a = a_deque.back();
+  a.p = getPitch();
+
+  mag m = m_deque.back();
+  m.h = getHeading();
+
+  l.a = a;
+  l.m = m;
+  return l;
 }
 
-int lsmpoller::get_heading(void)
+double lsmpoller::getPitch(void)
 {
-  return get_avg(h_deque);
-}
-
-float lsmpoller::get_avg(deque<int>& dq)
-{
-  float avg = 0.0;
-  for(int unsigned i=0; i<dq.size(); i++)
+  double avg = 0.0;
+  unsigned int len = a_deque.size();
+  for(unsigned int i=0; i<len; i++)
   {
-    // cout << dq[i] << "+";
-    avg += dq[i];
+    acc a = a_deque.at(i);
+    avg += a.p;
   }
   if(avg == 0)
     return 0;
-
-  // cout << "= > avg: " << avg/dq.size() << endl;
-  return avg/dq.size();
+  return avg/len;
 }
 
-void lsmpoller::add_deque(deque<int>& d, int& v, unsigned int& s)
+double lsmpoller::getHeading(void)
 {
-  d.push_back(v);
-  if( d.size() > s )
-    d.pop_front();
+  double avg = 0.0;
+  unsigned int len = m_deque.size();
+  for(unsigned int i=0; i<len; i++)
+  {
+    mag m = m_deque.at(i);
+    avg += m.h;
+  }
+  if(avg == 0)
+    return 0;
+  return avg/len;
+}
+
+void lsmpoller::add_m_deque(mag& m)
+{
+  m_deque.push_back(m);
+  if( m_deque.size() > m_size )
+    m_deque.pop_front();
+}
+
+void lsmpoller::add_a_deque(acc& a)
+{
+  a_deque.push_back(a);
+  if( a_deque.size() > a_size )
+    a_deque.pop_front();
 }

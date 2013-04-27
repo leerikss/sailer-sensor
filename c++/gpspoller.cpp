@@ -83,8 +83,11 @@ void* gpspoller::run(void)
 
 const gps gpspoller::getData(void)
 {
-  // Init
-  gps g = g_deque.back();
+  gps g;
+  if( g_deque.empty() )
+    return g;
+  
+  g = g_deque.back();
   setBounds();
 
   line l = getLine();
@@ -110,6 +113,10 @@ const gps gpspoller::getData(void)
 
 const bool gpspoller::isHalted(void)
 {
+  // No data yet = halted
+  if( g_deque.size() == 0)
+    return true;
+
   setBounds();
   double m = mathutil::getDistHaver( bnd.min.x, bnd.min.y, bnd.max.x, bnd.max.y ) * 1000;  
   if(m <= (double)halt_m)
@@ -121,7 +128,7 @@ void gpspoller::setBounds(void)
 {
   bnd.min.x=181; bnd.max.x=-181;
   bnd.min.y=91; bnd.max.y=-91;
-  for(int i=0; i<(int)g_deque.size(); i++)
+  for(unsigned int i=0; i<g_deque.size(); i++)
   {
     gps g = g_deque.at(i);
     bnd.min.x = min(g.lon,bnd.min.x);
@@ -140,7 +147,7 @@ line gpspoller::getLine(void)
 
   // Build deque of points dependent on axis we're moving in
   deque<point> ps;
-  for(int i=0;i<(int)g_deque.size(); i++)
+  for(int unsigned i=0;i<g_deque.size(); i++)
   {
     gps g = g_deque.at(i);
 
