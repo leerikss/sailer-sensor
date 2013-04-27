@@ -96,8 +96,8 @@ void sailersensor::run(void)
       // Halt message
       if(h)
       {
-	msg << MSG_GPS_HEAD << "- ";
-	msg << MSG_GPS_SPEED << "- ";
+	msg << MSG_GPS_HEAD << "-1 ";
+	msg << MSG_GPS_SPEED << "-1 ";
       }
       // Build normal message
       else 
@@ -141,14 +141,12 @@ void sailersensor::run(void)
       // Debug
       cout << "Message: " << msg.str() << endl;
 
-      /*
       // Send to display
       if(s.conn(display_ip,display_port) )
       {
 	s.send_data( msg.str() );
 	s.close();
       }
-      */
     }
     catch( const std::exception & ex ) 
     {
