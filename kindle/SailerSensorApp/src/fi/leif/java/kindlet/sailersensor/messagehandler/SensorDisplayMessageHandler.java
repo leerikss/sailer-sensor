@@ -78,7 +78,8 @@ public class SensorDisplayMessageHandler implements MessageHandler
 		try 
 		{ 
 			double d = Double.parseDouble(v); 
-			m.put( k, new Double(d) );		}	
+			m.put( k, new Double(d) );		
+		}	
 		catch(Exception e) { e.printStackTrace(); }
 	}
 

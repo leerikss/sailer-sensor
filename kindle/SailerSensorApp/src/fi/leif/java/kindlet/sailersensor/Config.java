@@ -1,9 +1,10 @@
 package fi.leif.java.kindlet.sailersensor;
 
-import fi.leif.java.kindlet.sailersensor.sensordisplay.CompassSensorDisplay;
-import fi.leif.java.kindlet.sailersensor.sensordisplay.HeadingSensorDisplay;
+import fi.leif.java.kindlet.sailersensor.sensordisplay.GpsHeadSensorDisplay;
+import fi.leif.java.kindlet.sailersensor.sensordisplay.GpsSpeedSensorDisplay;
+import fi.leif.java.kindlet.sailersensor.sensordisplay.MagHeadSensorDisplay;
+import fi.leif.java.kindlet.sailersensor.sensordisplay.PitchSensorDisplay;
 import fi.leif.java.kindlet.sailersensor.sensordisplay.SensorDisplay;
-import fi.leif.java.kindlet.sailersensor.sensordisplay.SpeedSensorDisplay;
 
 public class Config 
 {
@@ -11,9 +12,11 @@ public class Config
 	{
 			// Page 1
 			{
-				new CompassSensorDisplay(this),
-				new HeadingSensorDisplay(this),
-				new SpeedSensorDisplay(this)
+				// new CompassSensorDisplay(this),
+				new GpsHeadSensorDisplay(this),
+				new MagHeadSensorDisplay(this),
+				new GpsSpeedSensorDisplay(this),
+				new PitchSensorDisplay(this)
 			}/*,
 			
 			// Page 2
@@ -25,11 +28,11 @@ public class Config
 			
 	};
 
-	public final int MAX_PAGE_ROWS = 3;
+	public final int MAX_PAGE_ROWS = 2;
 	public final int PAGE_SHOW_MS = 3000;
 
-	public final int TITLE_FONT_SIZE = 50;
-	public final int DATA_FONT_SIZE = 210;
+	public final int TITLE_FONT_SIZE = 40;
+	public final int DATA_FONT_SIZE = 90;
 	public final String FONTFAMILY = null;
 	
 	public final int SOCKET_PORT = 9000;

@@ -9,21 +9,21 @@ import com.amazon.kindle.kindlet.ui.KLabel;
 import fi.leif.java.kindlet.sailersensor.Config;
 
 
-public class SpeedSensorDisplay extends SensorDisplay
+public class GpsSpeedSensorDisplay extends SensorDisplay
 {
 	KLabel speed;
 
-	private final String MSG_ID = "SP";
+	private final String MSG_ID = "GS";
 	private final int KN_FONT_SIZE = 75;
 
-	public SpeedSensorDisplay(Config config)
+	public GpsSpeedSensorDisplay(Config config)
 	{
 		super(config);
 		
 		setLayout(new BorderLayout());
 
 		// Add header
-		addHeader("SPEED");
+		addHeader("GPS SPEED");
 
 		// Speed label
 		speed = new KLabel("", KLabel.CENTER );
