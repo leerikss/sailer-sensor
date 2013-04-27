@@ -138,15 +138,15 @@ void sailersensor::run(void)
 	p_ap = ap;
       }
 
-      // Debug
-      cout << "Message: " << msg.str() << endl;
-
       // Send to display
       if(s.conn(display_ip,display_port) )
       {
 	s.send_data( msg.str() );
 	s.close();
       }
+
+      // Debug
+      // cout << "Message: " << msg.str() << endl;
     }
     catch( const std::exception & ex ) 
     {
