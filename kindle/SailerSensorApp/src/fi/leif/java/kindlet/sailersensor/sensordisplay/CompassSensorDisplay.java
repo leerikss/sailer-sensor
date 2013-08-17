@@ -15,7 +15,7 @@ public class CompassSensorDisplay extends SensorDisplay
 {
 	private Compass compass;
 
-	private final String MSG_GPS_ID = "HD";
+	private final String MSG_GPS_ID = "GH";
 	private final String MSG_MAG_ID = "MN";
 	
 	private final int 		POINT_W = 60;

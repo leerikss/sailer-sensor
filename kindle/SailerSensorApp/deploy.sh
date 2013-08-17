@@ -1,12 +1,12 @@
 #!/bin/sh
 
 FILENAME=SailerSensorApp
-KEYSTORE=$HOME/Dev/Kindle/keystore/developer.keystore
+KEYSTORE=developer.keystore
 YOUR_ALIAS=Test
 JAR=$FILENAME.azw2
 MANIFEST=$FILENAME.manifest
 SSH_USER=root
-SSH_IP=192.168.2.2
+SSH_IP=kindle.intra
 
 set -e
 ant jar
