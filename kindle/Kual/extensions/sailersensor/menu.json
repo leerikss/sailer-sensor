@@ -1,0 +1,92 @@
+{
+	"comment001": "Sailer Sensor KUAL companion",
+	"comment002": "",
+	"comment003": "Provides a GUI for connecting to the RPI device",
+	"comment004": "",
+	"items": 
+	[
+		{
+			"name": "Sailer Sensor",
+			"priority": -1,
+			"items": 
+			[
+				{
+					"name": "USB",
+					"items": 
+					[
+						{
+							"name": "Toggle USBNetwork",
+							"action": "./scripts/sailersensor.sh",
+							"params": "toggle_usbnet",
+							"checked": true,
+							"exitmenu": false,
+							"refresh": false,
+							"status": false
+						},
+						{
+							"name": "Test RPI Connection",
+							"action": "./scripts/sailersensor.sh",
+							"params": "test_rpi_usbnet",
+							"exitmenu": false,
+							"refresh": false,
+							"status": false
+						}
+					]
+				},
+				{
+					"name": "WiFi",
+					"items": 
+					[
+						{
+							"name": "Enable WiFi",
+							"action": "./scripts/sailersensor.sh",
+							"params": "enable_wifi",
+							"exitmenu": false,
+							"refresh": false,
+							"status": false
+						},
+						{
+							"name": "Test RPI Connection",
+							"action": "./scripts/sailersensor.sh",
+							"params": "test_rpi_wifi",
+							"exitmenu": false,
+							"refresh": false,
+							"status": false
+						},
+						{
+							"name": "Disable WiFi",
+							"action": "./scripts/sailersensor.sh",
+							"params": "disable_wifi",
+							"exitmenu": false,
+							"refresh": false,
+							"status": false
+						}
+					]
+				},
+				{
+					"name": "Screensaver",
+					"items": 
+					[
+						{
+							"name": "Prevent Screensaver",
+							"action": "./scripts/sailersensor.sh",
+							"params": "prevent_screensaver",
+							"exitmenu": false,
+							"refresh": false,
+							"status": false
+						},
+						{
+							"name": "Allow Screensaver",
+							"action": "./scripts/sailersensor.sh",
+							"params": "allow_screensaver",
+							"exitmenu": false,
+							"refresh": false,
+							"status": false
+						}
+					]
+				}
+
+			]
+		}
+	]
+}
