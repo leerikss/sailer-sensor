@@ -21,7 +21,7 @@ public class CompassSensorDisplay extends SensorDisplay
 	private final int 		POINT_W = 60;
 	private final int 		POINT_H = 40;
 
-	private final int 		DIRS_FONT_SIZE = 170;
+	private final int 		DIRS_FONT_SIZE = 180;
 	private final int 		DIRS_MARG = 60;
 	private final String[] 	DIRS = {"W","N","E","S"};
 	private final int 		DIRS_SHOW=3;
@@ -33,7 +33,7 @@ public class CompassSensorDisplay extends SensorDisplay
 		setLayout(new BorderLayout());
 		
 		// Add header
-		addHeader("COMPASS");
+		addHeader("  COMPASS");
 		
 		// Add compass
 		compass = new Compass();

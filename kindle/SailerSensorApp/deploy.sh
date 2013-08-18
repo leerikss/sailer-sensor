@@ -16,4 +16,4 @@ jarsigner -keystore $KEYSTORE -storepass $PASSWORD $JAR dk$YOUR_ALIAS
 jarsigner -keystore $KEYSTORE -storepass $PASSWORD $JAR di$YOUR_ALIAS
 jarsigner -keystore $KEYSTORE -storepass $PASSWORD $JAR dn$YOUR_ALIAS
 
-# scp $JAR $SSH_USER@$SSH_IP:/mnt/us/documents
+scp $JAR $SSH_USER@$SSH_IP:/mnt/us/documents
