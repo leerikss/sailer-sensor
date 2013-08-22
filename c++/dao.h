@@ -48,8 +48,8 @@ public:
   bool insertLsm(const lsm& l);
 
 private:
-  void open(void);
-  void close(void);
+  bool open(void);
+  bool close(void);
   bool query(const char* sql);
 
   log logger;

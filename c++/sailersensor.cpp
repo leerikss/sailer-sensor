@@ -57,7 +57,8 @@ int main(int argc,char *argv[])
 sailersensor::sailersensor(const Config& cfg) : logger(cfg), db(cfg), lsm_p(cfg), gps_p(cfg), sc(cfg)
 {
   s_time = cfg.lookup("sailersensor.sleep");
-  display_ip = cfg.lookup("sailersensor.display_ip");
+  display_usb_ip = cfg.lookup("sailersensor.display_usb_ip");
+  display_wlan_ip = cfg.lookup("sailersensor.display_wlan_ip");
   display_port = cfg.lookup("sailersensor.display_port");
   store_data = cfg.lookup("sailersensor.store_data");
 }
@@ -163,10 +164,17 @@ void sailersensor::run(void)
 	p_ap = ap;
       }
 
-      logger.debug("Sending Message to Kindle: " + msg.str() );
+      // Send via USB
+      logger.debug("Sending Message to Kindle via USB: " + msg.str() );
+      if(sc.conn(display_usb_ip,display_port) )
+      {
+	sc.send_data( msg.str() );
+	sc.close();
+      }
 
-      // Send to display
-      if(sc.conn(display_ip,display_port) )
+      // Send via Wlan
+      logger.debug("Sending Message to Kindle via Wlan: " + msg.str() );
+      if(sc.conn(display_wlan_ip,display_port) )
       {
 	sc.send_data( msg.str() );
 	sc.close();

@@ -2,6 +2,7 @@
 #include <libconfig.h++>
 #include <iostream>
 #include <sstream>
+#include <iomanip>
 #include <unistd.h>
 #include <gps.h>
 #include <deque>
@@ -61,6 +62,15 @@ void* gpspoller::run(void)
       g.sat = gpsdata->satellites_used;
       g.epx = gpsdata->fix.epx;
       g.epy = gpsdata->fix.epy;
+
+      // Debug
+      ostringstream ss;
+      ss << "gpspoller::run(): lat=" <<  fixed << setprecision(8) << g.lat;
+      ss << ",lon=" << fixed << setprecision(8) << g.lon;
+      ss << ",alt=" << fixed << setprecision(8) << g.alt;
+      ss << ",time=" << g.time << ",sats=" << g.sat;
+      logger.debug( ss.str() );
+
       add_deque(g);
     }
     // If gpsd has no new data, or data is invalid, sleep to spare cpu
@@ -209,13 +219,22 @@ bool gpspoller::isValidPoint(gps& g)
 {
   // Filter out corrupt latitude/longitude/time
   if(g.lat < -90 || g.lat > 90 || g.lon < -180 || g.lon > 180 )
+  {
+    logger.debug("gpspoler::isValidPoint(): Bad lat|lon, invalid point");
     return false;
+  }
   if(g.time == 0 || g.sat == 0)
+  {
+    logger.debug("gpspoler::isValidPoint(): Time or sat = 0, invalid point");
     return false;
+  }
 
   // If no previous records, skip rest
   if( g_deque.size() == 0 )
+  {
+    logger.debug("gpspoler::isValidPoint(): g_deque is empty, invalid point");
     return true;
+  }
 
   // Get previous record
   gps& g2 = g_deque.back();
@@ -229,7 +248,10 @@ bool gpspoller::isValidPoint(gps& g)
 
   // Skip records arriving too fast
   if( secDiff < buff_skip_min_sec )
+  {
+    logger.debug("gpspoler::isValidPoint(): secDiff < buff_skip_min_sec, invalid point");
     return false;
+  }
 
   // Record too far away
   if( dist >= buff_skip_dist_m )

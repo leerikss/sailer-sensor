@@ -84,8 +84,46 @@
 							"status": false
 						}
 					]
-				}
+				},
+				{
+					"name": "RPI",
+					"items": 
+					[
+						{
+							"name": "Stop Service",
+							"action": "./scripts/sailersensor.sh",
+							"params": "stop_service",
+							"exitmenu": false,
+							"refresh": false,
+							"status": false
+						},
+						{
+							"name": "Start Service",
+							"action": "./scripts/sailersensor.sh",
+							"params": "start_service",
+							"exitmenu": false,
+							"refresh": false,
+							"status": false
+						},
+						{
+							"name": "Reboot RPI",
+							"action": "./scripts/sailersensor.sh",
+							"params": "reboot_rpi",
+							"exitmenu": false,
+							"refresh": false,
+							"status": false
+						},
+						{
+							"name": "Shutdown RPI",
+							"action": "./scripts/sailersensor.sh",
+							"params": "shutdown_rpi",
+							"exitmenu": false,
+							"refresh": false,
+							"status": false
+						}
 
+					]
+				}
 			]
 		}
 	]

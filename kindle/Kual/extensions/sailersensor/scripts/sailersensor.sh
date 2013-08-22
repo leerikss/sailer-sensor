@@ -89,8 +89,37 @@ allow_screensaver()
     kh_msg "Screensaver allowed          " I v
 }
 
+stop_service()
+{  
+    kh_msg "Stopping Service         " I v
+    rpi_send "stop"
+}
+
+start_service()
+{  
+    kh_msg "Starting Service         " I v
+    rpi_send "start"
+}
+
+reboot_rpi()
+{  
+    kh_msg "Rebooting RPI         " I v
+    rpi_send "reboot"
+}
+
+shutdown_rpi()
+{  
+    kh_msg "Shutting down RPI         " I v
+    rpi_send "shutdown"
+}
 
 # Misc methods
+
+rpi_send()
+{
+    echo $1 | nc $RPI_USBNET_IP $RPI_PORT
+    echo $1 | nc $RPI_WLAN_IP $RPI_PORT
+}
 
 ping_test()
 {
@@ -151,6 +180,18 @@ case "${1}" in
 		${1}
 	;;
         "allow_screensaver" )
+		${1}
+	;;
+        "stop_service" )
+		${1}
+	;;
+        "start_service" )
+		${1}
+	;;
+        "reboot_rpi" )
+		${1}
+	;;
+        "shutdown_rpi" )
 		${1}
 	;;
 	* )

@@ -26,7 +26,8 @@ private:
 
   // Config vals
   int s_time;
-  const char* display_ip;
+  const char* display_usb_ip;
+  const char* display_wlan_ip;
   int display_port;
   bool store_data;  
 };
