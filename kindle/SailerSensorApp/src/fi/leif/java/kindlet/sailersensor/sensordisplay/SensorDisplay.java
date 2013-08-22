@@ -35,5 +35,25 @@ public abstract class SensorDisplay extends KPanel
 		parent.add( label, BorderLayout.NORTH );
 	}
 
+        protected String getValue(Double d)
+        {
+	  return getValue(d,"","");
+	}
+
+         protected String getValue(Double d, String pre)
+        {
+	  return getValue(d,pre,"");
+	}
+
+        protected String getValue(Double d, String pre, String post)
+        {
+	  if(d == null || d.intValue() == -1)
+	    return "---";
+	  else 
+	    return new StringBuffer(pre).append( d.intValue() )
+	      .append(post).toString();
+		 
+        }
+
 	public abstract void messageRetrieved(Map msg) throws Exception;
 }

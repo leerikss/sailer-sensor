@@ -52,24 +52,27 @@ public class PitchSpeedSensorDisplay extends SensorDisplay
 		speedLabel = new KLabel("  ", KLabel.CENTER );
 		speedLabel.setFont(new Font(config.FONTFAMILY, Font.BOLD, config.DATA_FONT_SIZE_2));
 		speedBox.add( speedLabel, BorderLayout.WEST );
-		knLabel = new KLabel(" kn ", KLabel.CENTER );
+
+		knLabel = new KLabel(" kt ", KLabel.CENTER );
 		knLabel.setFont(new Font(config.FONTFAMILY, Font.BOLD, config.DATA_FONT_SIZE_3));
 		speedBox.add( knLabel, BorderLayout.EAST );
+
 		add(speedBox, BorderLayout.EAST);
 	}
+
 
 	public void messageRetrieved(Map m) throws Exception
 	{
 		if(m.get(MSG_PITCH_ID) != null)
 		{
 			Double d = (Double)m.get(MSG_PITCH_ID);
-			pitchLabel.setText(" " + d.intValue() + "\u00B0");
+			pitchLabel.setText(getValue(d," ","\u00B0"));
 			pitchLabel.repaint();
 		}
 		if(m.get(MSG_GPS_SPEED_ID) != null)
 		{
 			Double d = (Double)m.get(MSG_GPS_SPEED_ID);
-			speedLabel.setText(d.toString());
+			speedLabel.setText(getValue(d," "));
 			speedLabel.repaint();
 		}
 	}
