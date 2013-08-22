@@ -7,7 +7,7 @@
 
 using namespace std;
 
-dao::dao(const libconfig::Config& cfg)
+dao::dao(const libconfig::Config& cfg) : logger(cfg)
 {
   db_file = cfg.lookup("sailersensor.db_file");
   // Create init tables
@@ -20,16 +20,24 @@ dao::~dao()
   close();
 }
 
-void dao::open()
+bool dao::open()
 {
   if( sqlite3_open(db_file, &db) != SQLITE_OK )
-    cerr << "dao::open(): Sqlite3 open failed" << endl;
+  {
+    logger.error( string("Failed to open db. ") + sqlite3_errmsg(db) );
+    return false;
+  }
+  return true;
 }
 
-void dao::close(void)
+bool dao::close(void)
 {
   if( sqlite3_close(db) != SQLITE_OK )
-    cerr << "dao::close(): Sqlite3 close failed" << endl;
+  {
+    logger.error( string("Failed to close db. ") + sqlite3_errmsg(db) );
+    return false;
+  }
+  return true;
 }
 
 
@@ -55,12 +63,15 @@ bool dao::query(const char* sql)
 {
   char* error;
 
-  open();
+  if( !open() )
+  {
+    close();
+    return false;
+  }
 
   if( sqlite3_exec(db,sql,NULL,NULL,&error) )
   {
-    cerr << "dao::quuery(): Error: " << sqlite3_errmsg(db) \
-	 << " while executing '" << sql << "'" << endl;
+    logger.error( sqlite3_errmsg(db) + string(" while executing '")+sql+string("'") );
     sqlite3_free(error);
 
     close();

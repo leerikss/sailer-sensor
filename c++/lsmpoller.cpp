@@ -11,7 +11,7 @@ using namespace std;
 
 const char *fileN = "/dev/i2c-1";
 
-lsmpoller::lsmpoller(const Config& cfg) : lsm303(fileN, cfg)
+lsmpoller::lsmpoller(const Config& cfg) : logger(cfg), lsm303(fileN, cfg)
 {
   // Set vals from config
   s_time = cfg.lookup("lsmpoller.sleep");

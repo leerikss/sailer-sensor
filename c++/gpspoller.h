@@ -5,6 +5,7 @@
 #include <gps.h>
 #include <deque>
 #include "structs.h"
+#include "log.h"
 
 #define MS_TO_KNOT    1.94384449244;
 
@@ -38,6 +39,7 @@ private:
   void add_deque(gps& g);
   bool isValidPoint(gps& g);
 
+  log logger;
   gps_data_t gpsdata_t;
   deque<gps> g_deque;
   int buff_skip_dist_count;

@@ -1,6 +1,8 @@
 #include "gpspoller.h"
 #include <libconfig.h++>
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 #include <unistd.h>
 #include <gps.h>
 #include <deque>
@@ -10,7 +12,7 @@
 using namespace libconfig;
 using namespace std;
 
-gpspoller::gpspoller(const Config& cfg)
+gpspoller::gpspoller(const Config& cfg) : logger(cfg)
 {    
   // Set vals from config
   s_time = cfg.lookup("gpspoller.sleep");
@@ -60,13 +62,16 @@ void* gpspoller::run(void)
       g.sat = gpsdata->satellites_used;
       g.epx = gpsdata->fix.epx;
       g.epy = gpsdata->fix.epy;
-      add_deque(g);
-      
-/*
-      printf("Latitude: %f\tLongitude: %f\tTime: %d\n", gpsdata->fix.latitude, \
-      gpsdata->fix.longitude, (int)gpsdata->fix.time);
-*/
 
+      // Debug
+      ostringstream ss;
+      ss << "gpspoller::run(): lat=" <<  fixed << setprecision(8) << g.lat;
+      ss << ",lon=" << fixed << setprecision(8) << g.lon;
+      ss << ",alt=" << fixed << setprecision(8) << g.alt;
+      ss << ",time=" << g.time << ",sats=" << g.sat;
+      logger.debug( ss.str() );
+
+      add_deque(g);
     }
     // If gpsd has no new data, or data is invalid, sleep to spare cpu
     else
@@ -187,7 +192,7 @@ void gpspoller::open(gps_data_t* gpsdata)
 {
   while( gps_open("localhost", DEFAULT_GPSD_PORT, gpsdata) < 0 )
   {
-    cerr << "Unable to connect to device. Trying again..." << endl;
+    logger.error("Unable to connect to device. Trying again...");
     usleep(s_time);
   }
   gps_stream(gpsdata, WATCH_ENABLE, NULL);
@@ -214,13 +219,22 @@ bool gpspoller::isValidPoint(gps& g)
 {
   // Filter out corrupt latitude/longitude/time
   if(g.lat < -90 || g.lat > 90 || g.lon < -180 || g.lon > 180 )
+  {
+    logger.debug("gpspoler::isValidPoint(): Bad lat|lon, invalid point");
     return false;
+  }
   if(g.time == 0 || g.sat == 0)
+  {
+    logger.debug("gpspoler::isValidPoint(): Time or sat = 0, invalid point");
     return false;
+  }
 
   // If no previous records, skip rest
   if( g_deque.size() == 0 )
+  {
+    logger.debug("gpspoler::isValidPoint(): g_deque is empty, invalid point");
     return true;
+  }
 
   // Get previous record
   gps& g2 = g_deque.back();
@@ -234,7 +248,10 @@ bool gpspoller::isValidPoint(gps& g)
 
   // Skip records arriving too fast
   if( secDiff < buff_skip_min_sec )
+  {
+    logger.debug("gpspoler::isValidPoint(): secDiff < buff_skip_min_sec, invalid point");
     return false;
+  }
 
   // Record too far away
   if( dist >= buff_skip_dist_m )
@@ -242,15 +259,17 @@ bool gpspoller::isValidPoint(gps& g)
     buff_skip_dist_count++;
     if( buff_skip_dist_count > buff_skip_dist_max )
     {
-      cerr << "Retrieved too many continuous distant points. "\
-	"Treating point as valid." << endl;
+      logger.error("Retrieved too many continuous distant points. "	\
+		   "Treating point as valid.");
       buff_skip_dist_count = 0;
       return true;
     }
     else
     {
-      cerr << "Retrieved a too distant point, treating it as an error,"\
-	" m = " << dist << endl;
+      ostringstream ss;
+      ss << "Retrieved a too distant point, treating it as an error. ";
+      ss << "Distance: " << dist << " meters";
+      logger.error( ss.str() );
       return false;
     }
   }

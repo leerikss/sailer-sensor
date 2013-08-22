@@ -3,7 +3,7 @@ import json
 
 sql = "SELECT sat_time,latitude,longitude,altitude,satellites,epx,epy FROM gps;"
 args=(-1,)
-database = "/home/pi/WORKING/sailer-sensor/c++/data/sailerlog.sqlite"
+database = "/home/pi/WORKING/sailer-sensor/data/sailerlog.sqlite"
 
 def main():
     try:

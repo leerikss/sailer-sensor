@@ -12,6 +12,7 @@
 #include <iomanip>
 #include <cmath>
 #include "mathutil.h"
+#include "log.h"
 
 #define MSG_GPS_HEAD  "GH"
 #define MSG_GPS_SPEED "GS"
@@ -28,7 +29,7 @@ int main(int argc,char *argv[])
     // Config passed as argument
     if(argc != 2)
     {
-      cerr << "sailersensor requires one argument only defining the path to the config file." << endl;
+      cerr << "sailersensor requires one argument only defining the path to the config file.";
       return(EXIT_FAILURE);
     }
 
@@ -40,30 +41,30 @@ int main(int argc,char *argv[])
   }
   catch(const FileIOException &fioex)
   {
-    cerr << "I/O error while reading file." << endl;
+    cerr << "I/O error while reading config file";
     return(EXIT_FAILURE);
   }
   catch(const ParseException &pex)
   {
-    cerr << "Parse error at " << pex.getFile() << ":" << pex.getLine()
-         << " - " << pex.getError() << endl;
+    cerr << "Config file parse error at " << pex.getFile() << ":" << pex.getLine();
+    cerr << " - " << pex.getError();
     return(EXIT_FAILURE);
   }
   
   return EXIT_SUCCESS;
 }
 
-sailersensor::sailersensor(const Config& cfg) : db(cfg), lsm_p(cfg), gps_p(cfg)
+sailersensor::sailersensor(const Config& cfg) : logger(cfg), db(cfg), lsm_p(cfg), gps_p(cfg), sc(cfg)
 {
   s_time = cfg.lookup("sailersensor.sleep");
-  display_ip = cfg.lookup("sailersensor.display_ip");
+  display_usb_ip = cfg.lookup("sailersensor.display_usb_ip");
+  display_wlan_ip = cfg.lookup("sailersensor.display_wlan_ip");
   display_port = cfg.lookup("sailersensor.display_port");
   store_data = cfg.lookup("sailersensor.store_data");
 }
 
 void sailersensor::run(void)
 {
-  
   // Start lsmpoller thread
   pthread_t lsm_t;
   pthread_create(&lsm_t, NULL, &lsmpoller::startThread, &lsm_p);
@@ -71,9 +72,6 @@ void sailersensor::run(void)
   // Start gpspoller thread
   pthread_t gps_t;
   pthread_create(&gps_t, NULL, &gpspoller::startThread, &gps_p);
-
-  // Init socket
-  socketclient s;
 
   // Cache previous values
   int p_gh, p_mh, p_ap;
@@ -83,21 +81,37 @@ void sailersensor::run(void)
   {
     try
     {
+      logger.debug("sailersensor::run() Loop starts");
+
       stringstream msg;
+
+      logger.debug("Getting GPS data...");
 
       // Handle GPS
       const gps& g = gps_p.getData();
       bool h = gps_p.isHalted();
 
+      // Debug data
+      ostringstream ss;
+      ss << "GPS data: lat=" << fixed << setprecision(8) << g.lat;
+      ss << ",lon=" << fixed << setprecision(8) << g.lon;
+      ss << ",head=" << fixed << setprecision(0) << g.head;
+      ss << ",knots=" << fixed << setprecision(1) << g.knots;
+      logger.debug( ss.str() );
+	
       // Store gps data into db
       if( store_data && !h )
+      {
+	logger.debug("Storing GPS data into DB...");
 	db.insertGps(g);
-      
+      }
+
       // Halt message
       if(h)
       {
-	msg << MSG_GPS_HEAD << "- ";
-	msg << MSG_GPS_SPEED << "- ";
+	logger.debug("GPS is halted. Sending GH & GS = -1");
+	msg << MSG_GPS_HEAD << "-1 ";
+	msg << MSG_GPS_SPEED << "-1 ";
       }
       // Build normal message
       else 
@@ -117,14 +131,26 @@ void sailersensor::run(void)
 	}
       }
 
+      logger.debug("Getting LSM303DLHC data...");
+
       // Handle lsm303dlhc
       const lsm& l = lsm_p.getData();
       int ap = abs( static_cast<int>(l.a.p) );
       int mh = static_cast<int>(l.m.h);
 
+      // Debug data
+      ostringstream ss2;
+      ss2 << "LSM303DLHC data: mag_head=" << fixed << setprecision(0) << l.m.h;
+      ss2 << ",acc_pitch=" << fixed << setprecision(0) << l.a.p;
+
+      logger.debug( ss2.str() );
+
       // Store lsm data into db
       if( store_data && (ap != p_ap || mh != p_mh) )
+      {
+	logger.debug("Storing LSM303DLHC data into DB...");
 	db.insertLsm(l);
+      }
 
       // Build message
       if( mh != p_mh )
@@ -138,25 +164,34 @@ void sailersensor::run(void)
 	p_ap = ap;
       }
 
-      // Debug
-      cout << "Message: " << msg.str() << endl;
-
-      /*
-      // Send to display
-      if(s.conn(display_ip,display_port) )
+      // Send via USB
+      logger.debug("Sending Message to Kindle via USB: " + msg.str() );
+      if(sc.conn(display_usb_ip,display_port) )
       {
-	s.send_data( msg.str() );
-	s.close();
+	sc.send_data( msg.str() );
+	sc.close();
       }
-      */
+
+      // Send via Wlan
+      logger.debug("Sending Message to Kindle via Wlan: " + msg.str() );
+      if(sc.conn(display_wlan_ip,display_port) )
+      {
+	sc.send_data( msg.str() );
+	sc.close();
+      }
+
+      logger.debug("sailersensor::run() loop ends. Sleeping...");
+
     }
     catch( const std::exception & ex ) 
     {
-      cerr << "sailersensor::run(): Error " << ex.what() << endl;
+      ostringstream ss;
+      ss << "sailersensor::run(): exception " << ex.what();
+      logger.error( ss.str() );
     }      
     catch(...)
     {
-      cerr << "sailersensor::run(): Unexpected Error" << endl;
+      logger.error( "sailersensor::run(): Unexpected Error" );
     }
     usleep(s_time);
   }  
