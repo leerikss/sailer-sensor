@@ -10,43 +10,14 @@
 . /mnt/us/usbnet/bin/libkh
 . /mnt/us/extensions/sailersensor/scripts/config
 
-# WiFi methods
-enable_wifi()
-{
-    /etc/init.d/wifid stop
-    /usr/sbin/wifid -n && echo $! >> /var/run/wifid.pid
-
-    # According to a post this daemon interfers with the connection...
-    /etc/init.d/netwatchd stop
-
-    kh_msg "WiFi is now enabled          " I v
-}
-
-test_rpi_wifi()
-{
-    kh_msg "Testing...           " I v
-    if ping_test $RPI_WLAN_IP ; then
-	kh_msg "The RPI is connected!          " I v
-    else
-	kh_msg "The RPI is -NOT- connected          " I v
-    fi
-}
-
-disable_wifi()
-{
-    kill -TERM $(cat /var/run/wifid.pid)
-    rm /var/run/wifid.pid
-    kh_msg "WiFi is now disabled          " I v
-}
-
 # Usb methods, nicked from Usbnetwork Hack Kual extensions script
 
 usbnet_status()
 {
     if check_is_in_usbnet "quiet" ; then
-	kh_msg "USBNetwork is now enabled           " I v
+	kh_msg "USBNetwork is enabled           " I v
     else
-	kh_msg "USBNetwork is now disabled          " I v
+	kh_msg "USBNetwork is disabled          " I v
     fi
 }
 
@@ -67,13 +38,39 @@ toggle_usbnet()
 	usbnet_status
 }
 
-test_rpi_usbnet()
+# WiFi methods
+enable_wifi()
+{
+    /etc/init.d/wifid stop
+    /usr/sbin/wifid -n && echo $! >> /var/run/wifid.pid
+
+    # According to a post this daemon interfers with the connection...
+    /etc/init.d/netwatchd stop
+
+    kh_msg "WiFi is now enabled          " I v
+}
+
+disable_wifi()
+{
+    kill -TERM $(cat /var/run/wifid.pid)
+    rm /var/run/wifid.pid
+    kh_msg "WiFi is now disabled          " I v
+}
+
+
+test_conn()
 {
     kh_msg "Testing...           " I v
-    if ping_test $RPI_USBNET_IP ; then
-	kh_msg "The RPI is connected!          " I v
+    if ping_test $RPI_WLAN_IP ; then
+	kh_msg "The RPI is connected via WiFi          " I v
     else
-	kh_msg "The RPI is -NOT- connected          " I v
+	kh_msg "The RPI is not connected via WiFi      " I v
+    fi
+    sleep 3
+    if ping_test $RPI_USBNET_IP ; then
+	kh_msg "The RPI is connected via USB          " I v
+    else
+	kh_msg "The RPI is not connected via USB    " I v
     fi
 }
 
@@ -115,12 +112,6 @@ shutdown_rpi()
 
 # Misc methods
 
-rpi_send()
-{
-    echo $1 | nc $RPI_USBNET_IP $RPI_PORT
-    echo $1 | nc $RPI_WLAN_IP $RPI_PORT
-}
-
 ping_test()
 {
     ping -q -c1 $1 > /dev/null 2>&1
@@ -129,6 +120,12 @@ ping_test()
     else
 	return 1;
     fi
+}
+
+rpi_send()
+{
+    echo $1 | nc $RPI_USBNET_IP $RPI_PORT
+    echo $1 | nc $RPI_WLAN_IP $RPI_PORT
 }
 
 ## Check if we're plugged in to something
@@ -161,19 +158,19 @@ check_is_in_usbnet()
 
 ## Main
 case "${1}" in
-	"enable_wifi" )
-		${1}
-	;;
-        "test_rpi_wifi" )
-		${1}
-	;;
-	"disable_wifi" )
+        "usbnet_status" )
 		${1}
 	;;
         "toggle_usbnet" )
 		${1}
 	;;
-        "test_rpi_usbnet" )
+	"enable_wifi" )
+		${1}
+	;;
+	"disable_wifi" )
+		${1}
+	;;
+        "test_conn" )
 		${1}
 	;;
         "prevent_screensaver" )
