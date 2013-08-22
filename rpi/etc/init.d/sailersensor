@@ -13,6 +13,9 @@
 #
 ### END INIT INFO
 
+# Source function library.
+. /lib/lsb/init-functions
+
 NAME=sailersensor
 HOME=/home/pi/sailer-sensor/rpi
 APP=$HOME/c++/$NAME.bin
@@ -20,53 +23,79 @@ LOCK=/var/lock/$NAME
 LOG=/var/log/$NAME.log
 CONFIG=$HOME/c++/$NAME.cfg
 
-OK="\e[00;32m[Ok]\e[00m"
-FAIL="\e[00;31m[Failed]\e[00m"
-
-test -f $DAEMON || exit 0
-
-. /lib/lsb/init-functions
-
+checkroot()
+{
+  if [ "$(id -u)" != "0" ]; then
+    echo "This script must be run as root"
+    exit 1
+  fi
+}
 # Start the service sailersensor
 
+start()
+{
+    log_daemon_msg "Starting Sailersensor..."
+    if [ -f $LOCK ]; then 
+	echo "Sailsensor is already running"
+	return 0
+    fi
+
+    touch $LOCK
+    $APP "$CONFIG" >> $LOG 2>&1 &
+    status=$?
+    log_end_msg $status
+}
+
+stop()
+{
+    log_daemon_msg "Stopping Sailersensor..."
+    if [ ! -f $LOCK ]; then
+	echo "Sailsensor is not running!"
+	return 0
+    else
+	rm -f $LOCK
+	PID=$(/bin/pidof "sailersensor.bin")
+	kill $PID
+	status=$?
+	log_end_msg $status
+    fi
+}
+
+status()
+{
+    if [ -f $LOCK ];
+    then
+	echo "Sailsensor is running"
+    else
+	echo "Sailsensor is not running"
+    fi
+}
+
+restart()
+{
+    stop
+    sleep 2
+    start
+}
+
 ### main logic ###
+checkroot
 case "$1" in
     start) 
-	if [ -f $LOCK ];
-	then 
-	    /bin/echo -e "Sailsensor is already running $FAIL"
-	else
-	    /bin/echo  -n "Starting sailersensor..."
-	    /bin/touch $LOCK
-            $APP "$CONFIG" >> $LOG 2>&1 &
-	    /bin/echo -e "$OK"
-	fi
-	;;
+	start
+    ;;
     stop)
-	if [ ! -f $LOCK ]; then
-	    /bin/echo -e "Sailsensor is not running $FAIL"
-	else
-	    /bin/echo  -n "Stopping sailersensor..."
-	    /bin/rm -f $LOCK
-	    PID=$(/bin/pidof "sailersensor.bin")
-	    $(/bin/kill $PID)
-	    /bin/echo -e "$OK"
-	fi
-        ;;
+	stop
+    ;;
     status)
-	if [ -f $LOCK ];
-	then
-	    /bin/echo "Sailsensor is running"
-	else
-	    /bin/echo "Sailsensor is not running"
-	fi
-        ;;
-    restart|reload|condrestart)
-        $0 stop
-        $0 start
-        ;;
+	status
+    ;;
+    restart)
+	restart
+    ;;
     *)
-        echo $"Usage: $0 {start|stop|restart|reload|status}"
-        exit 2
+        echo $"Usage: $0 {start|stop|restart|status}"
+    ;;
 esac
+
 exit 0
