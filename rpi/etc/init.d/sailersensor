@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # sailersensor initscript
 #
@@ -34,9 +34,9 @@ checkroot()
 
 start()
 {
-    log_daemon_msg "Starting Sailersensor..."
+    log_daemon_msg "Starting" "sailersensor"
     if [ -f $LOCK ]; then 
-	echo "Sailsensor is already running"
+	echo ". Sailsensor is already running.";
 	return 0
     fi
 
@@ -48,9 +48,9 @@ start()
 
 stop()
 {
-    log_daemon_msg "Stopping Sailersensor..."
+    log_daemon_msg "Stopping" "sailersensor"
     if [ ! -f $LOCK ]; then
-	echo "Sailsensor is not running!"
+	echo ". Sailsensor is not running."
 	return 0
     else
 	rm -f $LOCK
@@ -63,11 +63,12 @@ stop()
 
 status()
 {
+    echo -n "Sailersensor status: "
     if [ -f $LOCK ];
     then
-	echo "Sailsensor is running"
+	echo "Running"
     else
-	echo "Sailsensor is not running"
+	echo "Not running"
     fi
 }
 
