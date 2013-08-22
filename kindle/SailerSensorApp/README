@@ -1,0 +1,26 @@
+Keystore
+========
+To be able to run the SailerSensor app on your Kindle, you need to merge
+the SailerSensor app keystore into your Kindle device developer.keystore
+
+1) Copy (USBNetwork/scp) the Kindle developer.keystore somewhere
+   scp root@{KINDLE_IP}:/var/local/java/keystore/developer.keystore .
+
+2) Run keytool to merge the sailersensor.keystore into the developer.keystore
+   keytool -importkeystore -srckeystore sailersensor.keystore -destkeystore developer.keystore
+
+3) Copy the developer.keystore back
+   scp developer.keystore root@{KINDLE_UP}:/var/local/java/keystore/
+
+4) Restart the Kindle
+
+5) Install the app
+
+Building/deploying
+==================
+- Configure & run the deploy deploy.sh script
+- The script runs ant.jar, creates the SailerSensorApp.azw2, and tries to copy (scp)
+  it into the Kindle device
+- For scp to work, you need the Kindle to be connected (USBNetwork),
+  and set your Kindle IP addresse as the SSH_IP value
+
