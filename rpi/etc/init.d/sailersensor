@@ -1,4 +1,17 @@
 #!/bin/bash
+#
+# sailersensor initscript
+#
+### BEGIN INIT INFO
+# Provides:          sailersensor
+# Required-Start:    $local_fs $remote_fs
+# Required-Stop:     $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Sailersensor application init script
+# Description:       This script starts and stops the sailersensor application
+#
+### END INIT INFO
 
 NAME=sailersensor
 HOME=/home/pi/sailer-sensor/rpi
