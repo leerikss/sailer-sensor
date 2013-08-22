@@ -22,7 +22,7 @@ public class GpsHeadSensorDisplay extends SensorDisplay
 		setLayout(new BorderLayout());
 
 		// Add header
-		addHeader("GPS HEAD");
+		addHeader("  GPS HEADING");
 
 		// Speed label
 		head = new KLabel("", KLabel.CENTER );
@@ -35,7 +35,7 @@ public class GpsHeadSensorDisplay extends SensorDisplay
 		if(m.get(MSG_ID) != null)
 		{
 			Double d = (Double)m.get(MSG_ID);
-			head.setText(d.toString() + "\u00B0");
+			head.setText(d.intValue() + "\u00B0");
 			head.repaint();
 		}
 	}
