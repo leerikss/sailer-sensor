@@ -1,7 +1,7 @@
 #!/bin/bash
 
 NAME=sailersensor.bin
-PATH=/home/pi/WORKING/sailer-sensor/c++/$NAME
+APP=/home/pi/WORKING/sailer-sensor/c++/$NAME
 LOCK=/var/lock/sailersensor
 LOG=/var/log/sailersensor.log
 NAME=sailersensor
@@ -25,7 +25,7 @@ case "$1" in
 	else
 	    /bin/echo  -n "Starting sailersensor..."
 	    /bin/touch $LOCK
-            $PATH "$CONFIG" >> $LOG 2>&1 &
+            $APP "$CONFIG" >> $LOG 2>&1 &
 	    /bin/echo -e "$OK"
 	fi
 	;;
@@ -42,10 +42,10 @@ case "$1" in
         ;;
     status)
 	if [ -f $LOCK ];
-	then 
-	    /bin/echo -e "Sailsensor is running."
+	then
+	    /bin/echo "Sailsensor is running"
 	else
-	    /bin/echo  -n "Starting is not running"
+	    /bin/echo "Sailsensor is not running"
 	fi
         ;;
     restart|reload|condrestart)

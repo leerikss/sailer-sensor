@@ -1,0 +1,38 @@
+#!/bin/sh -e
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will "exit 0" on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+
+# Print the IP address
+_IP=$(hostname -I) || true
+if [ "$_IP" ]; then
+  printf "My IP address is %s\n" "$_IP"
+fi
+
+# Start gpsd
+sleep 5
+gpsd /dev/ttyUSB0 -b -n
+
+# Start wireless Access Point
+sudo ifconfig wlan0 192.168.5.100 up
+sleep 1
+
+# Start udhcpd
+service udhcpd restart
+sleep 1
+
+# Start eth0
+sudo ifconfig eth0 192.168.3.100 up
+
+# Start command listener
+/home/pi/WORKING/sailer-sensor/shell/listener.sh &
+
+exit 0
