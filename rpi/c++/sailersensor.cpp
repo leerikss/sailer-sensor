@@ -165,7 +165,7 @@ void sailersensor::run(void)
       }
 
       // Send via USB
-      logger.debug("Sending Message to Kindle via USB: " + msg.str() );
+      logger.debug("Sending Message to Kindle via USB: " + msg.str() + "...");
       if(sc.conn(display_usb_ip,display_port) )
       {
 	sc.send_data( msg.str() );
@@ -173,7 +173,7 @@ void sailersensor::run(void)
       }
 
       // Send via Wlan
-      logger.debug("Sending Message to Kindle via Wlan: " + msg.str() );
+      logger.debug("Sending Message to Kindle via Wlan: " + msg.str() + "...");
       if(sc.conn(display_wlan_ip,display_port) )
       {
 	sc.send_data( msg.str() );
