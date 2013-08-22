@@ -11,12 +11,6 @@
 #
 # By default this script does nothing.
 
-# Print the IP address
-_IP=$(hostname -I) || true
-if [ "$_IP" ]; then
-  printf "My IP address is %s\n" "$_IP"
-fi
-
 # Start gpsd
 sleep 5
 gpsd /dev/ttyUSB0 -b -n
@@ -32,7 +26,7 @@ sleep 1
 # Start eth0
 sudo ifconfig eth0 192.168.3.100 up
 
-# Start command listener
-/home/pi/WORKING/sailer-sensor/shell/listener.sh &
+# Start sailersensor command listener
+/home/pi/sailer-sensor/rpi/shell/command_listener.sh &
 
 exit 0

@@ -1,0 +1,32 @@
+
+*filter
+:INPUT DROP [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+
+# TCP handling. Allow incoming TCP TPH on WAN
+-A INPUT -i ppp0 -p tcp -m tcp --dport 40317 -j ACCEPT 
+-A INPUT -i ppp0 -p tcp -m state --state RELATED,ESTABLISHED -j ACCEPT 
+-A INPUT -i wlan0 -p tcp -m state --state RELATED,ESTABLISHED -j ACCEPT 
+-A INPUT -i wlan0 -p tcp --dport 22 -j ACCEPT
+
+# UDP Handling. Only allow device initiated connections.
+-A INPUT -i wlan0 -p udp -m state --state ESTABLISHED -j ACCEPT 
+-A INPUT -i ppp0 -p udp -m state --state ESTABLISHED -j ACCEPT 
+
+# Loopback. All traffic allowed.
+-A INPUT -i lo -s 127.0.0.1 -j ACCEPT
+-A OUTPUT -o lo -d 127.0.0.1 -j ACCEPT
+
+# Usbnet. All traffic allowed.
+-A INPUT -i usb0 -j ACCEPT 
+
+# ICMP. Allow only responses to local connections
+-A INPUT -p icmp -m state --state RELATED,ESTABLISHED -j ACCEPT 
+
+# SailerSensor IO socket communication wlan0 & usb0
+A INPUT -i wlan0 -p tcp --dport 9000 -j ACCEPT
+A INPUT -o wlan0 -p tcp --dport 9001 -j ACCEPT
+A INPUT -o usb0 -p tcp --dport 9001 -j ACCEPT
+
+COMMIT

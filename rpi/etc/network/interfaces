@@ -1,0 +1,24 @@
+auto lo
+iface lo inet loopback
+
+# Cable: Access RPI with Ethernet Cable
+auto eth0
+iface eth0 inet static
+      address 192.168.3.100
+
+# Wlan: RPI as an Access Point
+auto wlan0
+iface wlan0 inet static
+      address 192.168.5.100
+      netmask 255.255.255.0
+
+# USB Networking
+allow-hotplug usb0
+mapping hotplug
+script grep
+map usb0
+iface usb0 inet static
+      address 192.168.4.100
+      netmask 255.255.255.0
+      broadcast 192.168.4.255
+      up iptables -I INPUT 1 -s 192.168.4.100 -j ACCEPT

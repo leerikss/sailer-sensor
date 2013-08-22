@@ -8,7 +8,7 @@
 
 # Source external functions & config
 . /mnt/us/usbnet/bin/libkh
-. /mnt/us/extensions/sailersensor/bin/config
+. /mnt/us/extensions/sailersensor/scripts/config
 
 # WiFi methods
 enable_wifi()
