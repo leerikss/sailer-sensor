@@ -5,7 +5,6 @@
 #include <deque>
 #include "lsm303dlhc/lsm303dlhc.h"
 #include "structs.h"
-#include "log.h"
 
 using namespace libconfig;
 using namespace std;
@@ -31,7 +30,6 @@ private:
   void add_m_deque(mag& m);
   void add_a_deque(acc& a);
 
-  log logger;
   lsm303dlhc lsm303;
   int s_time;
   deque<mag> m_deque;

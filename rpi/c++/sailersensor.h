@@ -6,7 +6,6 @@
 #include "gpspoller.h"
 #include "structs.h"
 #include "dao.h"
-#include "log.h"
 #include "socketclient.h"
 
 using namespace libconfig;
@@ -18,7 +17,6 @@ public:
   void run(void);
 
 private:
-  log logger;
   dao db;
   lsmpoller lsm_p;
   gpspoller gps_p;

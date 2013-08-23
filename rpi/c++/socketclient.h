@@ -8,7 +8,6 @@
 #include<arpa/inet.h> //inet_addr
 #include<netdb.h> //hostent
 #include<libconfig.h++>
-#include"log.h"
 
 using namespace libconfig; 
 using namespace std;
@@ -30,7 +29,6 @@ private:
   struct sockaddr_in server;
   std::string address;
   int port;
-  log logger;
 };
 
 #endif

@@ -1,6 +1,7 @@
 #include "socketclient.h"
+#include "Log.h"
 
-socketclient::socketclient(const Config& cfg) : logger(cfg)
+socketclient::socketclient(const Config& cfg)
 {
   sock = -1;
   port = 0;
@@ -19,7 +20,7 @@ bool socketclient::conn(string address , int port)
     sock = socket(AF_INET , SOCK_STREAM , 0);
     if (sock == -1)
     {
-      logger.error("Could not create socket");
+      Log::get().error("Could not create socket");
     }
   }
 
@@ -27,7 +28,7 @@ bool socketclient::conn(string address , int port)
 
   if( server.sin_addr.s_addr == (in_addr_t)(-1) )
   {
-    logger.error("Socket connection failed. Bad IP address");
+    Log::get().error("Socket connection failed. Bad IP address");
     return false;
   }
   
@@ -37,7 +38,7 @@ bool socketclient::conn(string address , int port)
   //Connect to remote server
   if (connect(sock , (struct sockaddr *)&server , sizeof(server)) < 0)
   {
-    logger.error("Socket connection failed.");
+    Log::get().error("Socket connection failed.");
     return false;
   }
      
@@ -52,7 +53,7 @@ bool socketclient::send_data(string data)
   //Send some data
   if( send(sock , data.c_str() , strlen( data.c_str() ) , 0) < 0)
   {
-    logger.error("Socket send_data failed. Data: "+data);
+    Log::get().error("Socket send_data failed. Data: "+data);
     return false;
   }
   return true;
@@ -64,6 +65,6 @@ bool socketclient::send_data(string data)
 void socketclient::close(void)
 {
   if( shutdown(sock,SHUT_RDWR) )
-    logger.error("Unable to shutdown socket");
+    Log::get().error("Unable to shutdown socket");
   sock = -1;
 }

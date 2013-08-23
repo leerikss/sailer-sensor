@@ -8,11 +8,12 @@
 #include <deque>
 #include "structs.h"
 #include "mathutil.h"
+#include "Log.h"
 
 using namespace libconfig;
 using namespace std;
 
-gpspoller::gpspoller(const Config& cfg) : logger(cfg)
+gpspoller::gpspoller(const Config& cfg)
 {    
   // Set vals from config
   s_time = cfg.lookup("gpspoller.sleep");
@@ -69,7 +70,7 @@ void* gpspoller::run(void)
       ss << ",lon=" << fixed << setprecision(8) << g.lon;
       ss << ",alt=" << fixed << setprecision(8) << g.alt;
       ss << ",time=" << g.time << ",sats=" << g.sat;
-      logger.debug( ss.str() );
+      Log::get().debug( ss.str() );
 
       add_deque(g);
     }
@@ -192,7 +193,7 @@ void gpspoller::open(gps_data_t* gpsdata)
 {
   while( gps_open("localhost", DEFAULT_GPSD_PORT, gpsdata) < 0 )
   {
-    logger.error("Unable to connect to device. Trying again...");
+    Log::get().error("Unable to connect to device. Trying again...");
     usleep(s_time);
   }
   gps_stream(gpsdata, WATCH_ENABLE, NULL);
@@ -220,19 +221,19 @@ bool gpspoller::isValidPoint(gps& g)
   // Filter out corrupt latitude/longitude/time
   if(g.lat < -90 || g.lat > 90 || g.lon < -180 || g.lon > 180 )
   {
-    logger.debug("gpspoler::isValidPoint(): Bad lat|lon, invalid point");
+    Log::get().debug("gpspoler::isValidPoint(): Bad lat|lon, invalid point");
     return false;
   }
   if(g.time == 0 || g.sat == 0)
   {
-    logger.debug("gpspoler::isValidPoint(): Time or sat = 0, invalid point");
+    Log::get().debug("gpspoler::isValidPoint(): Time or sat = 0, invalid point");
     return false;
   }
 
   // If no previous records, skip rest
   if( g_deque.size() == 0 )
   {
-    logger.debug("gpspoler::isValidPoint(): g_deque is empty, invalid point");
+    Log::get().debug("gpspoler::isValidPoint(): g_deque is empty, invalid point");
     return true;
   }
 
@@ -249,7 +250,7 @@ bool gpspoller::isValidPoint(gps& g)
   // Skip records arriving too fast
   if( secDiff < buff_skip_min_sec )
   {
-    logger.debug("gpspoler::isValidPoint(): secDiff < buff_skip_min_sec, invalid point");
+    Log::get().debug("gpspoler::isValidPoint(): secDiff < buff_skip_min_sec, invalid point");
     return false;
   }
 
@@ -259,7 +260,7 @@ bool gpspoller::isValidPoint(gps& g)
     buff_skip_dist_count++;
     if( buff_skip_dist_count > buff_skip_dist_max )
     {
-      logger.error("Retrieved too many continuous distant points. "	\
+      Log::get().error("Retrieved too many continuous distant points. "	\
 		   "Treating point as valid.");
       buff_skip_dist_count = 0;
       return true;
@@ -269,7 +270,7 @@ bool gpspoller::isValidPoint(gps& g)
       ostringstream ss;
       ss << "Retrieved a too distant point, treating it as an error. ";
       ss << "Distance: " << dist << " meters";
-      logger.error( ss.str() );
+      Log::get().error( ss.str() );
       return false;
     }
   }
