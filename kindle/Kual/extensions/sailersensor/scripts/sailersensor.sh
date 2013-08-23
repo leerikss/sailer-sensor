@@ -54,6 +54,7 @@ disable_wifi()
 {
     kill -TERM $(cat /var/run/wifid.pid)
     rm /var/run/wifid.pid
+    /etc/init.d/wifid start
     kh_msg "WiFi is now disabled          " I v
 }
 
