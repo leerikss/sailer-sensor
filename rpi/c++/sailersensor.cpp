@@ -29,7 +29,7 @@ int main(int argc,char *argv[])
     // Config passed as argument
     if(argc != 2)
     {
-      cerr << "sailersensor requires one argument only defining the path to the config file.";
+      cerr << "sailersensor requires one argument only defining the path to the config file.\n";
       return(EXIT_FAILURE);
     }
 
@@ -41,14 +41,13 @@ int main(int argc,char *argv[])
   }
   catch(const FileIOException &fioex)
   {
-    cerr << "I/O error while reading config file";
+    cerr << "I/O error while reading config file\n";
     return(EXIT_FAILURE);
   }
   catch(const ParseException &pex)
   {
-    cerr << "Config file parse error at " << pex.getFile() << ":" << pex.getLine();
-    cerr << " - " << pex.getError();
-    return(EXIT_FAILURE);
+    cerr << "Config file parse error at " << pex.getFile() << ":" << pex.getLine() << " - " << pex.getError() << "\n";
+    return EXIT_FAILURE;
   }
   
   return EXIT_SUCCESS;

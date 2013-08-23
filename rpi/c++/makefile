@@ -2,7 +2,7 @@ CPP		:= g++ -g
 CPPFLAGS	:= -Wall
 LIBS		:= -lconfig++ -lgps -lsqlite3
 OBJECTS		:=  sailersensor.o  log.o mathutil.o gpspoller.o dao.o socketclient.o \
-	lsmpoller.o lsm303dlhc/lsm303dlhc.o lsm303dlhc/I2C_bus.o lsm303dlhc/smbus.o
+	 	    lsmpoller.o lsm303dlhc/lsm303dlhc.o lsm303dlhc/I2C_bus.o lsm303dlhc/smbus.o
 
 sailersensor: $(OBJECTS)
 	$(CPP) $(LIBS) $(OBJECTS) -o sailersensor.bin

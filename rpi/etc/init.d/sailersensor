@@ -20,7 +20,6 @@ NAME=sailersensor
 HOME=/home/pi/sailer-sensor/rpi
 APP=$HOME/c++/$NAME.bin
 LOCK=/var/lock/$NAME
-LOG=/var/log/$NAME.log
 CONFIG=$HOME/c++/$NAME.cfg
 
 checkroot()
@@ -30,7 +29,6 @@ checkroot()
     exit 1
   fi
 }
-# Start the service sailersensor
 
 start()
 {
@@ -41,7 +39,7 @@ start()
     fi
 
     touch $LOCK
-    $APP "$CONFIG" >> $LOG 2>&1 &
+    $APP "$CONFIG" &
     status=$?
     log_end_msg $status
 }
