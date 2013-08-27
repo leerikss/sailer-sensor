@@ -1,11 +1,14 @@
 #include "socketclient.h"
 #include "Log.h"
+#define TIMEOUT 5
 
 socketclient::socketclient(const Config& cfg)
 {
   sock = -1;
   port = 0;
   address = "";
+
+  Log::get().debug("socketclient constructed");
 }
  
 /**
@@ -51,7 +54,7 @@ bool socketclient::conn(string address , int port)
 bool socketclient::send_data(string data)
 {
   //Send some data
-  if( send(sock , data.c_str() , strlen( data.c_str() ) , 0) < 0)
+  if( send(sock, data.c_str(), strlen( data.c_str() ), TIMEOUT) < 0)
   {
     Log::get().error("Socket send_data failed. Data: "+data);
     return false;

@@ -22,6 +22,9 @@ public:
     return ((gpspoller*)context)->run();
   }
   void* run(void);
+  void close(void);
+  void stop(void);
+
   // Public access
   const gps getData(void);
   const bool isHalted(void);

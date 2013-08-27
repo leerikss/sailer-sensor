@@ -5,6 +5,7 @@
 #include <deque>
 #include "structs.h"
 #include "lsm303dlhc/lsm303dlhc.h"
+#include "Log.h"
 
 using namespace libconfig;
 using namespace std;
@@ -17,6 +18,15 @@ lsmpoller::lsmpoller(const Config& cfg) : lsm303(fileN, cfg)
   s_time = cfg.lookup("lsmpoller.sleep");
   a_size = cfg.lookup("accelerometer.buffer_size");
   m_size = cfg.lookup("magnetometer.buffer_size");
+
+  Log::get().debug("lsmpoller constructed");
+}
+
+lsmpoller::~lsmpoller()
+{
+  Log::get().debug("lsmpoller desctructor called");
+  // lsm303dlhc *p = &lsm303;
+  // delete p;
 }
 
 void* lsmpoller::run(void)
@@ -49,7 +59,14 @@ void* lsmpoller::run(void)
     usleep(s_time);
   }
 
+  Log::get().debug("lsmpoller run() stopped.");
   return 0;
+}
+
+void lsmpoller::stop()
+{
+  running = false;
+  Log::get().debug("lsmpoller stopping...");
 }
 
 const lsm lsmpoller::getData(void)

@@ -1,5 +1,5 @@
-#ifndef sailersensor_h
-#define sailersensor_h
+#ifndef sailersensord_h
+#define sailersensord_h
 
 #include <libconfig.h++>
 #include "lsmpoller.h"
@@ -14,6 +14,7 @@ class sailersensor
 {
 public:
   sailersensor(const Config& cfg);
+  ~sailersensor();
   void run(void);
 
 private:

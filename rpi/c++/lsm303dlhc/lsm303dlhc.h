@@ -76,6 +76,7 @@ class lsm303dlhc
  public:
   lsm303dlhc(const char * i2cDeviceName);  
   lsm303dlhc(const char * i2cDeviceName, const Config &cfg);
+  ~lsm303dlhc();  
 
   typedef struct ivector
   {

@@ -1,9 +1,6 @@
 #include "dao.h"
 
-#include <sqlite3.h>
 #include <iostream>
-#include "structs.h"
-#include <libconfig.h++>
 #include "Log.h"
 
 using namespace std;
@@ -11,14 +8,18 @@ using namespace std;
 dao::dao(const libconfig::Config& cfg)
 {
   db_file = cfg.lookup("sailersensor.db_file");
+
+  // Init sql
+  sqlCreateTables = SQL_CREATE_TABLES;
+  sqlInsertGps = SQL_INSERT_GPS;
+  sqlInsertLsm = SQL_INSERT_LSM;
+
   // Create init tables
-  const char* sql = SQL_CREATE_TABLES;
-  query(sql);
+  query(sqlCreateTables.c_str());
 }
 
 dao::~dao()
 {
-  close();
 }
 
 bool dao::open()
@@ -42,34 +43,27 @@ bool dao::close(void)
 }
 
 
-bool dao::insertGps(const gps& g)
+bool dao::insertGps(const gps &g)
 {
-  const char* sql = SQL_INSERT_GPS;
-
-  return query( \
-    sqlite3_mprintf(sql, g.time, g.lat, g.lon, g.alt, g.sat, \
-		    g.epx, g.epy, g.dist, g.head, g.knots) );
+  const char *sql = sqlite3_mprintf(sqlInsertGps.c_str(), g.time, g.lat, g.lon, g.alt, \
+				g.sat,g.epx, g.epy, g.dist, g.head, g.knots);
+  return query( sql );
 }
 
-bool dao::insertLsm(const lsm& l)
+bool dao::insertLsm(const lsm &l)
 {
-  const char* sql = SQL_INSERT_LSM;
-
-  return query( \
-    sqlite3_mprintf(sql, l.m.x, l.m.y, l.m.z, l.m.h,\
-		    l.a.x, l.a.y, l.a.z, l.a.p));
+  const char *sql = sqlite3_mprintf(sqlInsertLsm.c_str(), l.m.x, l.m.y, l.m.z, l.m.h, \
+				l.a.x, l.a.y, l.a.z, l.a.p);
+  return query( sql );
 }
 
-bool dao::query(const char* sql)
+bool dao::query(const char *sql)
 {
   char* error;
-
+  
   if( !open() )
-  {
-    close();
     return false;
-  }
-
+  
   if( sqlite3_exec(db,sql,NULL,NULL,&error) )
   {
     Log::get().error( sqlite3_errmsg(db) + string(" while executing '")+sql+string("'") );
@@ -78,9 +72,7 @@ bool dao::query(const char* sql)
     close();
     return false;
   }
-  else
-  {
-    close();
-    return true;
-  }
+
+  close();
+  return true;
 }

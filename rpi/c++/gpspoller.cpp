@@ -23,12 +23,15 @@ gpspoller::gpspoller(const Config& cfg)
   buff_skip_dist_max = cfg.lookup("gpspoller.buffer_skip_dist_max");
   buff_skip_min_sec = cfg.lookup("gpspoller.buffer_skip_min_sec");
   buff_skip_dist_count = 0;
+
+  Log::get().debug("gpspoller constructed");
 }
 
 gpspoller::~gpspoller()
 {
-  gps_data_t* gpsdata = &gpsdata_t;
-  close(gpsdata);
+  Log::get().debug("gpspoller desctructor called");
+  // gps_data_t *gpsdata = &gpsdata_t;
+  // close(gpsdata);
 }
 
 void* gpspoller::run(void)
@@ -83,8 +86,15 @@ void* gpspoller::run(void)
 
   // Close
   close(gpsdata);
+  Log::get().debug("gpspoller run() stopped.");
 
   return 0;
+}
+
+void gpspoller::stop()
+{
+  running = false;
+  Log::get().debug("gpspoller stopping...");
 }
 
 const gps gpspoller::getData(void)
@@ -92,12 +102,12 @@ const gps gpspoller::getData(void)
   gps g;
   if( g_deque.empty() )
     return g;
-  
+
   g = g_deque.back();
   setBounds();
 
   line l = getLine();
-  
+
   // Set heading
   double h = mathutil::getBearing(l.p1.x, l.p1.y, l.p2.x, l.p2.y);
   g.head = h;

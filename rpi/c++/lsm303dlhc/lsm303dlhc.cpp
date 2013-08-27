@@ -42,6 +42,13 @@ lsm303dlhc::lsm303dlhc(const char *i2cDeviceName, const Config &cfg) : i2c_lsm30
   a_init.z = (a_init.z<0) ? (a_init.z*-1) : a_init.z;
 }
 
+lsm303dlhc::~lsm303dlhc()
+{
+
+  //I2CBus *p = &i2c_lsm303;  
+  //delete p;
+}
+
 uint8_t lsm303dlhc::readAccRegister(uint8_t regAddr)
 {
   i2c_lsm303.addrSet(LSM303DLHC_ACC_ADDRESS);

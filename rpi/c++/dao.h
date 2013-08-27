@@ -28,21 +28,22 @@
   "acc_x INTEGER,"						\
   "acc_y INTEGER,"						\
   "acc_z INTEGER,"						\
-  "acc_p REAL);"
-
+  "acc_p REAL)"
+ 
 #define  SQL_INSERT_GPS  "INSERT INTO gps(sat_time,latitude,"	\
   "longitude,altitude,satellites,epx,epy,dist,head,knots) "	\
-  "VALUES (%d,%f,%f,%f,%d,%f,%f,%f,%f,%f)";
+  "VALUES (%d,%f,%f,%f,%d,%f,%f,%f,%f,%f)"
 
 #define SQL_INSERT_LSM    "INSERT INTO lsm303dlhc(mag_x,mag_y,mag_z,mag_h," \
-  "acc_x,acc_y,acc_z,acc_p) VALUES (%d,%d,%d,%f,%d,%d,%d,%f)";
+  "acc_x,acc_y,acc_z,acc_p) VALUES (%d,%d,%d,%f,%d,%d,%d,%f)"
+
+using namespace std;
 
 class dao
 {
 public:
   dao(const libconfig::Config& c);
   ~dao();
-
   bool insertGps(const gps& data);
   bool insertLsm(const lsm& l);
 
@@ -51,6 +52,9 @@ private:
   bool close(void);
   bool query(const char* sql);
 
+  string sqlInsertGps;
+  string sqlInsertLsm;
+  string sqlCreateTables;
   const char* db_file;
   sqlite3* db;
 };

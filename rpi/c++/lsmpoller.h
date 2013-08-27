@@ -13,8 +13,10 @@ class lsmpoller
 {
 public:
   lsmpoller(const Config& c);
+  ~lsmpoller();
 
   void* run(void);
+  void stop(void);
   static void* startThread(void* context)
   {
     return ((lsmpoller*)context)->run();

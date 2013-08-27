@@ -1,24 +1,24 @@
 #!/bin/sh
 #
-# sailersensor initscript
+# sailersensord initscript
 #
 ### BEGIN INIT INFO
-# Provides:          sailersensor
+# Provides:          sailersensord
 # Required-Start:    $local_fs $remote_fs
 # Required-Stop:     $remote_fs
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: Sailersensor application init script
-# Description:       This script starts and stops the sailersensor application
+# Short-Description: Sailersensodr daemon init script
+# Description:       This script starts and stops the sailersensord daemon
 #
 ### END INIT INFO
 
 # Source function library.
 . /lib/lsb/init-functions
 
-NAME=sailersensor
+NAME=sailersensord
 HOME=/home/pi/sailer-sensor/rpi
-APP=$HOME/c++/$NAME.bin
+DAEMON=$HOME/c++/$NAME
 LOCK=/var/lock/$NAME
 CONFIG=$HOME/c++/$NAME.cfg
 
@@ -32,27 +32,27 @@ checkroot()
 
 start()
 {
-    log_daemon_msg "Starting" "sailersensor"
+    log_daemon_msg "Starting" $NAME
     if [ -f $LOCK ]; then 
-	echo ". Sailsensor is already running.";
+	echo ". $NAME is already running.";
 	return 0
     fi
 
     touch $LOCK
-    $APP "$CONFIG" &
+    $DAEMON $CONFIG
     status=$?
     log_end_msg $status
 }
 
 stop()
 {
-    log_daemon_msg "Stopping" "sailersensor"
+    log_daemon_msg "Stopping" $NAME
     if [ ! -f $LOCK ]; then
-	echo ". Sailsensor is not running."
+	echo ". $NAME is not running."
 	return 0
     else
 	rm -f $LOCK
-	PID=$(/bin/pidof "sailersensor.bin")
+	PID=$(/bin/pidof $NAME)
 	kill $PID
 	status=$?
 	log_end_msg $status
@@ -61,7 +61,7 @@ stop()
 
 status()
 {
-    echo -n "Sailersensor status: "
+    echo -n "$NAME status: "
     if [ -f $LOCK ];
     then
 	echo "Running"
