@@ -35,7 +35,9 @@ public class GpsHeadSensorDisplay extends SensorDisplay
 		if(m.get(MSG_ID) != null)
 		{
 			Double d = (Double)m.get(MSG_ID);
-			head.setText(getValue(d,""," \u00B0"));
+			if(d == null) return;
+			int i = new Float( Math.round( d.doubleValue() ) ).intValue();
+			head.setText(i + "\u00B0");
 			head.repaint();
 		}
 	}

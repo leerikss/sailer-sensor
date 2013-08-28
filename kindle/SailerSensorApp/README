@@ -1,3 +1,11 @@
+Preconditions:
+==============
+- JDK installed
+- ant installed and found in system path
+- A copy of the Kindlet-1.3.jar
+- Edit build.xml line 8, and change the kindlet.lib.path to point to your local Kindlet-1.3.jar
+
+
 Keystore
 ========
 To be able to run the SailerSensor app on your Kindle, you need to merge
@@ -22,5 +30,5 @@ Building/deploying
 - The script runs ant.jar, creates the SailerSensorApp.azw2, and tries to copy (scp)
   it into the Kindle device
 - For scp to work, you need the Kindle to be connected (USBNetwork),
-  and set your Kindle IP addresse as the SSH_IP value
+  and set the SSH_IP to point to your Kindle IP
 

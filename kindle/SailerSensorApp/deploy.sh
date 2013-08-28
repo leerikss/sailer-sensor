@@ -10,7 +10,7 @@ SSH_USER=root
 SSH_IP=kindle.cable
 
 set -e
-ant jar
+ant jar 
 cp $FILENAME.jar $JAR
 jarsigner -keystore $KEYSTORE -storepass $PASSWORD $JAR dk$YOUR_ALIAS
 jarsigner -keystore $KEYSTORE -storepass $PASSWORD $JAR di$YOUR_ALIAS
