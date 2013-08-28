@@ -1,12 +1,5 @@
 #!/bin/sh
 PORT=9001
-LOG=/var/log/sailersensor.log
-
-log()
-{
-    NOW=$(date +"[%d.%m.%Y %H:%M:%S]")
-    echo "$NOW [command-listener.sh] $1" >> $LOG 2>&1
-}
 
 while [ -f $LOCK ]
 do
@@ -14,19 +7,19 @@ do
     
     case $command in
 	"stop" )
-	    log "Stopping sailersensor..."
-	    sudo /etc/init.d/sailersensor stop
+	    sudo /etc/init.d/sailersensord stop
 	;;
 	"start" )
-	    log "Starting sailersensor..."
-	    sudo /etc/init.d/sailersensor start
+	    sudo /etc/init.d/sailersensord start
 	;;
 	"reboot" )
-	    log "Rebooting device!"
+	    sudo /etc/init.d/sailersensord stop
+	    sleep 2
 	    sudo reboot
 	;;
 	"shutdown" )
-	    log "Shutting down device!"
+	    sudo /etc/init.d/sailersensord stop
+	    sleep 2
 	    sudo shutdown -h now
 	;;
     esac
