@@ -1,5 +1,6 @@
 #!/bin/sh
 PORT=9001
+SLEEP=4
 
 while [ -f $LOCK ]
 do
@@ -8,18 +9,19 @@ do
     case $command in
 	"stop" )
 	    sudo /etc/init.d/sailersensord stop
+	    sleep $SLEEP
 	;;
 	"start" )
 	    sudo /etc/init.d/sailersensord start
 	;;
 	"reboot" )
 	    sudo /etc/init.d/sailersensord stop
-	    sleep 2
+	    sleep $SLEEP
 	    sudo reboot
 	;;
 	"shutdown" )
 	    sudo /etc/init.d/sailersensord stop
-	    sleep 2
+	    sleep $SLEEP
 	    sudo shutdown -h now
 	;;
     esac
