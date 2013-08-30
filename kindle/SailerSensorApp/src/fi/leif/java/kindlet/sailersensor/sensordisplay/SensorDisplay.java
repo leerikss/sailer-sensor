@@ -13,37 +13,48 @@ import fi.leif.java.kindlet.sailersensor.Config;
 
 public abstract class SensorDisplay extends KPanel
 {
-	protected Config config;
+  protected Config config;
+  private String rawMsg;
+
+  public SensorDisplay(Config config)
+  {
+    this.config = config;
+  }
+
+  public void setRawMessage(String rawMsg)
+  {
+    this.rawMsg = rawMsg;
+  }
+
+  protected String getRawMessage()
+  {
+    return this.rawMsg;
+  }
+
+  protected void addHeader(String title)
+  {
+    addHeader(title, this);
+  }
 	
-	public SensorDisplay(Config config)
-	{
-		this.config = config;
-	}
+  protected void addHeader(String title, KPanel parent)
+  {
+    // Add header
+    KLabel label = new KLabel(title);
+    label.setFont(new Font(config.FONTFAMILY, Font.BOLD, config.TITLE_FONT_SIZE));
+    label.setBackground(Color.BLACK);
+    label.setForeground(Color.WHITE);
+    parent.add( label, BorderLayout.NORTH );
+  }
 
-	protected void addHeader(String title)
-	{
-		addHeader(title, this);
-	}
-	
-	protected void addHeader(String title, KPanel parent)
-	{
-		// Add header
-		KLabel label = new KLabel(title);
-		label.setFont(new Font(config.FONTFAMILY, Font.BOLD, config.TITLE_FONT_SIZE));
-		label.setBackground(Color.BLACK);
-		label.setForeground(Color.WHITE);
-		parent.add( label, BorderLayout.NORTH );
-	}
+  protected String getVal(String pre, double d, String post)
+  {
+    return(d == -1) ? "---" : pre + Double.toString(d) + post;
+  }
 
-        protected String getVal(String pre, double d, String post)
-        {
-	  return(d == -1) ? "---" : pre + Double.toString(d) + post;
-	}
+  protected String getVal(String pre, int i, String post)
+  {
+    return(i == -1) ? "---" : pre + Integer.toString(i) + post;
+  }
 
-        protected String getVal(String pre, int i, String post)
-        {
-	  return(i == -1) ? "---" : pre + Integer.toString(i) + post;
-	}
-
-	public abstract void messageRetrieved(Map msg) throws Exception;
+  public abstract void messageRetrieved(Map msg) throws Exception;
 }

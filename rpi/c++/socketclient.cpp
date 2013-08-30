@@ -1,5 +1,7 @@
 #include "socketclient.h"
 #include "Log.h"
+#include <errno.h>
+
 #define TIMEOUT 5
 
 socketclient::socketclient(const Config& cfg)
@@ -20,10 +22,13 @@ bool socketclient::conn(string address , int port)
   if(sock == -1)
   {
     //Create socket
+    errno = 0;
     sock = socket(AF_INET , SOCK_STREAM , 0);
     if (sock == -1)
     {
-      Log::get().error("Could not create socket");
+      string msg = "Could not create socket. errno = ";
+      msg += errno;
+      Log::get().error(msg);
     }
   }
 

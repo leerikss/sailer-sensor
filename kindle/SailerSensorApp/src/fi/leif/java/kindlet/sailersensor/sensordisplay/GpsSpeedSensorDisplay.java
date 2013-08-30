@@ -11,39 +11,39 @@ import fi.leif.java.kindlet.sailersensor.Config;
 
 public class GpsSpeedSensorDisplay extends SensorDisplay
 {
-	KLabel speed;
+  KLabel speed;
 
-	private final String MSG_ID = "GS";
-	private final int KN_FONT_SIZE = 75;
+  private final String MSG_ID = "GS";
+  private final int KN_FONT_SIZE = 75;
 
-	public GpsSpeedSensorDisplay(Config config)
-	{
-		super(config);
+  public GpsSpeedSensorDisplay(Config config)
+  {
+    super(config);
 		
-		setLayout(new BorderLayout());
+    setLayout(new BorderLayout());
 
-		// Add header
-		addHeader("GPS SPEED");
+    // Add header
+    addHeader("GPS SPEED");
 
-		// Speed label
-		speed = new KLabel("", KLabel.CENTER );
-		speed.setFont(new Font(config.FONTFAMILY, Font.BOLD, config.DATA_FONT_SIZE));
-		add( speed, BorderLayout.CENTER );
+    // Speed label
+    speed = new KLabel("", KLabel.CENTER );
+    speed.setFont(new Font(config.FONTFAMILY, Font.BOLD, config.DATA_FONT_SIZE));
+    add( speed, BorderLayout.CENTER );
 		
-		// Knots label
-		KLabel kn = new KLabel("kn  ");
-		kn.setFont(new Font(config.FONTFAMILY, Font.BOLD, KN_FONT_SIZE));
-		add( kn, BorderLayout.EAST );
+    // Knots label
+    KLabel kn = new KLabel("kn  ");
+    kn.setFont(new Font(config.FONTFAMILY, Font.BOLD, KN_FONT_SIZE));
+    add( kn, BorderLayout.EAST );
 		
-	}
+  }
 
-	public void messageRetrieved(Map m) throws Exception
-	{
-		if(m.get(MSG_ID) != null)
-		{
-			Double d = (Double)m.get(MSG_ID);
-			speed.setText(d.toString());
-			speed.repaint();
-		}
-	}
+  public void messageRetrieved(Map m) throws Exception
+  {
+    if(m.get(MSG_ID) != null)
+    {
+      Double d = (Double)m.get(MSG_ID);
+      speed.setText(d.toString());
+      speed.repaint();
+    }
+  }
 }

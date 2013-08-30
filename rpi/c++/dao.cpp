@@ -46,14 +46,14 @@ bool dao::close(void)
 bool dao::insertGps(const gps &g)
 {
   const char *sql = sqlite3_mprintf(sqlInsertGps.c_str(), g.time, g.lat, g.lon, g.alt, \
-				g.sat,g.epx, g.epy, g.dist, g.head, g.knots);
+				    g.sat,g.epx, g.epy, g.dist, g.head, g.knots);
   return query( sql );
 }
 
 bool dao::insertLsm(const lsm &l)
 {
   const char *sql = sqlite3_mprintf(sqlInsertLsm.c_str(), l.m.x, l.m.y, l.m.z, l.m.h, \
-				l.a.x, l.a.y, l.a.z, l.a.p);
+				    l.a.x, l.a.y, l.a.z, l.a.p);
   return query( sql );
 }
 

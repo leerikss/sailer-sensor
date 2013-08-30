@@ -3,6 +3,7 @@
 *.o
 *.azw2
 *.bin
+sailersensord
 *~
 [#]*[#]
 .\#*
