@@ -31,7 +31,7 @@ public class Config
   public final int PAGE_SHOW_MS = 3000;
 
   public final int TITLE_FONT_SIZE = 50;
-  public final int DATA_FONT_SIZE = 20;
+  public final int DATA_FONT_SIZE = 200;
   public final int DATA_FONT_SIZE_2 = 120;
   public final int DATA_FONT_SIZE_3 = 60;
   public final String FONTFAMILY = null;

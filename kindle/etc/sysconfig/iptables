@@ -27,6 +27,5 @@
 # SailerSensor IO socket communication wlan0 & usb0
 A INPUT -i wlan0 -p tcp --dport 9000 -j ACCEPT
 A INPUT -o wlan0 -p tcp --dport 9001 -j ACCEPT
-A INPUT -o usb0 -p tcp --dport 9001 -j ACCEPT
 
 COMMIT

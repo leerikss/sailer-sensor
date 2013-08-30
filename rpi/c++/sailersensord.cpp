@@ -254,16 +254,16 @@ void sailersensor::run(void)
       Log::get().debug("Sending Message to Kindle via USB");
       if(sc.conn(display_usb_ip,display_port) )
       {
-	sc.send_data( msg.str() );
-	sc.close();
+	sc.submit( msg.str() );
+	sc.disconn();
       }
 
       // Send via Wlan
       Log::get().debug("Sending Message to Kindle via Wlan");
       if(sc.conn(display_wlan_ip,display_port) )
       {
-	sc.send_data( msg.str() );
-	sc.close();
+	sc.submit( msg.str() );
+	sc.disconn();
       }
 
       // Clear message
