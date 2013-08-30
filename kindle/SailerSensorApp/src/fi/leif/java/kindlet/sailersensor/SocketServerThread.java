@@ -60,7 +60,7 @@ public class SocketServerThread extends Thread
 				
 				// Get data
 				in = new BufferedReader(new InputStreamReader(
-                        socket.getInputStream()));
+							  socket.getInputStream()));
 				String msg = in.readLine();
 				
 				// Send message

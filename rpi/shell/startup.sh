@@ -13,4 +13,4 @@ sudo ifconfig eth0 192.168.3.100 up
 /home/pi/sailer-sensor/rpi/shell/set_time.sh &
 
 # Start sailersensor command listener
-/home/pi/sailer-sensor/rpi/shell/command_listener.sh &
+/home/pi/sailer-sensor/rpi/shell/sailersensor_listener.sh &

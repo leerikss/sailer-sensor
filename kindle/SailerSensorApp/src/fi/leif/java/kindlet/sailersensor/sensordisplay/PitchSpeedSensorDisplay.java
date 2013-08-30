@@ -68,14 +68,14 @@ public class PitchSpeedSensorDisplay extends SensorDisplay
 			Double d = (Double)m.get(MSG_PITCH_ID);
 			if(d == null) return;
 			int i = new Float( Math.round( d.doubleValue() ) ).intValue();
-			pitchLabel.setText(" " + i + "\u00B0");
+			pitchLabel.setText(getVal(" ",i,"\u00B0"));
 			pitchLabel.repaint();
 		}
 		if(m.get(MSG_GPS_SPEED_ID) != null)
 		{
 			Double d = (Double)m.get(MSG_GPS_SPEED_ID);
 			if(d == null) return;
-			speedLabel.setText(" " + d.doubleValue() );
+			speedLabel.setText(getVal(" ",d.doubleValue(),""));
 			speedLabel.repaint();
 		}
 	}
