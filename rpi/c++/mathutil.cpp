@@ -7,7 +7,7 @@
 using namespace std;
 
 double mathutil::getDistHaver(const double& lat1, const double& lon1,
-				 const double& lat2, const double& lon2)
+			      const double& lat2, const double& lon2)
 {
   double dLat = toRadian( lat2 - lat1 );
   double dLon = toRadian( lon2 - lon1 );
@@ -25,7 +25,7 @@ double mathutil::getDistHaver(const double& lat1, const double& lon1,
 }
 
 double mathutil::getBearing(const double& lat1, const double& lon1,
-				 const double& lat2, const double& lon2)
+			    const double& lat2, const double& lon2)
 {
   double dLat1 = toRadian(lat1);
   double dLat2 = toRadian(lat2);

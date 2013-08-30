@@ -1,27 +1,25 @@
 package fi.leif.java.kindlet.sailersensor;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.DatagramSocket;
+import java.net.DatagramPacket;
 import java.net.SocketException;
 
 import fi.leif.java.kindlet.sailersensor.messagehandler.MessageHandler;
 
-public class SocketServerThread extends Thread
+public class DatagramSocketThread extends Thread
 {
   private boolean running = false;
-  private ServerSocket server = null;
   private Config config;
+  private DatagramSocket server = null;  
   private MessageHandler msgHandler;
-	
-  public SocketServerThread(Config config, MessageHandler msgHandler)
+
+  public DatagramSocketThread(Config config, MessageHandler msgHandler)
   {
     this.config = config;
     this.msgHandler = msgHandler;
   }
-	
+
   public void run()
   {
     startServer();
@@ -29,45 +27,43 @@ public class SocketServerThread extends Thread
 	
   private void startServer()
   {
-    // Init ServerSocket
     try
     {
-      server = new ServerSocket(config.SOCKET_PORT);
+      server = new DatagramSocket(config.SOCKET_PORT);
+      msgHandler.sendMessage("1");
       this.running = true;
     }
     // Unable to listen to port. Sleep & try again.
     catch(IOException e1)
     {
+      msgHandler.sendMessage("Jes");
+
       try 
       {
-        SocketServerThread.sleep(config.SOCKET_SLEEP_ON_ERROR); 
+        DatagramSocketThread.sleep(config.SOCKET_SLEEP_ON_ERROR); 
         startServer();
       }
       // Sleep might be interrupted, quit here
       catch(InterruptedException e2) { return; }
     }
-		
-    // Sart socket loop
+
+    // Start socket loop
     while(this.running)
     {
-      Socket socket = null;
-      BufferedReader in = null;
-			
+      msgHandler.sendMessage("3");
       try
       {
-        // Wait for packets (blocking mode)
-        socket = server.accept();
-				
-        // Get data
-        in = new BufferedReader(new InputStreamReader(
-                                                      socket.getInputStream()));
-        String msg = in.readLine();
-				
-        // Send message
-        msgHandler.sendMessage(msg);
+	byte[] data = new byte[1024];
+	DatagramPacket packet = new DatagramPacket(data,
+						 data.length);
+	server.receive(packet);
+
+	String msg = new String(packet.getData(),0,0
+				 ,packet.getLength());      
+	msgHandler.sendMessage(msg);
+
       }
-				
-      // ServerSocket.close() was called, end while loop
+      // close() was called, end while loop
       catch(SocketException se)
       {
         running = false;
@@ -78,7 +74,7 @@ public class SocketServerThread extends Thread
       {
         try 
         { 
-          SocketServerThread.sleep(config.SOCKET_SLEEP_ON_ERROR); 
+          DatagramSocketThread.sleep(config.SOCKET_SLEEP_ON_ERROR); 
         }
         // Sleep might be interrupted, end while loop
         catch(InterruptedException ie) 
@@ -86,16 +82,9 @@ public class SocketServerThread extends Thread
           running = false;
         }
       }
-			
-      // Close resources
-      finally
-      {
-        try { in.close(); } catch(Exception e) {}
-        try { socket.close(); } catch(Exception e) {}
-      }
     }
-  }
-	
+  }  
+
   public void stopServer()
   {
     if(server != null)
@@ -108,4 +97,5 @@ public class SocketServerThread extends Thread
       catch(Exception e) {}
     }
   }
+
 }

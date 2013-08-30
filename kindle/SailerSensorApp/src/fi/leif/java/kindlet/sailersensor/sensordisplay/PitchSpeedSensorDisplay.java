@@ -16,67 +16,67 @@ import fi.leif.java.kindlet.sailersensor.Config;
 
 public class PitchSpeedSensorDisplay extends SensorDisplay
 {
-	private static final long serialVersionUID = 1L;
-	KLabel pitchLabel;
-	KLabel speedLabel;
-	KLabel knLabel;
+  private static final long serialVersionUID = 1L;
+  KLabel pitchLabel;
+  KLabel speedLabel;
+  KLabel knLabel;
 
-	private final String MSG_PITCH_ID = "AP";
-	private final String MSG_GPS_SPEED_ID = "GS";
+  private final String MSG_PITCH_ID = "AP";
+  private final String MSG_GPS_SPEED_ID = "GS";
 
-	public PitchSpeedSensorDisplay(Config config)
-	{
-		super(config);
+  public PitchSpeedSensorDisplay(Config config)
+  {
+    super(config);
 		
-		setLayout(new BorderLayout());
+    setLayout(new BorderLayout());
 		
-		// Pitch
-		KPanel pitchBox = new KPanel();
-		pitchBox.setLayout(new BorderLayout());
-		addHeader("  PITCH", pitchBox);
-		pitchLabel = new KLabel("  ", KLabel.CENTER);
-		pitchLabel.setFont(new Font(config.FONTFAMILY, Font.BOLD, config.DATA_FONT_SIZE_2));
-		pitchBox.add( pitchLabel, BorderLayout.CENTER );
-		add(pitchBox, BorderLayout.WEST);
+    // Pitch
+    KPanel pitchBox = new KPanel();
+    pitchBox.setLayout(new BorderLayout());
+    addHeader("  PITCH", pitchBox);
+    pitchLabel = new KLabel("  ", KLabel.CENTER);
+    pitchLabel.setFont(new Font(config.FONTFAMILY, Font.BOLD, config.DATA_FONT_SIZE_2));
+    pitchBox.add( pitchLabel, BorderLayout.CENTER );
+    add(pitchBox, BorderLayout.WEST);
 		
-		// Center (crap solution, but will do for now)
-		KPanel center = new KPanel();
-		center.setLayout(new BorderLayout());
-		addHeader("    ",center);
-		add(center, BorderLayout.CENTER);
+    // Center (crap solution, but will do for now)
+    KPanel center = new KPanel();
+    center.setLayout(new BorderLayout());
+    addHeader("    ",center);
+    add(center, BorderLayout.CENTER);
 		
-		// Speed
-		KPanel speedBox = new KPanel();
-		speedBox.setLayout(new BorderLayout());
-		addHeader("SPEED  ", speedBox);
-		speedLabel = new KLabel("  ", KLabel.CENTER );
-		speedLabel.setFont(new Font(config.FONTFAMILY, Font.BOLD, config.DATA_FONT_SIZE_2));
-		speedBox.add( speedLabel, BorderLayout.WEST );
+    // Speed
+    KPanel speedBox = new KPanel();
+    speedBox.setLayout(new BorderLayout());
+    addHeader("SPEED  ", speedBox);
+    speedLabel = new KLabel("  ", KLabel.CENTER );
+    speedLabel.setFont(new Font(config.FONTFAMILY, Font.BOLD, config.DATA_FONT_SIZE_2));
+    speedBox.add( speedLabel, BorderLayout.WEST );
 
-		knLabel = new KLabel(" kt ", KLabel.CENTER );
-		knLabel.setFont(new Font(config.FONTFAMILY, Font.BOLD, config.DATA_FONT_SIZE_3));
-		speedBox.add( knLabel, BorderLayout.EAST );
+    knLabel = new KLabel(" kt ", KLabel.CENTER );
+    knLabel.setFont(new Font(config.FONTFAMILY, Font.BOLD, config.DATA_FONT_SIZE_3));
+    speedBox.add( knLabel, BorderLayout.EAST );
 
-		add(speedBox, BorderLayout.EAST);
-	}
+    add(speedBox, BorderLayout.EAST);
+  }
 
 
-	public void messageRetrieved(Map m) throws Exception
-	{
-		if(m.get(MSG_PITCH_ID) != null)
-		{
-			Double d = (Double)m.get(MSG_PITCH_ID);
-			if(d == null) return;
-			int i = new Float( Math.round( d.doubleValue() ) ).intValue();
-			pitchLabel.setText(getVal(" ",i,"\u00B0"));
-			pitchLabel.repaint();
-		}
-		if(m.get(MSG_GPS_SPEED_ID) != null)
-		{
-			Double d = (Double)m.get(MSG_GPS_SPEED_ID);
-			if(d == null) return;
-			speedLabel.setText(getVal(" ",d.doubleValue(),""));
-			speedLabel.repaint();
-		}
-	}
+  public void messageRetrieved(Map m) throws Exception
+  {
+    if(m.get(MSG_PITCH_ID) != null)
+    {
+      Double d = (Double)m.get(MSG_PITCH_ID);
+      if(d == null) return;
+      int i = new Float( Math.round( d.doubleValue() ) ).intValue();
+      pitchLabel.setText(getVal(" ",i,"\u00B0"));
+      pitchLabel.repaint();
+    }
+    if(m.get(MSG_GPS_SPEED_ID) != null)
+    {
+      Double d = (Double)m.get(MSG_GPS_SPEED_ID);
+      if(d == null) return;
+      speedLabel.setText(getVal(" ",d.doubleValue(),""));
+      speedLabel.repaint();
+    }
+  }
 }

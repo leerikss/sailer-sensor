@@ -252,7 +252,7 @@ bool gpspoller::isValidPoint(gps& g)
 
   // Distance between records
   double dist = mathutil::getDistHaver( g.lat, g.lon,
-				     g2.lat, g2.lon) * 1000;
+					g2.lat, g2.lon) * 1000;
 
   // Time difference between records
   int secDiff = ( g.time - g2.time );
@@ -271,7 +271,7 @@ bool gpspoller::isValidPoint(gps& g)
     if( buff_skip_dist_count > buff_skip_dist_max )
     {
       Log::get().error("Retrieved too many continuous distant points. "	\
-		   "Treating point as valid.");
+		       "Treating point as valid.");
       buff_skip_dist_count = 0;
       return true;
     }
