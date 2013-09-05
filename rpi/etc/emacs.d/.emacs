@@ -7,14 +7,19 @@
 ;; do not make backup files
 (setq make-backup-files nil)
 
-;; Fix fucked up indentation
-;; (setq-default c-basic-offset 2)
-(setq c-default-style "linux"
-          c-basic-offset 2)
+;; Custom indentation
+(defun my-indentation ()
+  (setq c-basic-offset 2)
+  (c-set-offset 'substatement-open 0)
+)
+
+;; Java & C indentation
+(add-hook 'c-mode-common-hook 'my-indentation)
+(add-hook 'java-mode-hook 'my-indentation)
 
 ;; Spaces for tabs
 (setq c-basic-indent 2)
-(setq tab-width 4)
+(setq tab-width 2)
 (setq indent-tabs-mode nil)
 
 ;; Match parenthesis in code

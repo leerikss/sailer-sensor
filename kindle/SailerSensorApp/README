@@ -1,3 +1,13 @@
+Preconditions:
+==============
+- A jailbreaked Kindle
+- USBNetwork installed and configured on your Kindle
+- JDK installed (Debian: sudo apt-get install openjdk-7-jdk)
+- ant installed and found in system path (Debian: sudo apt-get install ant)
+- A copy of the Kindlet-1.3.jar
+  - Copy /opt/amazon/ebook/lib/*.jar as well as /opt/amazon/ebook/sdk/lib/*.jar from your Kindle locally
+- Edit the build.xml and change the kindlet.lib.path to point to your local Kindlet-1.3.jar
+
 Keystore
 ========
 To be able to run the SailerSensor app on your Kindle, you need to merge
@@ -10,17 +20,16 @@ the SailerSensor app keystore into your Kindle device developer.keystore
    keytool -importkeystore -srckeystore sailersensor.keystore -destkeystore developer.keystore
 
 3) Copy the developer.keystore back
-   scp developer.keystore root@{KINDLE_UP}:/var/local/java/keystore/
+   scp developer.keystore root@{KINDLE_IP}:/var/local/java/keystore/
 
 4) Restart the Kindle
 
 5) Install the app
 
-Building/deploying
-==================
-- Configure & run the deploy deploy.sh script
-- The script runs ant.jar, creates the SailerSensorApp.azw2, and tries to copy (scp)
-  it into the Kindle device
-- For scp to work, you need the Kindle to be connected (USBNetwork),
-  and set your Kindle IP addresse as the SSH_IP value
-
+Building and deploying
+======================
+- Edit the build.xml and change the kindlet.lib.path to point to your local Kindlet-1.3.jar
+- Edit the deploy.sh and set the SSH_IP to point to your Kindle IP
+- Run ./deploy.sh
+  - The script runs ant (build.xml), creates the SailerSensorApp.azw2 application, 
+    and tries to copy it onto the device (scp)

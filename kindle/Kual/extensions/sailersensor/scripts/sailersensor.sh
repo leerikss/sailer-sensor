@@ -99,6 +99,12 @@ start_service()
     rpi_send "start"
 }
 
+restart_wifi()
+{  
+    kh_msg "Restart WiFi         " I v
+    rpi_send "restart_wifi"
+}
+
 reboot_rpi()
 {  
     kh_msg "Rebooting RPI         " I v
@@ -184,6 +190,9 @@ case "${1}" in
 		${1}
 	;;
         "start_service" )
+		${1}
+	;;
+        "restart_wifi" )
 		${1}
 	;;
         "reboot_rpi" )

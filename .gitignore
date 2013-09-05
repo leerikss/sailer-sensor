@@ -1,7 +1,9 @@
 *.class
 *.jar
 *.o
+*.azw2
 *.bin
+sailersensord
 *~
 [#]*[#]
 .\#*

@@ -94,6 +94,14 @@
 	"status": false
       },
       {
+        "name": "Restart WiFi",
+	"action": "./scripts/sailersensor.sh",
+	"params": "restart_wifi",
+	"exitmenu": false,
+	"refresh": false,
+	"status": false
+      },
+      {
         "name": "Reboot RPI",
 	"action": "./scripts/sailersensor.sh",
 	"params": "reboot_rpi",

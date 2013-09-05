@@ -5,10 +5,11 @@
 	<property name="debuglevel" value="source,lines,vars" />
 	<property name="target" value="1.4" />
 	<property name="source" value="1.4" />
+	<property name="kindlet.lib.path" value="${user.home}/Dev/Kindle/lib/Kindlet-1.3.jar" />
 
 	<path id="app.classpath">
 		<pathelement location="bin" />
-		<pathelement location="${user.home}/Dev/Kindle/kindle_lib/Kindlet-1.3.jar" />
+		<pathelement location="${kindlet.lib.path}" />
 	</path>
 
 	<target name="clean">
@@ -27,7 +28,7 @@
     
     <target name="build" depends="init" >
         <mkdir dir="bin" />
-        <echo message="${ant.project.name}: ${ant.file}" />
+        <echo message="Kindle Lib Path: ${kindle.lib.path}" />
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
             <src path="src" />
             <classpath refid="app.classpath" />
