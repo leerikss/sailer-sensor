@@ -59,6 +59,26 @@ function GpsPlot()
 /**************************
  * METHODS CALLED FROM UI * 
  *************************/
+GpsPlot.prototype.initDates = function()
+{
+  var url = '/getDates';
+  $.getJSON(url, function(data) {
+      for(var item in data)
+      {
+	var itm = data[item];
+	var date = itm.date;
+	var dd = date.substring(0,2);
+	var mm = date.substring(3,5);
+	var yyyy = date.substring(6);
+	var url = '/getDataByDate?date='+yyyy+'-'+mm+'-'+dd;
+	var row = '<a class="left" href="#" onclick="javascript:gpsPlot.load(this, \''+url+'\');">'+itm.date+'</a>';
+	row += '<a class="right" href="#" onclick="javascript:gpsPlot.hide(\''+url+'\');">Hide</a>';
+	row += '<br class="clear"/>';
+	$("#dates").append(row);
+      }
+    });    
+}
+
 GpsPlot.prototype.load = function(n, url)
 {
   var _this = this;
@@ -67,7 +87,7 @@ GpsPlot.prototype.load = function(n, url)
     // Init
     _this.json = data;
     _this.id = url;
-    $("#file").html( n.innerText.substr(0,14) );
+    $("#file").html( n.innerText );
     
     // Don't redraw if already drawn
     if( _this.paths['raw_'+url] )
@@ -347,7 +367,7 @@ GpsPlot.prototype.drawDots = function(id, path, color)
       fillColor: color,
       fillOpacity: 1,
       center: path[i],
-      radius: 0.5
+      radius: 1
     };
     cs.push( new google.maps.Circle(opts) );
   }

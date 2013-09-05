@@ -14,3 +14,6 @@ sudo ifconfig eth0 192.168.3.100 up
 
 # Start sailersensor command listener
 /home/pi/sailer-sensor/rpi/shell/sailersensor_listener.sh &
+
+# Start gpsplot www server
+python /home/pi/sailer-sensor/rpi/www/gpsplot.py &

@@ -1,6 +1,3 @@
-<?php
-define("DATA", "data/");
-?>
 <!DOCTYPE html>
 <html lang="en">
   <title>Gps Plot</title>
@@ -16,6 +13,7 @@ define("DATA", "data/");
     $(document).ready(function() 
     {
       gpsPlot = new GpsPlot();
+      gpsPlot.initDates();
     });
 
   </script>
@@ -29,7 +27,8 @@ define("DATA", "data/");
 
     <fieldset id="coords">
       <legend>GPS Data Files</legend>
-<?php
+      <span id="dates">
+<!--
 if ($handle = opendir(DATA)) 
 {
     $blacklist = array('.', '..', '.DS_Store', 'gpx');
@@ -44,7 +43,8 @@ if ($handle = opendir(DATA))
     }
     closedir($handle);
 }
-?>      
+-->
+    </span>
     </fieldset>
     <div class="btns">
       <input type="button" value="Clean Up JSON" onclick="gpsPlot.cleanUpJson()"/>
