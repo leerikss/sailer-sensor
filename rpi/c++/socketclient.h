@@ -21,10 +21,11 @@ public:
   socketclient(const Config& cfg);
 
   bool conn(string, int);
-  bool send_data(string data);
-  void close(void);
+  bool submit(string data);
+  void disconn(void);
 
 private:
+
   int sock;
   struct sockaddr_in server;
   std::string address;

@@ -135,7 +135,7 @@ const bool gpspoller::isHalted(void)
 
   setBounds();
   double m = mathutil::getDistHaver( bnd.min.x, bnd.min.y, bnd.max.x, bnd.max.y ) * 1000;  
-  if(m <= (double)halt_m)
+  if(m <= halt_m)
     return true;
   return false;
 }

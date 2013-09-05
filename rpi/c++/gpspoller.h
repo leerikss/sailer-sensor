@@ -49,7 +49,7 @@ private:
   bound bnd;
 
   // Config vals
-  int halt_m;
+  double halt_m;
   unsigned int buff_size;
   int buff_skip_dist_m;
   int buff_skip_dist_max;

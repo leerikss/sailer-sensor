@@ -14,6 +14,9 @@ do
 	"start" )
 	    sudo /etc/init.d/sailersensord start
 	;;
+	"restart_wifi" )
+	    sudo /etc/init.d/hostapd restart
+	;;
 	"reboot" )
 	    sudo /etc/init.d/sailersensord stop
 	    sleep $SLEEP

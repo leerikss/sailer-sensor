@@ -168,8 +168,9 @@ void sailersensor::run(void)
     try
     {
       Log::get().debug("sailersensor::run() Loop starts");
-      
+
       msg.str("");
+
       Log::get().debug("Getting GPS data...");
 
       // Handle GPS
@@ -183,7 +184,7 @@ void sailersensor::run(void)
       ss << ",head=" << fixed << setprecision(0) << g.head;
       ss << ",knots=" << fixed << setprecision(1) << g.knots;
       Log::get().debug( ss.str() );
-      ss.clear();
+      // ss.clear();
 
       // Store gps data into db
       if( store_data && !h )
@@ -229,7 +230,7 @@ void sailersensor::run(void)
       ss << "LSM303DLHC data: mag_head=" << fixed << setprecision(0) << l.m.h;
       ss << ",acc_pitch=" << fixed << setprecision(0) << l.a.p;
       Log::get().debug( ss.str() );
-      ss.clear();
+      // ss.clear();
 
       // Store lsm data into db
       if( store_data && (ap != p_ap || mh != p_mh) )
@@ -254,26 +255,26 @@ void sailersensor::run(void)
       Log::get().debug("Sending Message to Kindle via USB");
       if(sc.conn(display_usb_ip,display_port) )
       {
-	sc.send_data( msg.str() );
-	sc.close();
+	sc.submit( msg.str() );
+	sc.disconn();
       }
 
       // Send via Wlan
       Log::get().debug("Sending Message to Kindle via Wlan");
       if(sc.conn(display_wlan_ip,display_port) )
       {
-	sc.send_data( msg.str() );
-	sc.close();
+	sc.submit( msg.str() );
+	sc.disconn();
       }
 
       // Clear message
-      msg.clear();
+      // msg.clear();
 
       Log::get().debug("sailersensor::run() loop ends. Sleeping...");
     }
     catch( const std::exception & ex ) 
     {
-      ss.clear();
+      // ss.clear();
       ss.str("");
       ss << "sailersensor::run(): exception " << ex.what();
       Log::get().error( ss.str() );
