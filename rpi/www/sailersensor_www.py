@@ -13,7 +13,7 @@ DATABASE = "/home/pi/sailer-sensor/rpi/data/sailerlog.sqlite"
 # @route('/gpsplot')
 @route('/:filename#.*#')
 def index(filename):
-    return static_file(filename, root='.')
+    return static_file(filename, root='/home/pi/sailer-sensor/rpi/www')
 
 @route('/getDates')
 def getDates():

@@ -7,7 +7,7 @@ using namespace std;
 
 dao::dao(const libconfig::Config& cfg)
 {
-  db_file = cfg.lookup("sailersensor.db_file");
+  db_file = cfg.lookup("config.sailersensor.db_file");
 
   // Init sql
   sqlCreateTables = SQL_CREATE_TABLES;

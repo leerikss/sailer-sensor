@@ -71,7 +71,7 @@ int main(int argc,char *argv[])
   }
 
   // Set log level from config file
-  Log::get().setLevel( cfg.lookup("log.level") );
+  Log::get().setLevel( cfg.lookup("config.log.level") );
 
   // Start process
   Log::get().info("Configs ok. Starting daemon...");
@@ -138,11 +138,11 @@ sailersensor::~sailersensor()
 
 sailersensor::sailersensor(const Config& cfg) : db(cfg), lsm_p(cfg), gps_p(cfg), sc(cfg)
 {
-  s_time = cfg.lookup("sailersensor.sleep");
-  display_usb_ip = cfg.lookup("sailersensor.display_usb_ip");
-  display_wlan_ip = cfg.lookup("sailersensor.display_wlan_ip");
-  display_port = cfg.lookup("sailersensor.display_port");
-  store_data = cfg.lookup("sailersensor.store_data");
+  s_time = cfg.lookup("config.sailersensor.sleep");
+  display_usb_ip = cfg.lookup("config.sailersensor.display_usb_ip");
+  display_wlan_ip = cfg.lookup("config.sailersensor.display_wlan_ip");
+  display_port = cfg.lookup("config.sailersensor.display_port");
+  store_data = cfg.lookup("config.sailersensor.store_data");
 }
 
 void sailersensor::run(void)

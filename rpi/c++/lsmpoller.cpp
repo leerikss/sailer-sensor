@@ -15,9 +15,9 @@ const char *fileN = "/dev/i2c-1";
 lsmpoller::lsmpoller(const Config& cfg) : lsm303(fileN, cfg)
 {
   // Set vals from config
-  s_time = cfg.lookup("lsmpoller.sleep");
-  a_size = cfg.lookup("accelerometer.buffer_size");
-  m_size = cfg.lookup("magnetometer.buffer_size");
+  s_time = cfg.lookup("config.lsmpoller.sleep");
+  a_size = cfg.lookup("config.accelerometer.buffer_size");
+  m_size = cfg.lookup("config.magnetometer.buffer_size");
 
   Log::get().debug("lsmpoller constructed");
 }

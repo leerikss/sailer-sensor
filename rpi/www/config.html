@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<link type="text/css" rel="stylesheet" href="css/config.css"/>
+
+<!-- TODO: Remove this -->
+<script type="text/javascript" src="js/config.json"></script>
+
+<script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="js/config.js"></script>
+
+<title>Configure Sailer Sensor</title>
+
+<script type="text/javascript">
+
+// Init app
+$(document).ready(function()
+{
+	// TODO: Don't pass configs
+	c = new Config();
+    c.init();
+});
+
+</script>
+  
+</head>
+
+<body>
+<div id="content"></div>
+<div class="buttons">
+<input type="button" class="button" value="Save" onclick="c.save()"/>
+</div>
+</body>
+
+</html>

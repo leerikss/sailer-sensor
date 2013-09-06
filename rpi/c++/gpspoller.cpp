@@ -16,12 +16,12 @@ using namespace std;
 gpspoller::gpspoller(const Config& cfg)
 {    
   // Set vals from config
-  s_time = cfg.lookup("gpspoller.sleep");
-  halt_m = cfg.lookup("gpspoller.halt_m");
-  buff_size = cfg.lookup("gpspoller.buffer_size");
-  buff_skip_dist_m = cfg.lookup("gpspoller.buffer_skip_dist_m");
-  buff_skip_dist_max = cfg.lookup("gpspoller.buffer_skip_dist_max");
-  buff_skip_min_sec = cfg.lookup("gpspoller.buffer_skip_min_sec");
+  s_time = cfg.lookup("config.gpspoller.sleep");
+  halt_m = cfg.lookup("config.gpspoller.halt_m");
+  buff_size = cfg.lookup("config.gpspoller.buffer_size");
+  buff_skip_dist_m = cfg.lookup("config.gpspoller.buffer_skip_dist_m");
+  buff_skip_dist_max = cfg.lookup("config.gpspoller.buffer_skip_dist_max");
+  buff_skip_min_sec = cfg.lookup("config.gpspoller.buffer_skip_min_sec");
   buff_skip_dist_count = 0;
 
   Log::get().debug("gpspoller constructed");

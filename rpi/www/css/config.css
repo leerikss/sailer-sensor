@@ -1,0 +1,94 @@
+*
+{
+	margin:0px;
+}
+
+body
+{
+	margin-left:15px;
+	margin-right:15px;
+	background-color: #ffffff;
+}
+
+.header:first-child
+{
+	margin-top:15px;
+}
+
+.header
+{
+	font-size: 2em;
+	font-weight: strong;
+	font-style: italic;
+	border-bottom:1px solid #cccccc;
+	clear:both;
+	margin-top:50px;
+	margin-bottom: 20px;
+	color:#333333;
+	text-shadow: 2px 2px #dddddd;
+}
+
+.row
+{
+	padding:10px;
+	clear:both;
+	display:block;
+	width:80%;
+}
+
+.name
+{
+	text-align:right;
+	float:left;
+	width:20%;
+	font-size: 0.9em;
+	font-weight: 400;
+	margin: 0px 0px 10px;
+	font-family: 'Open Sans',sans-serif;
+}
+
+.input-text
+{
+	box-shadow: inset 1px 4px 9px -6px rgba(0,0,0,0.5);
+	border-radius: 3px;
+	border:0; 
+	padding:10px; 
+	font-size:1em; 
+	font-family:Arial, sans-serif; 
+	border:solid 1px #ccc; 
+}
+
+.buttons
+{
+	clear:both;
+}
+
+.button
+{
+    box-shadow: 0px 1px 0px rgba(255, 255, 255, 0.5) inset, 0px 1px 2px rgba(0, 0, 0, 0.2);
+	background-image: -moz-linear-gradient(center top , rgb(221, 221, 221), rgb(170, 170, 170));
+	text-shadow: 0px -1px 1px rgba(255, 255, 255, 0.8);
+	border-radius: 3px 3px 3px 3px;
+	border: 1px solid rgb(170, 170, 170);
+	padding: 15px 30px;
+	margin: 0px 0px 20px;
+	font-family: Arial,sans-serif;
+	font-size: 1.2em;
+	text-transform: uppercase;
+	font-weight: bold;
+	cursor: pointer;
+	color: rgb(51, 51, 51);	
+	float:right;
+}
+.value
+{
+	width:75%;
+	float:right;
+}
+
+.sub
+{
+}
+
+.sub .name { width:5%}
+.sub .value { width: 90%; }
