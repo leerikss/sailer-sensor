@@ -89,7 +89,7 @@ allow_screensaver()
 
 reset_pitch()
 {  
-    kh_msg "Resettings DaemonPitch         " I v
+    kh_msg "Reseting Pitch         " I v
     rpi_send "reset_pitch"
 }
 

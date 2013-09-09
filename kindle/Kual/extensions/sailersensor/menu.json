@@ -6,7 +6,7 @@
   "items": [
   {
     "name": "Sailer Sensor",
-    "priority": -1,
+    "priority": -10,
     "items": [
     {
       "name": "Connection",
