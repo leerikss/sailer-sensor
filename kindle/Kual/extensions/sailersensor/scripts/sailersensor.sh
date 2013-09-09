@@ -87,16 +87,16 @@ allow_screensaver()
     kh_msg "Screensaver allowed          " I v
 }
 
-stop_service()
+reset_pitch()
 {  
-    kh_msg "Stopping Service         " I v
-    rpi_send "stop"
+    kh_msg "Resettings DaemonPitch         " I v
+    rpi_send "reset_pitch"
 }
 
-start_service()
+restart_daemon()
 {  
-    kh_msg "Starting Service         " I v
-    rpi_send "start"
+    kh_msg "Restarting Daemon         " I v
+    rpi_send "restart_daemon"
 }
 
 restart_wifi()
@@ -186,10 +186,10 @@ case "${1}" in
         "allow_screensaver" )
 		${1}
 	;;
-        "stop_service" )
+        "reset_pitch" )
 		${1}
 	;;
-        "start_service" )
+        "restart_daemon" )
 		${1}
 	;;
         "restart_wifi" )

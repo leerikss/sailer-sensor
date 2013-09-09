@@ -78,17 +78,17 @@
       "name": "RPI",
       "items": [
       {
-        "name": "Stop Service",
+        "name": "Reset Pitch",
 	"action": "./scripts/sailersensor.sh",
-	"params": "stop_service",
+	"params": "reset_pitch",
 	"exitmenu": false,
 	"refresh": false,
 	"status": false
       },
       {
-        "name": "Start Service",
+        "name": "Restart Daemon",
 	"action": "./scripts/sailersensor.sh",
-	"params": "start_service",
+	"params": "restart_daemon",
 	"exitmenu": false,
 	"refresh": false,
 	"status": false
