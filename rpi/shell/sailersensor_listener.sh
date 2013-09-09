@@ -11,7 +11,7 @@ do
     command=$(nc -l -p $PORT)
     
     case $command in
-	"calibrate_acc" )
+	"reset_pitch" )
 	    sed -i "s/init:.*/init: $INIT,/" $CFG
 	    sudo /etc/init.d/sailersensord restart
 	    sleep $SLEEP
