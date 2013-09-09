@@ -5,17 +5,16 @@
 #include "lsm303dlhc.h"
 #include <unistd.h>
 
-#define CONFIG_FILE "lsm303dlhc.cfg"
-
 using namespace libconfig;
 using namespace std;
 
 void usage(void)
 {
-  printf("Usage:\n");
+  printf("Usage: lsmout.bin --[raw|cal|acc] path/tp/config_file.cfg\n");
   printf("--raw: Outputs the raw data retrieved from the device\n");
   printf("--cal: Outputs maximum levels needed for calibration (turn around the device for maximum values)\n");
   printf("--pih: Outputs accelerometer pitch (deg) and magnetometer heading (tilt compensated)\n");
+  printf("--acc: Output current accelerometer values without looping\n");
 }
 
 void raw(lsm303dlhc &sensor)
@@ -23,6 +22,11 @@ void raw(lsm303dlhc &sensor)
   printf("\e[27;1;31mAcc: { x: %d, y: %d, z: %d }    \e[27;1;34m Mag: { x: %d, y: %d, z: %d }\e[m\n",
 	 sensor.a.x, sensor.a.y, sensor.a.z,
 	 sensor.m.x, sensor.m.y, sensor.m.z); 
+}
+
+void acc(lsm303dlhc &sensor)
+{
+  printf("{ x: %d, y: %d, z: %d }\n", sensor.a.x, sensor.a.y, sensor.a.z); 
 }
 
 void cal(lsm303dlhc &sensor, lsm303dlhc::ivector &mag_min, lsm303dlhc::ivector &mag_max, 
@@ -58,16 +62,24 @@ void pih(lsm303dlhc &sensor)
 int main(int argc,char *argv[])
 {
   // Parse arguments
-  char arg='?'; int i;
-  for(i=0; i < argc ; i++)
+  char arg='?'; 
+  bool loop=true;
+
+  if( sizeof(argv) < 3)
   {
-    if(!strcmp(argv[i], "--raw") )
-      arg='r';
-    if(!strcmp(argv[i], "--cal") )
-      arg='c';
-    if(!strcmp(argv[i], "--pih") )
-      arg='p';
+    usage();
+    return(EXIT_FAILURE);
   }
+
+  if(!strcmp(argv[1], "--raw") )
+    arg='r';
+  if(!strcmp(argv[1], "--cal") )
+    arg='c';
+  if(!strcmp(argv[1], "--pih") )
+    arg='p';
+  if(!strcmp(argv[1], "--acc") )
+    arg='a';
+
   if(arg == '?')
   {
     usage();
@@ -76,7 +88,7 @@ int main(int argc,char *argv[])
 
   // Read the config file
   Config cfg;
-  try { cfg.readFile(CONFIG_FILE);  }
+  try { cfg.readFile( argv[2] );  }
   catch(const FileIOException &fioex)
   {
     std::cerr << "I/O error while reading file." << std::endl;
@@ -100,10 +112,10 @@ int main(int argc,char *argv[])
 
   // Loop sleep time
   int ms;
-  cfg.lookupValue("sleep",ms);
+  cfg.lookupValue("config.sleep",ms);
 
   // Main loop
-  while(1)
+  while(loop)
   {
     sensor.readAccRaw();
     sensor.readMagRaw();
@@ -122,10 +134,12 @@ int main(int argc,char *argv[])
 	pih(sensor);
 	break;
 
-
+      case 'a':
+	acc(sensor);
+	loop=false;
+	break;
     }
-
-    usleep(ms);
+    if(loop)
+      usleep(ms);
   }
-
 }

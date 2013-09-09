@@ -1,6 +1,7 @@
 from bottle import route, run, response, request, get, static_file
 import sqlite3
 import json
+import subprocess
 
 SQL_DATES="select distinct strftime('%d.%m.%Y',time) from gps;"
 
@@ -8,6 +9,8 @@ SQL_DATA_BY_DAYS="select time,latitude,longitude,altitude,satellites,epx,epy \
 from gps where time between date('%s') and date('%s','+1 day') and id %% %d = 0;"
 INTERVAL=10
 
+LSMOUT_BIN = "/home/pi/sailer-sensor/rpi/c++/lsm303dlhc/lsmout.bin"
+LSMOUT_CFG = "/home/pi/sailer-sensor/rpi/c++/lsm303dlhc/lsm303dlhc.cfg"
 DATABASE = "/home/pi/sailer-sensor/rpi/data/sailerlog.sqlite"
 
 # @route('/gpsplot')
@@ -37,6 +40,12 @@ def getDataByDate():
     response.content_type = 'application/json'
     return json.dumps(rows)
 
+@route('/calibrateAccelerometer')
+def calibrateAccelerometer():
+    json = subprocess.Popen([LSMOUT_BIN, "--acc",LSMOUT_CFG],stdout=subprocess.PIPE).communicate()[0]
+    response.content_type = 'application/json'
+    return json
+
 def conn_db():
     try:
         conn = sqlite3.connect(DATABASE)
@@ -47,6 +56,5 @@ def conn_db():
     except Exception as ex:
         print("Error: Storage: Could not open database %s: %s" % (DATABASE, ex))
         raise ex
-
 
 run(host='pi.cable', port=80)
