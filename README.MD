@@ -6,5 +6,5 @@ and a jailbreaked second generation Kindle device.
 I noticed that the Kindle E Ink display visibility was excellent in direct sunlight, so I coded a Kindle Java app that
 shows my sailboat speed and heading, based on GPS data received by the RPI, and transferred wirelessly.
 
-![Alt text](img/preview1.jpg?raw=true "Kindle & an USB powered RPI")
-![Alt text](img/preview2.jpg?raw=true "Kindle showing compass, heading & speed, based on GPS data received by the RPI")
+![Alt text](preview1.jpg?raw=true "Kindle & an USB powered RPI")
+![Alt text](preview2.jpg?raw=true "Kindle showing compass, heading & speed, based on GPS data received by the RPI")
